@@ -14,7 +14,7 @@ export const SITE = {
   instagram: "@rohis_smapa",
   instagramUrl: "https://www.instagram.com/rohis_smapa/",
   youtubeUrl: "https://www.youtube.com/@sman4purwokerto",
-  period: "2025/2026",
+  period: "2026/2027",
   establishedYear: "1985",
   schoolName: "SMA Negeri 4 Purwokerto",
   schoolNick: "SMAPA",
@@ -25,7 +25,11 @@ export const SITE = {
   photoSub: "Keluarga besar Kerohanian Islam SMA Negeri 4 Purwokerto dalam memperkuat syiar dakwah sekolah dan keteladanan akhlak pelajar.",
   metaStatus: "RESMI • EKSTRAKURIKULER INTRA SEKOLAH",
   metaSince: "SMAPA PURWOKERTO",
-  metaNetwork: "Musholla Al-Ikhlas & Ruang Kelas"
+  metaNetwork: "Musholla Al-Ikhlas & Ruang Kelas",
+  logo: "/images/logo-transparent.png",
+  logoSquare: "/images/logo-square.png",
+  logoOriginal: "/images/logo.png",
+  logoAlt: "Logo Resmi Rohis SMA Negeri 4 Purwokerto"
 };
 
 export const ORG_STATS = [
@@ -36,7 +40,7 @@ export const ORG_STATS = [
     colorClass: "stat-green"
   },
   {
-    value: 5,
+    value: 6,
     suffix: "",
     label: "Divisi Kepengurusan",
     colorClass: "stat-cyan"
@@ -57,12 +61,26 @@ export const ORG_STATS = [
 ];
 
 export const ABOUT_CONTENT = {
-  tag: "PROFIL KAMI",
-  title: "Membangun Generasi Emas Pelajar Berkarakter Islami.",
-  lead: "Berdiri seiring dinamika pembinaan kesiswaan di SMA Negeri 4 Purwokerto, Rohis SMAPA tumbuh menjadi rumah belajar, berkarya, dan beribadah bagi generasi muda muslim sekolah.",
-  paragraph1: "Rohis SMA Negeri 4 Purwokerto bukan sekadar organisasi ekstrakurikuler formal, melainkan ruang keluarga tempat setiap siswa dapat memperdalam pemahaman agama Islam yang sejuk, santun, dan toleran. Kami membiasakan ibadah berjamaah, menghidupkan majelis ilmu, dan melatih kepemimpinan amanah.",
-  paragraph2: "Dengan bimbingan dewan guru Pendidikan Agama Islam (PAI) dan dukungan penuh pihak sekolah, seluruh kegiatan Rohis SMAPA diintegrasikan untuk menunjang pencapaian Profil Pelajar Pancasila yang beriman, bertakwa kepada Tuhan Yang Maha Esa, dan berakhlak mulia.",
-  quote: "“Menjadi muslim sejati di bangku SMA: berprestasi dalam akademik, beradab dalam pergaulan, dan istiqomah dalam ibadah.”",
+  tag: "TENTANG KAMI",
+  title: "Bukan sekadar sebuah organisasi.",
+  lead: "Didirikan seiring dinamika pembinaan kesiswaan di SMA Negeri 4 Purwokerto, ROHIS SMAPA tumbuh dari tekad bersama para pelajar untuk merajut ukhuwah dan memperkuat dakwah sekolah.",
+  paragraph1: "Kami hadir bukan sekadar menyusun struktur jabatan formal, melainkan membangun ruang perjumpaan yang hangat—tempat setiap pelajar Muslim dapat belajar memahami nilai-nilai Islam yang rahmatan lil 'alamin, mengasah kepemimpinan, dan menyalurkan kepedulian nyata bagi masyarakat sekolah.",
+  paragraph2: "Dari kajian ba'da shalat di Musholla Al-Ikhlas hingga lingkaran mentoring pekanan dan aksi peduli sosial di lingkungan Banyumas, seluruh langkah kami digerakkan secara gotong-royong oleh kader pelajar bersama bimbingan dewan guru pembina.",
+  quote: "Di sini kami belajar bahwa dakwah terbaik tidak diukur dari megahnya panggung, melainkan dari keteladanan akhlak dan keikhlasan melayani sesama pelajar.",
+  quoteAuthor: "Catatan Lapangan Kader Pelajar, Rohis SMAPA Purwokerto",
+  photoBadge: "",
+  highlights: [
+    {
+      title: "Sinergi & Ukhuwah Sekolah",
+      desc: "Mengikis sekat antarkelas, menghubungkan seluruh pelajar muslim dalam majelis ilmu dan ibadah berjamaah.",
+      icon: "check"
+    },
+    {
+      title: "Kaderisasi Berjenjang",
+      desc: "Mencetak generasi muda yang kritis, berakhlak mulia, berprestasi akademik, dan siap memimpin dengan amanah.",
+      icon: "award"
+    }
+  ],
   points: [
     {
       title: "Syiar & Pembiasaan Ibadah Rutin",
@@ -83,108 +101,186 @@ export const ABOUT_CONTENT = {
   ]
 };
 
+export const PEMBINA_WELCOME = {
+  tag: "SAMBUTAN PEMBINA",
+  title: "Sambutan Dewan Pembina ROHIS",
+  pembinaList: [
+    {
+      id: "pembina-1",
+      name: "Toyyib Yuliadi, Sh. M.Pd",
+      role: "Pembina 1",
+      image: "/images/pembina/toyyib-yuliadi.jpg",
+      tagColor: "emerald",
+      salamPembuka: "Assalamu'alaikum warahmatullahi wabarakatuh.",
+      paragraphs: [
+        "Selamat datang di portal resmi Kerohanian Islam (ROHIS) SMA Negeri 4 Purwokerto. Website ini kami hadirkan sebagai sarana informasi, komunikasi, dan publikasi kegiatan dakwah serta pengembangan potensi peserta didik di lingkungan sekolah.",
+        "ROHIS SMAPA menjadi wadah sinergi bagi seluruh kader untuk belajar berorganisasi, memperkuat ukhuwah islamiyah, menumbuhkan jiwa kepemimpinan amanah, dan menyebarkan syiar Islam yang rahmatan lil 'alamin di Musholla Al-Ikhlas.",
+        "Kami berharap kehadiran media digital ini mampu menjadi inspirasi yang mendorong partisipasi aktif seluruh pelajar dalam setiap program kebaikan. Mari bersama-sama kita rawat dakwah sekolah, mengokohkan karakter generasi muda, dan mengharumkan nama SMA Negeri 4 Purwokerto dengan prestasi dan akhlak mulia."
+      ],
+      salamPenutup: "Wassalamu'alaikum warahmatullahi wabarakatuh."
+    },
+    {
+      id: "pembina-2",
+      name: "Saifur Ro'yi, S.Pd.",
+      role: "Pembina 2",
+      image: "/images/pembina/saifur-royi.jpg",
+      tagColor: "amber",
+      salamPembuka: "Assalamu'alaikum warahmatullahi wabarakatuh.",
+      paragraphs: [
+        "Alhamdulillah, puji syukur ke hadirat Allah Subhanahu Wa Ta'ala atas hadirnya portal digital resmi Rohis SMA Negeri 4 Purwokerto. Media ini hadir untuk merajut silaturahmi yang erat antarseluruh warga sekolah dan masyarakat luas.",
+        "Melalui pembinaan karakter, majelis ilmu, dan kegiatan dakwah sekolah, kami mendampingi para pelajar untuk tumbuh menjadi generasi muda yang berakhlak mulia, cerdas dalam berpikir, santun dalam tutur kata, serta teguh menjaga akidah dan akhlak di era digital.",
+        "Jadikan Rohis sebagai rumah belajar yang nyaman untuk menempa diri, memperdalam pemahaman agama Islam yang sejuk, dan saling menguatkan dalam amal kebajikan. Semoga Allah SWT senantiasa meridhoi setiap ikhtiar kita bersama."
+      ],
+      salamPenutup: "Wassalamu'alaikum warahmatullahi wabarakatuh."
+    }
+  ]
+};
+
 export const DIVISIONS = [
   {
-    id: "syiar",
-    name: "Divisi Syiar & Peribadahan",
-    shortName: "Syiar & Ibadah",
-    color: "#16644A",
-    icon: "BookOpen",
-    coordinator: "Ibnu Majid (XI MIPA 2)",
-    description: "Bertanggung jawab atas pengelolaan kegiatan ibadah harian, jadwal muadzin & imam shalat berjamaah, kajian rutin Jumat, dan peringatan hari besar Islam (PHBI) di SMAN 4 Purwokerto.",
+    id: "bph",
+    name: "Badan Pengurus Harian (BPH)",
+    shortName: "BPH",
+    color: "#065F46",
+    icon: "ShieldCheck",
+    coordinator: "Tifatul Reyhan Zahran (XI A2) & Fanny Sri Masruroh (XI A4)",
+    description: "Pucuk pimpinan organisasi yang mengoordinasikan arah kebijakan strategis dakwah sekolah, kepemimpinan umum, pengawasan seluruh divisi, tata kelola administrasi persuratan, serta akuntabilitas dan transparansi keuangan Rohis SMAPA.",
     programs: [
-      "Pengelolaan Shalat Dzuhur & Ashar Berjamaah",
-      "Kajian Rutin Jumat Berkah & Kultum Ba'da Dzuhur",
-      "Peringatan Maulid Nabi & Isra Mi'raj Sekolah",
-      "Gerakan Shalat Dhuha dan Tadarus Pagi"
+      "Musyawarah Kerja Anggota (MUSKERTA) & Grand Design Dakwah",
+      "Rapat Koordinasi & Evaluasi Pleno Bulanan Antar Divisi",
+      "Tata Kelola Administrasi, Pengarsipan Dokumen & Surat Keputusan",
+      "Transparansi Kas Organisasi, Laporan Infak, dan Penganggaran Program"
     ],
     members: [
-      { id: "syr-1", name: "Ibnu Majid", role: "Koordinator", classGrade: "XI MIPA 2", instagram: "ibn444_" },
-      { id: "syr-2", name: "Alfirdo Dwi Pratama", role: "Anggota", classGrade: "XI IPS 1", instagram: "am.frdoo" },
-      { id: "syr-3", name: "Faza Arka Pramuditya", role: "Anggota", classGrade: "X-2", instagram: "fazaarka9" },
-      { id: "syr-4", name: "Muhammad Zaki", role: "Anggota", classGrade: "X-4", instagram: "zakii_rmd" }
+      { id: "bph-1", name: "Tifatul Reyhan Zahran", role: "Ketua Umum", classGrade: "XI A2", instagram: "z4hrn._" },
+      { id: "bph-2", name: "Fanny Sri Masruroh", role: "Ketua Akhwat", classGrade: "XI A4", instagram: "fynnface" },
+      { id: "bph-3", name: "Lutfi Triansyah", role: "Ketua Ikhwan", classGrade: "Kelas X", instagram: "Upithok" },
+      { id: "bph-4", name: "Aqila Syarifah Marzuqoh", role: "Sekretaris 1", classGrade: "XI A2", instagram: "chinqilla_" },
+      { id: "bph-5", name: "Imtiyaz Azmi Faiha", role: "Sekretaris 2", classGrade: "Kelas X", instagram: "imtiyafhaa" },
+      { id: "bph-6", name: "Sahela Amelia Tofani", role: "Bendahara 1", classGrade: "XI C2", instagram: "ameliashla" },
+      { id: "bph-7", name: "Fauziyyah Dhiya Syarafana", role: "Bendahara 2", classGrade: "Kelas X", instagram: "ziyasyaraa" }
     ]
   },
   {
-    id: "keputrian",
-    name: "Divisi Keputrian",
-    shortName: "Keputrian",
-    color: "#E11D48",
-    icon: "HeartHandshake",
-    coordinator: "Annisa Nur Fitriana (XI MIPA 1)",
-    description: "Membina dan memfasilitasi siswi muslimah SMA Negeri 4 Purwokerto melalui kajian fiqih wanita, penguatan jati diri muslimah, dan kepribadian Islami saat berlangsungnya Shalat Jumat.",
+    id: "pendidikan",
+    name: "Divisi Pendidikan & Keilmuan Islam",
+    shortName: "Pendidikan",
+    color: "#16644A",
+    icon: "BookOpen",
+    coordinator: "Abel Calya Saputri (XI A1) & Thufail lutfirrahmansyah (XI A1)",
+    description: "Membina pemahaman ilmu agama Islam, fiqih ibadah, akidah dan akhlak, pembiasaan shalat berjamaah di Musholla Al-Ikhlas, bimbingan tahsin & tilawah Al-Qur'an, serta mengawal kajian rutin pelajar SMAPA.",
     programs: [
-      "Kajian Keputrian Jumat Mingguan di Ruang Multimedia",
-      "Diskusi Fiqih Nisa & Etika Pergaulan Remaja Putri",
-      "Workshop Keterampilan & Kreasi Handcraft Muslimah",
-      "Bimbingan Tilawah dan Tahsin Khusus Siswi"
+      "Kajian Rutin Jumat Berkah & Kultum Ba'da Shalat Dzuhur",
+      "Bimbingan Tahsin, Tajwid & Setoran Hafalan Juz 30",
+      "Gerakan Shalat Dhuha Bersama & Tadarus Pagi Sebelum KBM",
+      "Peringatan Hari Besar Islam (PHBI) & Seminar Edukasi Keislaman"
     ],
     members: [
-      { id: "kpt-1", name: "Annisa Nur Fitriana", role: "Koordinator", classGrade: "XI MIPA 1", instagram: "ann_nsz" },
-      { id: "kpt-2", name: "Khansathifa Zebediah", role: "Anggota", classGrade: "XI MIPA 3", instagram: "khansathifa_z" },
-      { id: "kpt-3", name: "Linda Kamilah Pribadi", role: "Anggota", classGrade: "X-1", instagram: "nda.kari" },
-      { id: "kpt-4", name: "Nayla Lutfiana", role: "Anggota", classGrade: "X-3", instagram: "naylutfiii" }
+      { id: "pnd-1", name: "Abel Calya Saputri", role: "Pendidikan & Evaluasi", classGrade: "XI A1", instagram: "_abellyc_" },
+      { id: "pnd-2", name: "Thufail lutfirrahmansyah", role: "Pendidikan & Evaluasi", classGrade: "XI A1", instagram: "tuupelldsnoo" },
+      { id: "pnd-3", name: "Saluna Rahma", role: "Divisi Dakwah", classGrade: "XI A3", instagram: "salunarahma_" },
+      { id: "pnd-4", name: "Kayla Ramadhani", role: "Divisi Dakwah", classGrade: "XI B1", instagram: "kylieraaa" },
+      { id: "pnd-5", name: "Cantik Kinaza Azalia", role: "Divisi Dakwah", classGrade: "XI A2", instagram: "cantikinazaa" },
+      { id: "pnd-6", name: "Syifa Putri Hariyadi", role: "Pendidikan & Evaluasi", classGrade: "Kelas X", instagram: "syifpeteer_hariyadi" },
+      { id: "pnd-7", name: "Ihsanu Tamleka", role: "Pendidikan & Evaluasi", classGrade: "Kelas X", instagram: "tamlekism" },
+      { id: "pnd-8", name: "Kartika Puteri Hapsari", role: "Pendidikan & Evaluasi", classGrade: "Kelas X", instagram: "graygrapple" },
+      { id: "pnd-9", name: "Diah Ayu Eka Anindita", role: "Divisi Dakwah", classGrade: "Kelas X", instagram: "dhyuekaa_" },
+      { id: "pnd-10", name: "Nabila Hafsah Khairunnisa", role: "Divisi Dakwah", classGrade: "Kelas X", instagram: "nabilahafsaa" },
+      { id: "pnd-11", name: "Nasifah Ainurahma", role: "Divisi Dakwah", classGrade: "Kelas X", instagram: "nasifarahma24_" },
+      { id: "pnd-12", name: "Muhammad Azzam Akbar Saputra", role: "Divisi Dakwah", classGrade: "Kelas X", instagram: "zama_tr7" }
     ]
   },
   {
     id: "kaderisasi",
-    name: "Divisi Kaderisasi & SDM (Mentoring)",
-    shortName: "Kaderisasi & SDM",
+    name: "Divisi Kaderisasi & Pengembangan SDM",
+    shortName: "Kaderisasi",
     color: "#2563EB",
     icon: "Users",
-    coordinator: "Yasmin Noor Atira (XI MIPA 2)",
-    description: "Merancang regenerasi kepemimpinan, Masa Ta'aruf Anggota Baru (MTA), Latihan Dasar Kepemimpinan Rohis (LDKR), serta mengoordinasikan kelompok mentoring pekanan siswa.",
+    coordinator: "Ziven Reyfansyah Putra (XI B3)",
+    description: "Merancang regenerasi kepemimpinan, Masa Ta'aruf Anggota Baru (MTA), Latihan Dasar Kepemimpinan Rohis (LDKR), serta mengoordinasikan kelompok mentoring pekanan dan pembinaan karakter muslim.",
     programs: [
       "Latihan Dasar Kepemimpinan Rohis (LDKR) SMAPA",
-      "Halaqah Mentoring Mingguan Pelajar",
       "Masa Ta'aruf Anggota Baru (MTA) Siswa Kelas X",
-      "Evaluasi & Pendataan Prestasi Kader Muslim SMAPA"
+      "Halaqah Mentoring Pekanan Pelajar & Pembinaan Karakter",
+      "Monitoring Keaktifan & Pengembangan Potensi Kader"
     ],
     members: [
-      { id: "kdr-1", name: "Yasmin Noor Atira", role: "Koordinator", classGrade: "XI MIPA 2", instagram: "yasminnatira" },
-      { id: "kdr-2", name: "Abia Sofia Kartika", role: "Anggota", classGrade: "XI IPS 2", instagram: "_abyaaa" },
-      { id: "kdr-3", name: "Falah Nur Syarifah", role: "Anggota", classGrade: "X-5", instagram: "syarifa_shaa" }
+      { id: "kdr-1", name: "Ziven Reyfansyah Putra", role: "Koordinator", classGrade: "XI B3", instagram: "kirito_cid354" },
+      { id: "kdr-2", name: "Salva Anggraeni", role: "Anggota", classGrade: "XI C1", instagram: "llluvv.slvaa" },
+      { id: "kdr-3", name: "Denisa Dwi Anjani", role: "Anggota", classGrade: "XI A5", instagram: "dnsadaaa" },
+      { id: "kdr-4", name: "Shafia Nadia Putri", role: "Anggota", classGrade: "Kelas X", instagram: "1uvvyou13" },
+      { id: "kdr-5", name: "Kirana Ayrindita Hapsari", role: "Anggota", classGrade: "Kelas X", instagram: "kiryrinn" },
+      { id: "kdr-6", name: "Shezan Nuraisya", role: "Anggota", classGrade: "Kelas X", instagram: "whoisshezan_21" }
     ]
   },
   {
-    id: "medinfo",
-    name: "Divisi Media, Jurnalistik & Informasi",
-    shortName: "Medinfo",
-    color: "#00F0CF",
-    icon: "Newspaper",
-    coordinator: "Rafif Nur Hafizudin (XI IPS 1)",
-    description: "Mengelola publikasi digital, media sosial Instagram @rohis_smapa, dokumentasi kegiatan sekolah, buletin dakwah cetak, dan mading Musholla Al-Ikhlas.",
+    id: "humas",
+    name: "Divisi Hubungan Masyarakat (Humas)",
+    shortName: "Humas",
+    color: "#E11D48",
+    icon: "HeartHandshake",
+    coordinator: "Naila Aufani (XI A1) & Ishak Abdul Aziz (XI A3)",
+    description: "Membangun kemitraan dan jejaring komunikasi eksternal dengan OSIS-MPK, Rohis antarsekolah (FKMI Banyumas), pihak sekolah, alumni, serta menyelenggarakan aksi bakti sosial peduli sesama.",
     programs: [
-      "Pengelolaan Akun Instagram & Saluran Informasi Rohis SMAPA",
-      "Penerbitan Mading Islami Dwi-Mingguan Musholla",
-      "Desain Poster & Konten Dakwah Visual Menarik",
-      "Dokumentasi Foto & Video Seluruh Agenda Sekolah"
+      "Sinergi Program Dakwah Sekolah dengan OSIS & Ekstrakurikuler",
+      "Jejaring Silaturahmi Antar-Rohis & FKMI se-Banyumas",
+      "Bakti Sosial Pelajar, Santunan Anak Yatim & Tebar Berkah Ramadhan",
+      "Temu Kemitraan & Silaturahmi Alumni Rohis SMAPA"
     ],
     members: [
-      { id: "med-1", name: "Rafif Nur Hafizudin", role: "Koordinator", classGrade: "XI IPS 1", instagram: "rafifn_1" },
-      { id: "med-2", name: "Ajeng Puspita Maya", role: "Anggota", classGrade: "XI MIPA 4", instagram: "ssopy_y" },
-      { id: "med-3", name: "Aulia Putri Aisyah", role: "Anggota", classGrade: "X-2", instagram: "nqaulr" },
-      { id: "med-4", name: "Sulistiana", role: "Anggota", classGrade: "X-6", instagram: "sliss_8" }
+      { id: "hms-1", name: "Naila Aufani", role: "Humas", classGrade: "XI A1", instagram: "naii.aufanii_" },
+      { id: "hms-2", name: "Ishak Abdul Aziz", role: "Humas", classGrade: "XI A3", instagram: "azizjoga" },
+      { id: "hms-3", name: "Akmal Yufa Al Fikri", role: "Humas", classGrade: "XI A1", instagram: "akmalyufaa" },
+      { id: "hms-4", name: "Indah Nurul Jannah", role: "Humas", classGrade: "Kelas X", instagram: "__heindd" },
+      { id: "hms-5", name: "Alysa Zahra Almahyra", role: "Humas", classGrade: "Kelas X", instagram: "kvaly.zar" },
+      { id: "hms-6", name: "Fina Nailatul Ngiza", role: "Humas", classGrade: "Kelas X", instagram: "finana4_" },
+      { id: "hms-7", name: "Zakaria Syah Putra", role: "Humas", classGrade: "Kelas X", instagram: "jeky92725" }
+    ]
+  },
+  {
+    id: "perpusmed",
+    name: "Divisi Perpustakaan & Media (Perpusmed)",
+    shortName: "Perpusmed",
+    color: "#0284C7",
+    icon: "Newspaper",
+    coordinator: "Najma Maulida (XI A2)",
+    description: "Mengembangkan literasi buku islami perpustakaan musholla, majalah dinding (mading), buletin dakwah cetak, konten media sosial digital Instagram @rohis_smapa, dokumentasi fotografi & videografi, serta publikasi syiar kreatif.",
+    programs: [
+      "Pengelolaan Perpustakaan Islami & Pojok Literasi Musholla Al-Ikhlas",
+      "Penerbitan Mading Islami Dwi-Mingguan & Buletin Literasi Dakwah",
+      "Produksi Konten Media Sosial Instagram, Reels & Poster Dakwah",
+      "Dokumentasi Foto & Video Seluruh Agenda Kegiatan Sekolah"
+    ],
+    members: [
+      { id: "med-1", name: "Najma Maulida", role: "Perpusmed", classGrade: "XI A2", instagram: "najmaulidaa" },
+      { id: "med-2", name: "Queeneta aura sisu hana", role: "Perpusmed", classGrade: "XI C1", instagram: "nettaauraa_" },
+      { id: "med-3", name: "Farand Nazriel Yuwono", role: "Perpusmed", classGrade: "XI A2", instagram: "f.zrilly" },
+      { id: "med-4", name: "Khairunnisa Fahima Aisha", role: "Perpustakaan & Media", classGrade: "Kelas X", instagram: "aieyy.yl" },
+      { id: "med-5", name: "Aurora Putri Agita", role: "Perpustakaan & Media", classGrade: "Kelas X", instagram: "cumberworlds" },
+      { id: "med-6", name: "Talitha Ghina Khairiyah Jauda", role: "Perpustakaan & Media", classGrade: "Kelas X", instagram: "tlha.ghina" }
     ]
   },
   {
     id: "sarpras",
-    name: "Divisi Danus & Sarana Prasarana",
-    shortName: "Danus & Sarpras",
-    color: "#D4A843",
-    icon: "Wallet",
-    coordinator: "Felishia Rahma Agustin (XI MIPA 3)",
-    description: "Bertanggung jawab atas pemeliharaan kebersihan dan perlengkapan ibadah di Musholla Al-Ikhlas SMAN 4, pengelolaan infak Jumat, dan pengadaan atribut resmi rohis.",
+    name: "Divisi Sarana & Prasarana (Sarpras)",
+    shortName: "Sarpras",
+    color: "#D97706",
+    icon: "Building",
+    coordinator: "Raffa Putra Febrian (XI B2)",
+    description: "Bertanggung jawab atas kenyamanan dan kelengkapan fasilitas Musholla Al-Ikhlas SMAN 4 Purwokerto, pemeliharaan sound system, inventarisasi Al-Qur'an, sajadah, mukena, serta kesiapan logistik seluruh kegiatan.",
     programs: [
-      "Piket Pemeliharaan & Kebersihan Musholla Al-Ikhlas",
-      "Pengelolaan Kotak Infak Jum'at Berkah Pelajar",
-      "Pengadaan Mukena, Sajadah, & Al-Qur'an Standar",
-      "Kewirausahaan Halal & Merchandise Rohis SMAPA"
+      "Piket Rutin Pemeliharaan & Kebersihan Musholla Al-Ikhlas",
+      "Pengelolaan Sound System, Peralatan Adzan & Ruang Musholla",
+      "Inventarisasi, Pencucian Mukena & Peremajaan Mushaf Al-Qur'an",
+      "Pengadaan dan Pengelolaan Logistik Perlengkapan Acara"
     ],
     members: [
-      { id: "srp-1", name: "Felishia Rahma Agustin", role: "Koordinator", classGrade: "XI MIPA 3", instagram: "bluely_0" },
-      { id: "srp-2", name: "Tegar Ibrahim", role: "Anggota", classGrade: "XI IPS 3", instagram: "tegarxll" },
-      { id: "srp-3", name: "Isna Luthfiyatuzahro", role: "Anggota", classGrade: "X-1", instagram: "isnluza_il" }
+      { id: "srp-1", name: "Raffa Putra Febrian", role: "Sarpras", classGrade: "XI B2", instagram: "Rapxszx" },
+      { id: "srp-2", name: "Ziyadatu Rizqul Arifin", role: "Sarpras", classGrade: "XI C2", instagram: "zii.dat" },
+      { id: "srp-3", name: "Agung Kurnia Ramadhan", role: "Sarpras", classGrade: "XI A1", instagram: "justkurnia_" },
+      { id: "srp-4", name: "Muhammad Riski Pratama", role: "Sarpras", classGrade: "Kelas X", instagram: "tkingrizz1" },
+      { id: "srp-5", name: "Shofi Nur Azizzah", role: "Sarpras", classGrade: "Kelas X", instagram: "shofinurazizzah" },
+      { id: "srp-6", name: "Zivanaya Almeyla", role: "Sarpras", classGrade: "Kelas X", instagram: "meylavya" }
     ]
   }
 ];
@@ -196,51 +292,58 @@ export const TEAM_MEMBERS = [
     category: "Dewan Pembina Rohis",
     members: [
       {
-        name: "Drs. H. Sugeng Riyadi, M.Pd.I",
+        name: "Toyyib Yuliadi, Sh. M.Pd",
         role: "Guru Pembina Utama PAI SMAN 4",
         classGrade: "Guru PAI",
-        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
+        image: "/images/pembina/toyyib-yuliadi.jpg",
         bio: "Membimbing arah syiar keagamaan dan pembinaan karakter akhlak mulia siswa-siswi SMA Negeri 4 Purwokerto."
       },
       {
-        name: "Dra. Hj. Siti Fatimah",
-        role: "Guru Pembina Keputrian SMAN 4",
-        classGrade: "Guru PAI & BK",
-        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80",
-        bio: "Mendampingi kegiatan keputrian Jumat, fiqih wanita, dan konseling remaja muslimah SMAPA."
+        name: "Saifur Ro'yi, S.Pd.",
+        role: "Guru Pembina Rohis SMAN 4",
+        classGrade: "Guru PAI",
+        image: "/images/pembina/saifur-royi.jpg",
+        bio: "Mendampingi kegiatan pembinaan ibadah, dakwah sekolah, dan penguatan ukhuwah islamiyah kader Rohis SMAPA."
       }
     ]
   },
   {
-    category: "Badan Pengurus Harian (BPH) Masa Bakti 2025/2026",
+    category: "Badan Pengurus Harian (BPH) Masa Bakti 2026/2027",
     members: [
       {
-        name: "Muhammad Fakhri Pratama",
+        name: "Tifatul Reyhan Zahran",
         role: "Ketua Umum Rohis SMAPA",
-        classGrade: "Kelas XI MIPA 2",
-        image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80",
-        bio: "Mengkoordinasikan seluruh program kerja, sinergi dengan OSIS-MPK, dan memimpin kemajuan dakwah sekolah."
+        classGrade: "Kelas XI A2",
+        image: "/images/pengurus/avatar-ikhwan.png",
+        bio: "Memimpin kepengurusan rohis dengan keteladanan, sinergi sekolah, dan memperkokoh ukhuwah islamiyah."
       },
       {
-        name: "Rafif Nur Hafizudin",
-        role: "Wakil Ketua Umum & Koordinator Medinfo",
-        classGrade: "Kelas XI IPS 1",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-        bio: "Mendampingi kepemimpinan organisasi, tata kelola media digital rohis, dan komunikasi program antar divisi."
+        name: "Fanny Sri Masruroh",
+        role: "Ketua Akhwat Rohis SMAPA",
+        classGrade: "Kelas XI A4",
+        image: "/images/pengurus/avatar-akhwat.jpg",
+        bio: "Mengkoordinasikan keputrian, pembinaan karakter muslimah tangguh, anggun, dan berakhlak mulia."
       },
       {
-        name: "Aulia Putri Aisyah",
-        role: "Sekretaris Umum",
-        classGrade: "Kelas XI MIPA 4",
-        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
-        bio: "Mengelola administrasi persuratan, notulensi musyawarah, dan arsip keanggotaan Rohis SMAPA."
+        name: "Lutfi Triansyah",
+        role: "Ketua Ikhwan Rohis SMAPA",
+        classGrade: "Kelas X",
+        image: "/images/pengurus/avatar-ikhwan.png",
+        bio: "Mengayomi barisan ikhwan, memakmurkan musholla, dan mengawal pembiasaan ibadah berjamaah."
       },
       {
-        name: "Felishia Rahma Agustin",
-        role: "Bendahara Umum",
-        classGrade: "Kelas XI MIPA 3",
-        image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
-        bio: "Mengelola kas organisasi, transparansi infak Jum'at berkah, dan pendanaan kegiatan syiar rohis."
+        name: "Aqila Syarifah Marzuqoh",
+        role: "Sekretaris 1",
+        classGrade: "Kelas XI A2",
+        image: "/images/pengurus/avatar-akhwat.jpg",
+        bio: "Mengelola tertib administrasi persuratan, notulensi, dan dokumentasi agenda kegiatan organisasi."
+      },
+      {
+        name: "Sahela Amelia Tofani",
+        role: "Bendahara 1",
+        classGrade: "Kelas XI C2",
+        image: "/images/pengurus/avatar-akhwat.jpg",
+        bio: "Mengelola perputaran kas, transparansi keuangan infak, dan kelancaran pendanaan program dakwah."
       }
     ]
   }
@@ -256,6 +359,7 @@ export const EVENTS_DATA = [
     speaker: "Ustadz Pembina & Tim Keputrian SMAPA",
     type: "Kajian",
     status: "upcoming",
+    image: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=800&q=80",
     description: "Kegiatan rutin mingguan pembinaan rohani Islam bagi siswa putra (shalat Jumat & kultum) serta kajian fiqih dan akhlak keputrian bagi siswi muslimah."
   },
   {
@@ -267,6 +371,7 @@ export const EVENTS_DATA = [
     speaker: "Tim Trainer Motivasi Muslim & Alumni Rohis SMAPA",
     type: "Pelatihan",
     status: "upcoming",
+    image: "/images/dokumentasi-smapa.jpg",
     description: "Pelatihan kepemimpinan, manajemen organisasi dakwah sekolah, public speaking, dan team building bagi calon pengurus generasi penerus Rohis SMAPA."
   },
   {
@@ -278,6 +383,7 @@ export const EVENTS_DATA = [
     speaker: "Ustadz Tamu Penceramah & Dewan Guru PAI",
     type: "Kajian",
     status: "upcoming",
+    image: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=800&q=80",
     description: "Kajian akbar memperingati peristiwa agung Isra Mi'raj dengan tema 'Menegakkan Shalat Sebagai Pilar Karakter Generasi Emas Pelajar'."
   },
   {
@@ -289,6 +395,7 @@ export const EVENTS_DATA = [
     speaker: null,
     type: "Sosial",
     status: "upcoming",
+    image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80",
     description: "Penyaluran paket sembako dan bantuan perlengkapan sekolah dari hasil himpunan infak siswa-siswi SMAN 4 Purwokerto untuk warga dhuafa."
   },
   {
@@ -300,6 +407,7 @@ export const EVENTS_DATA = [
     speaker: "Kak Rafif Nur Hafizudin (Tim Media Rohis)",
     type: "Workshop",
     status: "upcoming",
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
     description: "Pelatihan pembuatan poster islami modern, tips copywriting dakwah Instagram, dan tata letak artistik majalah dinding musholla sekolah."
   },
   {
@@ -311,6 +419,7 @@ export const EVENTS_DATA = [
     speaker: "Dewan Guru PAI & Asatidz Tamu",
     type: "Organisasi",
     status: "upcoming",
+    image: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&fit=crop&w=800&q=80",
     description: "Rangkaian tadarus Al-Qur'an, pembinaan tahsin, santunan yatim piatu, tausiyah menjelang berbuka, dan shalat tarawih berjamaah keluarga besar SMAN 4."
   },
   {
@@ -322,6 +431,7 @@ export const EVENTS_DATA = [
     speaker: null,
     type: "Organisasi",
     status: "upcoming",
+    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80",
     description: "Laporan pertanggungjawaban program kerja tahunan dan serah terima amanah kepengurusan Rohis SMAPA periode berikutnya."
   }
 ];
@@ -615,7 +725,7 @@ export const QUESTIONS_DATA = [
     query: "Bagaimana cara menjaga wudhu dan shalat berjamaah jika seragam sekolah terkena debu atau kotoran saat olahraga?",
     question: "Bagaimana cara menjaga wudhu dan shalat berjamaah jika seragam sekolah terkena kotoran saat olahraga?",
     answer: "Debu lapangan atau keringat olahraga pada dasarnya suci dan bukan najis. Namun bila terkena najis yang nyata (seperti kotoran hewan), cukup dibersihkan bagian yang terkena air sampai hilang warna, bau, dan rasanya. Di Musholla Al-Ikhlas SMAN 4 tersedia sarung dan celana bersih ganti yang dapat dipinjam siswa agar ibadah shalat tetap tenang dan sah.",
-    answeredBy: "Drs. H. Sugeng Riyadi, M.Pd.I",
+    answeredBy: "Toyyib Yuliadi, Sh. M.Pd",
     asatidzRole: "Guru Pembina PAI SMAN 4",
     isPublic: true,
     status: "answered",
@@ -632,7 +742,7 @@ export const QUESTIONS_DATA = [
     query: "Saat hari Jumat kami yang putri tidak shalat Jumat, amalan apa yang paling utama dilakukan saat kegiatan keputrian?",
     question: "Amalan apa yang paling utama bagi siswi saat jam Shalat Jumat?",
     answer: "Bagi muslimah, kewajiban tetap melaksanakan Shalat Dzuhur 4 rakaat. Di SMAN 4 Purwokerto, sembari menunggu waktu dzuhur, siswi mengikuti kajian keputrian di ruang multimedia untuk mengaji Al-Qur'an, menyimak kajian akhlak, atau memperbanyak shalawat di hari Jumat yang mulia.",
-    answeredBy: "Dra. Hj. Siti Fatimah",
+    answeredBy: "Saifur Ro'yi, S.Pd.",
     asatidzRole: "Pembina Keputrian SMAPA",
     isPublic: true,
     status: "answered",

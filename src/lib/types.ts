@@ -62,6 +62,7 @@ export interface QAItem {
 export interface PengurusMember {
   id: string;
   name: string;
+  nickname?: string;
   role: string;
   division: string;
   classGrade: string;
@@ -69,6 +70,8 @@ export interface PengurusMember {
   image: string;
   sashTitle?: string;
   instagram?: string;
+  whatsapp?: string;
+  phone?: string;
   quote?: string;
   isBph?: boolean;
 }

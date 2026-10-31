@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SITE } from "@/lib/constants";
 import { Heart, Mail, Phone, MapPin } from "lucide-react";
 
@@ -13,8 +14,14 @@ export default function Footer() {
           {/* Brand Col */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-center justify-center text-white shadow-lg border border-emerald-500/30">
-                <span className="font-black text-xs text-amber-300">SMAPA</span>
+              <div className="relative w-12 h-12 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-lg border border-white/20 overflow-hidden shrink-0">
+                <Image
+                  src="/images/logo-transparent.png"
+                  alt={SITE.logoAlt || "Logo Rohis SMAPA"}
+                  width={48}
+                  height={48}
+                  className="w-full h-auto max-h-10 object-contain"
+                />
               </div>
               <div>
                 <span className="font-extrabold text-base tracking-tight text-white block">
@@ -58,13 +65,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/anggota" className="hover:text-amber-300 transition-colors">
-                  Kepengurusan & Anggota
+                <Link href="/tentang#kepengurusan" className="hover:text-amber-300 transition-colors">
+                  Struktur Kepengurusan
                 </Link>
               </li>
               <li>
                 <Link href="/program" className="hover:text-amber-300 transition-colors">
-                  5 Divisi & Program Kerja
+                  6 Divisi & Program Kerja
                 </Link>
               </li>
               <li>
@@ -87,18 +94,13 @@ export default function Footer() {
             </h4>
             <ul className="flex flex-col gap-2.5 text-xs text-emerald-100/70">
               <li>
-                <Link href="/pendaftaran" className="hover:text-amber-300 transition-colors">
-                  Pendaftaran Anggota Rohis
-                </Link>
-              </li>
-              <li>
                 <Link href="/aspirasi" className="hover:text-amber-300 transition-colors">
                   Kotak Aspirasi & Suara Siswa
                 </Link>
               </li>
               <li>
-                <Link href="/kontak" className="hover:text-amber-300 transition-colors">
-                  Hubungi Pengurus & Pembina
+                <Link href="/agenda" className="hover:text-amber-300 transition-colors">
+                  Jadwal Kegiatan & Kajian
                 </Link>
               </li>
               <li>
@@ -159,10 +161,19 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-300/60">
           <p>© {new Date().getFullYear()} {SITE.fullName}. Hak Cipta Dilindungi.</p>
-          <div className="flex items-center gap-1">
-            <span>Dikelola dengan cinta</span>
-            <Heart size={13} className="text-amber-400 fill-amber-400 inline" />
-            <span>oleh Tim Medinfo Rohis SMAN 4 Purwokerto</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <span>Dikelola dengan cinta</span>
+              <Heart size={13} className="text-amber-400 fill-amber-400 inline" />
+              <span>oleh Tim Medinfo Rohis SMAN 4 Purwokerto</span>
+            </div>
+            <span>•</span>
+            <Link
+              href="/admin"
+              className="text-amber-300/80 hover:text-amber-300 font-bold transition-colors underline-offset-2 hover:underline"
+            >
+              Portal Admin BPH
+            </Link>
           </div>
         </div>
       </div>

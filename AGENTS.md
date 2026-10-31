@@ -7,3 +7,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Full Autonomy & Direct Execution
+- **DILARANG MINTA IZIN (NO PERMISSION NEEDED)**: Jangan pernah meminta izin/konfirmasi saat mengubah kode, memodifikasi project, merestrukturisasi halaman, atau mengedit styling. Langsung kerjakan dan terapkan perubahan secara proaktif.
+- **Execute Directly**: Run all commands, modifications, and tasks immediately without pausing or waiting for approval.
+- **Proactive Execution**: Never ask for confirmation before executing file edits, command runs, or fixes. Proceed directly.
