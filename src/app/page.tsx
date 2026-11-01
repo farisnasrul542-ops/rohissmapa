@@ -38,9 +38,7 @@ import {
   Camera,
   MapPin,
   Clock,
-  ShieldCheck,
   Send,
-  Building,
   CheckCircle2,
   Quote,
   ImageIcon,
@@ -367,22 +365,6 @@ export default function HomePage() {
                   </Link>
                 </div>
               </CinematicReveal>
-
-              {/* Badges from school info */}
-              <div className="mt-12 pt-8 border-t border-emerald-800/40 flex flex-wrap items-center justify-start gap-3 sm:gap-4 text-xs sm:text-sm text-emerald-200/80">
-                <div className="inline-flex items-center gap-2 bg-emerald-900/60 px-3.5 py-2 rounded-xl border border-emerald-700/40">
-                  <ShieldCheck size={16} className="text-amber-400 shrink-0" />
-                  <span>{SITE.metaStatus}</span>
-                </div>
-                <div className="inline-flex items-center gap-2 bg-emerald-900/60 px-3.5 py-2 rounded-xl border border-emerald-700/40">
-                  <MapPin size={16} className="text-amber-400 shrink-0" />
-                  <span>{SITE.photoLoc}</span>
-                </div>
-                <div className="inline-flex items-center gap-2 bg-emerald-900/60 px-3.5 py-2 rounded-xl border border-emerald-700/40">
-                  <Building size={16} className="text-amber-400 shrink-0" />
-                  <span>{SITE.mosqueName}</span>
-                </div>
-              </div>
             </motion.div>
 
             {/* Right Column: Hero Showcase Card with Differential Parallax (Opposing Rate) */}
