@@ -936,9 +936,9 @@ export default function HomePage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
 
-                    {/* Category Pill Tag (Exact Reference Shape) */}
-                    <div className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 px-3.5 py-1 rounded-full bg-emerald-900/90 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md">
-                      {event.type}
+                    {/* Category Pill Tag (Exact Reference Shape & Color) */}
+                    <div className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 px-3.5 py-1 rounded-full bg-emerald-800/95 backdrop-blur-md border border-white/25 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md">
+                      {event.type || "KAJIAN"}
                     </div>
                   </div>
 
@@ -956,7 +956,24 @@ export default function HomePage() {
                       {/* Date with Calendar Icon (Clean Line below Image, Exactly like Reference) */}
                       <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 font-semibold mb-2">
                         <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
-                        <span className="truncate">{event.date}</span>
+                        <span className="truncate">
+                          {event.date && event.date.includes("-") && event.date.length === 10
+                            ? (() => {
+                                try {
+                                  const d = new Date(event.date);
+                                  return !isNaN(d.getTime())
+                                    ? d.toLocaleDateString("id-ID", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                      })
+                                    : event.date;
+                                } catch {
+                                  return event.date;
+                                }
+                              })()
+                            : event.date}
+                        </span>
                       </div>
 
                       {/* Title */}
