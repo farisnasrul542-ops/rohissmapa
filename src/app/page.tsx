@@ -38,8 +38,6 @@ import {
   Camera,
   MapPin,
   Clock,
-  ShieldCheck,
-  Building,
   Send,
   CheckCircle2,
   Quote,
@@ -367,51 +365,6 @@ export default function HomePage() {
                   </Link>
                 </div>
               </CinematicReveal>
-
-              {/* Architectural 3-Column Info Cards (Boxy / Non-Lonjong, All-DPI Responsive & Admin-Synced) */}
-              <div className="mt-8 sm:mt-10 pt-6 sm:pt-7 border-t border-emerald-800/40 grid grid-cols-3 gap-2 sm:gap-3">
-                <div className="relative p-2.5 sm:p-3.5 rounded-lg bg-[#07261c]/85 border border-emerald-700/45 border-l-2 border-l-amber-400/80 shadow-md flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-left transition-colors hover:border-emerald-500/50">
-                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-md bg-emerald-950/90 border border-amber-400/25 flex items-center justify-center text-amber-400 shrink-0">
-                    <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="block text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-emerald-300/75 leading-tight truncate">
-                      {cms.hero?.infoLabel1 || "STATUS ORGANISASI"}
-                    </span>
-                    <span className="block text-[11px] sm:text-xs lg:text-[13px] font-black text-white leading-snug mt-0.5 line-clamp-2 sm:truncate">
-                      {cms.hero?.infoValue1 || "Ekstrakurikuler Resmi"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="relative p-2.5 sm:p-3.5 rounded-lg bg-[#07261c]/85 border border-emerald-700/45 border-l-2 border-l-amber-400/80 shadow-md flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-left transition-colors hover:border-emerald-500/50">
-                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-md bg-emerald-950/90 border border-amber-400/25 flex items-center justify-center text-amber-400 shrink-0">
-                    <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="block text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-emerald-300/75 leading-tight truncate">
-                      {cms.hero?.infoLabel2 || "PUSAT KEGIATAN"}
-                    </span>
-                    <span className="block text-[11px] sm:text-xs lg:text-[13px] font-black text-white leading-snug mt-0.5 line-clamp-2 sm:truncate">
-                      {cms.hero?.infoValue2 || "Musholla Al-Ikhlas"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="relative p-2.5 sm:p-3.5 rounded-lg bg-[#07261c]/85 border border-emerald-700/45 border-l-2 border-l-amber-400/80 shadow-md flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-left transition-colors hover:border-emerald-500/50">
-                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-md bg-emerald-950/90 border border-amber-400/25 flex items-center justify-center text-amber-400 shrink-0">
-                    <Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="block text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-emerald-300/75 leading-tight truncate">
-                      {cms.hero?.infoLabel3 || "NAUNGAN SEKOLAH"}
-                    </span>
-                    <span className="block text-[11px] sm:text-xs lg:text-[13px] font-black text-white leading-snug mt-0.5 line-clamp-2 sm:truncate">
-                      {cms.hero?.infoValue3 || "SMAN 4 Purwokerto"}
-                    </span>
-                  </div>
-                </div>
-              </div>
             </motion.div>
 
             {/* Right Column: Hero Showcase Card with Differential Parallax (Opposing Rate) */}
@@ -809,15 +762,15 @@ export default function HomePage() {
 
       {/* ── 4. AGENDA & EVENT TERBARU (3D COVERFLOW SLIDER) ── */}
       {cms.sections.showAgenda && (
-        <section className="py-24 sm:py-28 lg:py-32 bg-gradient-to-b from-[#051c14] via-[#07261c] to-[#04120c] text-white relative overflow-hidden">
+        <section className="py-20 sm:py-26 lg:py-30 bg-gradient-to-b from-[#051c14] via-[#07261c] to-[#04120c] text-white relative overflow-hidden">
           {/* Ambient Glows */}
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[450px] bg-emerald-500/10 blur-[140px] rounded-full pointer-events-none" />
           <div className="absolute bottom-10 left-10 w-80 h-80 bg-amber-500/5 blur-[120px] rounded-full pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
             {/* Header with Smooth Viewport Deceleration */}
-            <CinematicReveal direction="up" delay={0.1} className="max-w-3xl mx-auto mb-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-bold tracking-wide mb-4 backdrop-blur-md">
+            <CinematicReveal direction="up" delay={0.1} className="max-w-3xl mx-auto mb-5 sm:mb-8">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-bold tracking-wide mb-3.5 backdrop-blur-md">
                 <Calendar className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{cms.agenda?.tag || "AGENDA KEGIATAN"}</span>
               </div>
@@ -826,23 +779,23 @@ export default function HomePage() {
                 {cms.agenda?.title || "Agenda & Kajian Rohis SMAPA"}
               </h2>
 
-              <div className="w-20 h-1 bg-gradient-to-r from-emerald-400 via-amber-300 to-emerald-400 mx-auto rounded-full mt-3 mb-4" />
+              <div className="w-20 h-1 bg-gradient-to-r from-emerald-400 via-amber-300 to-emerald-400 mx-auto rounded-full mt-3 mb-3.5" />
 
-              <p className="text-sm sm:text-base text-emerald-100/80 max-w-2xl mx-auto leading-relaxed mb-4">
+              <p className="text-sm sm:text-base text-emerald-100/80 max-w-2xl mx-auto leading-relaxed mb-3.5">
                 {cms.agenda?.lead ||
                   "Informasi jadwal kegiatan, pembinaan syiar, dan kajian dakwah pelajar di lingkungan SMA Negeri 4 Purwokerto."}
               </p>
 
-              {/* Hint as in reference image */}
+              {/* Hint */}
               <p className="text-xs sm:text-sm font-semibold text-amber-300/90 inline-flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+                <Sparkles className="w-4 h-4 text-amber-300 animate-pulse shrink-0" />
                 <span>{cms.agenda?.hintText || "Klik kartu samping atau gunakan tombol panah untuk agenda lain ›"}</span>
               </p>
             </CinematicReveal>
 
-          {/* 3D Coverflow Stage with Hardware-Accelerated 60/120fps Touch Physics */}
+          {/* 3D Coverflow Stage with Balanced Segi-4 Cards (All-DPI Mobile & Desktop) */}
           <div
-            className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-6xl h-[495px] sm:h-[600px] flex items-center justify-center select-none overflow-visible ${
+            className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-6xl h-[395px] sm:h-[465px] lg:h-[495px] flex items-center justify-center select-none overflow-visible ${
               isAgendaDragging ? "cursor-grabbing" : "cursor-grab"
             }`}
             style={{
@@ -874,29 +827,29 @@ export default function HomePage() {
             onTouchEnd={handleAgendaDragEnd}
             onTouchCancel={handleAgendaDragEnd}
           >
-            {/* Left Floating Arrow Button (Elevated in 3D Z-space so it never hides behind cards) */}
+            {/* Left Floating Arrow Button (Soft-Edged Square Segi-4) */}
             <button
               type="button"
               onClick={prevAgenda}
               aria-label="Agenda Sebelumnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
+              className="absolute left-1.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
             >
-              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronLeft className="w-5 h-5 sm:w-5 sm:h-5" />
             </button>
 
-            {/* Right Floating Arrow Button (Elevated in 3D Z-space so it never hides behind cards) */}
+            {/* Right Floating Arrow Button (Soft-Edged Square Segi-4) */}
             <button
               type="button"
               onClick={nextAgenda}
               aria-label="Agenda Berikutnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
+              className="absolute right-1.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
             >
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronRight className="w-5 h-5 sm:w-5 sm:h-5" />
             </button>
 
-            {/* Cards Slider with Lightweight GPU-Composited 3D Transforms */}
+            {/* Cards Slider with Proportional Segi-4 Smooth-Edged Design */}
             {eventsList.map((event, idx) => {
               const total = eventsList.length;
               let dist = (idx - agendaIndex + total) % total;
@@ -910,7 +863,7 @@ export default function HomePage() {
               const currentDrag = isAgendaDragging ? agendaDragOffset : 0;
               const dragAngle = Number(((currentDrag / 300) * 10).toFixed(2));
 
-              // Pure GPU-composited 3D Geometry (transform + opacity only, no CSS filter blur)
+              // Pure GPU-composited 3D Geometry
               let transform = "";
               let zIndex = 1;
               let opacity = 0;
@@ -922,21 +875,21 @@ export default function HomePage() {
                 opacity = 1;
                 pointerEvents = "auto";
               } else if (isLeft) {
-                transform = `translate3d(calc(-62% + ${currentDrag * 0.65}px), 0, -75px) rotateY(${26 + dragAngle}deg) scale(0.86)`;
+                transform = `translate3d(calc(-54% + ${currentDrag * 0.65}px), 0, -80px) rotateY(${24 + dragAngle}deg) scale(0.88)`;
                 zIndex = 15;
                 opacity = 0.62;
                 pointerEvents = "auto";
               } else if (isRight) {
-                transform = `translate3d(calc(62% + ${currentDrag * 0.65}px), 0, -75px) rotateY(${-26 + dragAngle}deg) scale(0.86)`;
+                transform = `translate3d(calc(54% + ${currentDrag * 0.65}px), 0, -80px) rotateY(${-24 + dragAngle}deg) scale(0.88)`;
                 zIndex = 15;
                 opacity = 0.62;
                 pointerEvents = "auto";
               } else if (dist < -1) {
-                transform = "translate3d(-115%, 0, -180px) rotateY(38deg) scale(0.72)";
+                transform = "translate3d(-110%, 0, -180px) rotateY(36deg) scale(0.74)";
                 zIndex = 1;
                 opacity = 0;
               } else {
-                transform = "translate3d(115%, 0, -180px) rotateY(-38deg) scale(0.72)";
+                transform = "translate3d(110%, 0, -180px) rotateY(-36deg) scale(0.74)";
                 zIndex = 1;
                 opacity = 0;
               }
@@ -963,14 +916,14 @@ export default function HomePage() {
                       ? "none"
                       : "transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
-                  className={`absolute w-[68vw] min-w-[210px] max-w-[300px] sm:w-[390px] sm:max-w-none lg:w-[435px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-white text-gray-900 border-[2px] border-white/30 will-change-transform ${
+                  className={`absolute w-[82vw] min-w-[260px] max-w-[340px] sm:w-[405px] sm:max-w-none lg:w-[450px] rounded-xl sm:rounded-2xl overflow-hidden bg-white text-gray-900 border border-white/40 will-change-transform ${
                     isCenter
-                      ? "shadow-2xl ring-2 ring-white/15 cursor-default"
+                      ? "shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] ring-1 ring-white/30 cursor-default"
                       : "shadow-xl cursor-pointer hover:opacity-85"
                   }`}
                 >
-                  {/* Photo Header with Category Badge */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-emerald-950">
+                  {/* Photo Header with Segi-4 Category Badge */}
+                  <div className="relative h-[155px] sm:h-[190px] lg:h-[205px] w-full overflow-hidden bg-emerald-950">
                     <img
                       draggable={false}
                       decoding="async"
@@ -981,11 +934,17 @@ export default function HomePage() {
                       style={getImageCropStyle(event.image)}
                       className="w-full h-full object-cover select-none"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent pointer-events-none" />
 
-                    {/* Category Pill Tag */}
-                    <div className="absolute top-3 left-3 sm:top-4 sm:left-4 px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-black/80 border border-white/25 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-md">
+                    {/* Category Rectangular Tag (Segi-4 Tepi Halus) */}
+                    <div className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 px-2.5 sm:px-3 py-1 rounded-md bg-emerald-950/90 border border-white/20 text-amber-300 text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md">
                       {event.type}
+                    </div>
+
+                    {/* Date Badge on Bottom-Left of Photo for Compact Segi-4 Proportions */}
+                    <div className="absolute bottom-2.5 left-3 sm:bottom-3 sm:left-3.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-black/75 border border-white/15 text-amber-300 text-[10.5px] sm:text-xs font-bold">
+                      <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 shrink-0" />
+                      <span className="truncate">{event.date}</span>
                     </div>
                   </div>
 
@@ -997,40 +956,34 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-black/30 pointer-events-none z-20" />
                   )}
 
-                  {/* Card Content */}
-                  <div className="p-4 sm:p-6 lg:p-7 flex flex-col justify-between text-left">
+                  {/* Card Content (Balanced Segi-4 Layout) */}
+                  <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between text-left">
                     <div>
-                      {/* Date Row */}
-                      <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold text-amber-700 mb-1.5 sm:mb-2">
-                        <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 shrink-0" />
-                        <span>{event.date}</span>
-                      </div>
-
                       {/* Title */}
-                      <h3 className="text-[14px] sm:text-lg font-black text-emerald-950 mb-1.5 sm:mb-2.5 leading-snug line-clamp-2">
+                      <h3 className="text-[15px] sm:text-lg font-black text-emerald-950 mb-1.5 leading-snug line-clamp-2">
                         {event.title}
                       </h3>
 
                       {/* Description */}
-                      <p className="text-[11px] sm:text-[13px] text-gray-600 line-clamp-2 leading-relaxed mb-3 sm:mb-4">
+                      <p className="text-[11.5px] sm:text-[13px] text-gray-600 line-clamp-2 leading-relaxed mb-3">
                         {event.description}
                       </p>
 
-                      {/* Time & Location */}
-                      <div className="space-y-1 sm:space-y-1.5 text-[11px] sm:text-xs text-gray-500 mb-3.5 sm:mb-5">
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-700 shrink-0" />
-                          <span className="truncate">{event.time}</span>
+                      {/* Time & Location in Clean Compact Box */}
+                      <div className="grid grid-cols-1 gap-1 p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-900/10 text-[11px] sm:text-xs text-gray-600 mb-3.5">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                          <span className="font-semibold text-emerald-950 truncate">{event.time}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-700 shrink-0" />
-                          <span className="line-clamp-1">{event.location}</span>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                          <span className="truncate">{event.location}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Divider & Action Button */}
-                    <div className="pt-3 sm:pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
+                    {/* Divider & Action Button (Never Clipped on Any Mobile DPI) */}
+                    <div className="pt-2.5 sm:pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
                       <button
                         type="button"
                         onClick={(e) => {
@@ -1038,13 +991,13 @@ export default function HomePage() {
                           e.stopPropagation();
                           setSelectedEvent(event as unknown as EventItem);
                         }}
-                        className="text-[11px] sm:text-sm font-black text-emerald-800 hover:text-emerald-950 flex items-center gap-1 sm:gap-1.5 group/btn cursor-pointer whitespace-nowrap"
+                        className="text-xs sm:text-sm font-black text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 group/btn cursor-pointer whitespace-nowrap"
                       >
                         <span>Lihat Rincian Acara</span>
-                        <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 group-hover/btn:translate-x-1.5 transition-transform shrink-0" />
+                        <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 group-hover/btn:translate-x-1 transition-transform shrink-0" />
                       </button>
-                      <span className="text-[8.5px] sm:text-[10px] uppercase font-bold tracking-wider px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 whitespace-nowrap shrink-0">
-                        Agenda SMAPA
+                      <span className="text-[9px] sm:text-[10px] uppercase font-extrabold tracking-wider px-2.5 py-1 rounded-md bg-emerald-900 text-amber-300 whitespace-nowrap shrink-0">
+                        SMAPA
                       </span>
                     </div>
                   </div>
@@ -1054,12 +1007,12 @@ export default function HomePage() {
           </div>
 
           {/* Bottom Navigation & Indicator Dots */}
-          <div className="flex items-center justify-center gap-4 mt-8 mb-8">
+          <div className="flex items-center justify-center gap-4 mt-5 sm:mt-7 mb-6 sm:mb-7">
             <button
               type="button"
               onClick={prevAgenda}
               aria-label="Sebelumnya"
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center border border-white/20 transition-all hover:scale-110 cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center border border-white/20 transition-all hover:scale-105 cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -1073,8 +1026,8 @@ export default function HomePage() {
                   aria-label={`Pilih Agenda ${i + 1}`}
                   className={`cursor-pointer transition-all duration-300 ${
                     i === agendaIndex
-                      ? "w-8 h-2.5 rounded-full bg-amber-400 shadow-sm"
-                      : "w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-white/60"
+                      ? "w-7 h-2 rounded-md bg-amber-400 shadow-sm"
+                      : "w-2 h-2 rounded-md bg-white/30 hover:bg-white/60"
                   }`}
                 />
               ))}
@@ -1084,17 +1037,17 @@ export default function HomePage() {
               type="button"
               onClick={nextAgenda}
               aria-label="Berikutnya"
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center border border-white/20 transition-all hover:scale-110 cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center border border-white/20 transition-all hover:scale-105 cursor-pointer"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Bottom Button (Exact match to Gambar 1: "Lihat Semua Agenda") */}
+          {/* Bottom Button */}
           <div>
             <Link
               href="/agenda"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black shadow-xl shadow-emerald-950/40 hover:scale-105 hover:shadow-2xl transition-all duration-300"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black shadow-xl shadow-emerald-950/40 hover:scale-105 transition-all duration-300"
             >
               <span>Lihat Semua Agenda</span>
               <ArrowRight className="w-4 h-4" />

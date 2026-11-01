@@ -285,7 +285,7 @@ export default function Directory3DShowcase() {
 
         {/* 3D CAROUSEL STAGE */}
         <div
-          className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-5xl h-[350px] sm:h-[400px] flex items-center justify-center select-none overflow-visible ${
+          className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-5xl h-[290px] sm:h-[340px] flex items-center justify-center select-none overflow-visible ${
             isDragging ? "cursor-grabbing" : "cursor-grab"
           }`}
           style={{
@@ -326,7 +326,7 @@ export default function Directory3DShowcase() {
             }}
             aria-label="Menu Sebelumnya"
             style={{ transform: "translateZ(150px)" }}
-            className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-transform duration-200 cursor-pointer group"
+            className="absolute left-1.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-transform duration-200 cursor-pointer group"
           >
             <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -340,7 +340,7 @@ export default function Directory3DShowcase() {
             }}
             aria-label="Menu Berikutnya"
             style={{ transform: "translateZ(150px)" }}
-            className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-transform duration-200 cursor-pointer group"
+            className="absolute right-1.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-transform duration-200 cursor-pointer group"
           >
             <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
           </button>
@@ -371,27 +371,27 @@ export default function Directory3DShowcase() {
               opacity = 1;
               pointerEvents = "auto";
             } else if (isLeft) {
-              transform = `translate3d(calc(-62% + ${
+              transform = `translate3d(calc(-54% + ${
                 currentDrag * 0.65
-              }px), 0, -75px) rotateY(${26 + dragAngle}deg) scale(0.86)`;
+              }px), 0, -75px) rotateY(${24 + dragAngle}deg) scale(0.88)`;
               zIndex = 15;
               opacity = 0.65;
               pointerEvents = "auto";
             } else if (isRight) {
-              transform = `translate3d(calc(62% + ${
+              transform = `translate3d(calc(54% + ${
                 currentDrag * 0.65
-              }px), 0, -75px) rotateY(${-26 + dragAngle}deg) scale(0.86)`;
+              }px), 0, -75px) rotateY(${-24 + dragAngle}deg) scale(0.88)`;
               zIndex = 15;
               opacity = 0.65;
               pointerEvents = "auto";
             } else if (dist < -1) {
               transform =
-                "translate3d(-115%, 0, -180px) rotateY(38deg) scale(0.72)";
+                "translate3d(-110%, 0, -180px) rotateY(36deg) scale(0.74)";
               zIndex = 1;
               opacity = 0;
             } else {
               transform =
-                "translate3d(115%, 0, -180px) rotateY(-38deg) scale(0.72)";
+                "translate3d(110%, 0, -180px) rotateY(-36deg) scale(0.74)";
               zIndex = 1;
               opacity = 0;
             }
@@ -420,22 +420,22 @@ export default function Directory3DShowcase() {
                     ? "none"
                     : "transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
-                className={`absolute w-[68vw] min-w-[210px] max-w-[300px] sm:w-[370px] sm:max-w-none lg:w-[410px] h-[290px] sm:h-[330px] rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 bg-white border border-gray-200/80 will-change-transform flex flex-col justify-between text-left ${
+                className={`absolute w-[82vw] min-w-[260px] max-w-[340px] sm:w-[390px] sm:max-w-none lg:w-[430px] h-[250px] sm:h-[285px] rounded-xl sm:rounded-2xl p-4 sm:p-6 bg-white border border-gray-200/80 will-change-transform flex flex-col justify-between text-left ${
                   isCenter
-                    ? "shadow-xl ring-2 ring-emerald-500/35 cursor-default"
+                    ? "shadow-xl ring-1 ring-emerald-500/40 cursor-default"
                     : "shadow-md cursor-pointer hover:opacity-85"
                 }`}
               >
                 {/* Top Row: Icon on Left & Category Tag on Right */}
                 <div className="flex items-center justify-between gap-2">
                   <div
-                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${item.iconBg} ${item.iconColor} flex items-center justify-center shadow-xs shrink-0`}
+                    className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl ${item.iconBg} ${item.iconColor} flex items-center justify-center shadow-xs shrink-0`}
                   >
                     <IconComponent size={20} />
                   </div>
 
                   <span
-                    className={`px-2.5 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate ${item.tagColor.bg} ${item.tagColor.text} border ${item.tagColor.border}`}
+                    className={`px-2.5 sm:px-3 py-1 rounded-md text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate ${item.tagColor.bg} ${item.tagColor.text} border ${item.tagColor.border}`}
                   >
                     {item.tag}
                   </span>
