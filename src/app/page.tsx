@@ -793,9 +793,9 @@ export default function HomePage() {
               </p>
             </CinematicReveal>
 
-          {/* 3D Coverflow Stage with Balanced Segi-4 Cards (All-DPI Mobile & Desktop) */}
+          {/* 3D Coverflow Stage with Smooth Balanced Curves (Like Reference) */}
           <div
-            className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-6xl h-[395px] sm:h-[465px] lg:h-[495px] flex items-center justify-center select-none overflow-visible ${
+            className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-6xl h-[425px] sm:h-[495px] lg:h-[525px] flex items-center justify-center select-none overflow-visible ${
               isAgendaDragging ? "cursor-grabbing" : "cursor-grab"
             }`}
             style={{
@@ -827,29 +827,29 @@ export default function HomePage() {
             onTouchEnd={handleAgendaDragEnd}
             onTouchCancel={handleAgendaDragEnd}
           >
-            {/* Left Floating Arrow Button (Soft-Edged Square Segi-4) */}
+            {/* Left Floating Arrow Button */}
             <button
               type="button"
               onClick={prevAgenda}
               aria-label="Agenda Sebelumnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute left-1.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
+              className="absolute left-1.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5 sm:w-5 sm:h-5" />
             </button>
 
-            {/* Right Floating Arrow Button (Soft-Edged Square Segi-4) */}
+            {/* Right Floating Arrow Button */}
             <button
               type="button"
               onClick={nextAgenda}
               aria-label="Agenda Berikutnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute right-1.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
+              className="absolute right-1.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
             >
               <ChevronRight className="w-5 h-5 sm:w-5 sm:h-5" />
             </button>
 
-            {/* Cards Slider with Proportional Segi-4 Smooth-Edged Design */}
+            {/* Cards Slider with Reference Smooth Curves */}
             {eventsList.map((event, idx) => {
               const total = eventsList.length;
               let dist = (idx - agendaIndex + total) % total;
@@ -916,14 +916,14 @@ export default function HomePage() {
                       ? "none"
                       : "transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
-                  className={`absolute w-[82vw] min-w-[260px] max-w-[340px] sm:w-[405px] sm:max-w-none lg:w-[450px] rounded-xl sm:rounded-2xl overflow-hidden bg-white text-gray-900 border border-white/40 will-change-transform ${
+                  className={`absolute w-[84vw] min-w-[270px] max-w-[340px] sm:w-[410px] sm:max-w-none lg:w-[450px] rounded-[26px] sm:rounded-[32px] overflow-hidden bg-white text-gray-900 border border-white/40 will-change-transform ${
                     isCenter
                       ? "shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] ring-1 ring-white/30 cursor-default"
                       : "shadow-xl cursor-pointer hover:opacity-85"
                   }`}
                 >
-                  {/* Photo Header with Segi-4 Category Badge */}
-                  <div className="relative h-[155px] sm:h-[190px] lg:h-[205px] w-full overflow-hidden bg-emerald-950">
+                  {/* Photo Header with Category Pill Badge */}
+                  <div className="relative h-[160px] sm:h-[195px] lg:h-[215px] w-full overflow-hidden bg-emerald-950">
                     <img
                       draggable={false}
                       decoding="async"
@@ -934,17 +934,11 @@ export default function HomePage() {
                       style={getImageCropStyle(event.image)}
                       className="w-full h-full object-cover select-none"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
 
-                    {/* Category Rectangular Tag (Segi-4 Tepi Halus) */}
-                    <div className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 px-2.5 sm:px-3 py-1 rounded-md bg-emerald-950/90 border border-white/20 text-amber-300 text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md">
+                    {/* Category Pill Tag (Exact Reference Shape) */}
+                    <div className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 px-3.5 py-1 rounded-full bg-emerald-900/90 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md">
                       {event.type}
-                    </div>
-
-                    {/* Date Badge on Bottom-Left of Photo for Compact Segi-4 Proportions */}
-                    <div className="absolute bottom-2.5 left-3 sm:bottom-3 sm:left-3.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-black/75 border border-white/15 text-amber-300 text-[10.5px] sm:text-xs font-bold">
-                      <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 shrink-0" />
-                      <span className="truncate">{event.date}</span>
                     </div>
                   </div>
 
@@ -956,11 +950,17 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-black/30 pointer-events-none z-20" />
                   )}
 
-                  {/* Card Content (Balanced Segi-4 Layout) */}
+                  {/* Card Content (Clean & Smooth Layout matching Reference) */}
                   <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between text-left">
                     <div>
+                      {/* Date with Calendar Icon (Clean Line below Image, Exactly like Reference) */}
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 font-semibold mb-2">
+                        <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
+                        <span className="truncate">{event.date}</span>
+                      </div>
+
                       {/* Title */}
-                      <h3 className="text-[15px] sm:text-lg font-black text-emerald-950 mb-1.5 leading-snug line-clamp-2">
+                      <h3 className="text-base sm:text-lg font-black text-emerald-950 mb-1.5 leading-snug line-clamp-2">
                         {event.title}
                       </h3>
 
@@ -969,8 +969,8 @@ export default function HomePage() {
                         {event.description}
                       </p>
 
-                      {/* Time & Location in Clean Compact Box */}
-                      <div className="grid grid-cols-1 gap-1 p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-900/10 text-[11px] sm:text-xs text-gray-600 mb-3.5">
+                      {/* Time & Location in Smooth Rounded Box */}
+                      <div className="grid grid-cols-1 gap-1 p-2 sm:p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-900/10 text-[11px] sm:text-xs text-gray-600 mb-3">
                         <div className="flex items-center gap-2">
                           <Clock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                           <span className="font-semibold text-emerald-950 truncate">{event.time}</span>
@@ -982,8 +982,8 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    {/* Divider & Action Button (Never Clipped on Any Mobile DPI) */}
-                    <div className="pt-2.5 sm:pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                    {/* Divider & Action Row */}
+                    <div className="pt-2 sm:pt-2.5 border-t border-gray-100 flex items-center justify-between gap-2">
                       <button
                         type="button"
                         onClick={(e) => {
@@ -996,8 +996,8 @@ export default function HomePage() {
                         <span>Lihat Rincian Acara</span>
                         <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 group-hover/btn:translate-x-1 transition-transform shrink-0" />
                       </button>
-                      <span className="text-[9px] sm:text-[10px] uppercase font-extrabold tracking-wider px-2.5 py-1 rounded-md bg-emerald-900 text-amber-300 whitespace-nowrap shrink-0">
-                        SMAPA
+                      <span className="text-[9px] sm:text-[10px] uppercase font-extrabold tracking-wider px-2.5 py-1 rounded-full bg-emerald-100/90 text-emerald-900 border border-emerald-200/80 whitespace-nowrap shrink-0">
+                        AGENDA SMAPA
                       </span>
                     </div>
                   </div>
@@ -1012,7 +1012,7 @@ export default function HomePage() {
               type="button"
               onClick={prevAgenda}
               aria-label="Sebelumnya"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center border border-white/20 transition-all hover:scale-105 cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center border border-white/20 transition-all hover:scale-105 cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -1026,8 +1026,8 @@ export default function HomePage() {
                   aria-label={`Pilih Agenda ${i + 1}`}
                   className={`cursor-pointer transition-all duration-300 ${
                     i === agendaIndex
-                      ? "w-7 h-2 rounded-md bg-amber-400 shadow-sm"
-                      : "w-2 h-2 rounded-md bg-white/30 hover:bg-white/60"
+                      ? "w-7 h-2 rounded-full bg-amber-400 shadow-sm"
+                      : "w-2 h-2 rounded-full bg-white/30 hover:bg-white/60"
                   }`}
                 />
               ))}
@@ -1037,7 +1037,7 @@ export default function HomePage() {
               type="button"
               onClick={nextAgenda}
               aria-label="Berikutnya"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center border border-white/20 transition-all hover:scale-105 cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center border border-white/20 transition-all hover:scale-105 cursor-pointer"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -1047,7 +1047,7 @@ export default function HomePage() {
           <div>
             <Link
               href="/agenda"
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black shadow-xl shadow-emerald-950/40 hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black shadow-xl shadow-emerald-950/40 hover:scale-105 transition-all duration-300"
             >
               <span>Lihat Semua Agenda</span>
               <ArrowRight className="w-4 h-4" />

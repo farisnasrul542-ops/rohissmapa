@@ -288,7 +288,7 @@ export default function Gallery3DShowcase({
               }}
               aria-label="Foto Sebelumnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute left-1.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-black/80 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center border border-white/25 shadow-xl transition-transform duration-200 cursor-pointer group"
+              className="absolute left-1.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/80 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center border border-white/25 shadow-xl transition-transform duration-200 cursor-pointer group"
             >
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-0.5 transition-transform" />
             </button>
@@ -302,7 +302,7 @@ export default function Gallery3DShowcase({
               }}
               aria-label="Foto Berikutnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute right-1.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-black/80 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center border border-white/25 shadow-xl transition-transform duration-200 cursor-pointer group"
+              className="absolute right-1.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/80 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center border border-white/25 shadow-xl transition-transform duration-200 cursor-pointer group"
             >
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-0.5 transition-transform" />
             </button>
@@ -393,7 +393,7 @@ export default function Gallery3DShowcase({
                       ? "transform 160ms ease-out, opacity 420ms cubic-bezier(0.22, 1, 0.36, 1)"
                       : "transform 440ms cubic-bezier(0.22, 1, 0.36, 1), opacity 440ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
-                  className={`absolute w-[82vw] min-w-[260px] max-w-[345px] sm:w-[490px] sm:max-w-none lg:w-[620px] h-[350px] sm:h-[460px] lg:h-[500px] rounded-xl sm:rounded-2xl overflow-hidden bg-emerald-950 will-change-transform border border-white/30 select-none ${
+                  className={`absolute w-[82vw] min-w-[260px] max-w-[345px] sm:w-[490px] sm:max-w-none lg:w-[620px] h-[350px] sm:h-[460px] lg:h-[500px] rounded-[26px] sm:rounded-[32px] overflow-hidden bg-emerald-950 will-change-transform border border-white/30 select-none ${
                     isCenter
                       ? "shadow-2xl ring-1 ring-white/25"
                       : "shadow-xl cursor-pointer hover:opacity-80"
