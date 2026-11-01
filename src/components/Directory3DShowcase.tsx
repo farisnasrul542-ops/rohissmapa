@@ -269,7 +269,7 @@ export default function Directory3DShowcase() {
 
         {/* 3D CAROUSEL STAGE */}
         <div
-          className={`relative max-w-5xl mx-auto h-[380px] sm:h-[400px] flex items-center justify-center select-none ${
+          className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-5xl h-[350px] sm:h-[400px] flex items-center justify-center select-none overflow-visible ${
             isDragging ? "cursor-grabbing" : "cursor-grab"
           }`}
           style={{
@@ -308,8 +308,8 @@ export default function Directory3DShowcase() {
               prevItem();
             }}
             aria-label="Menu Sebelumnya"
-            style={{ transform: "translateZ(100px)" }}
-            className="absolute left-1 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-all duration-300 cursor-pointer group"
+            style={{ transform: "translateZ(150px)" }}
+            className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-all duration-300 cursor-pointer group"
           >
             <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -322,8 +322,8 @@ export default function Directory3DShowcase() {
               nextItem();
             }}
             aria-label="Menu Berikutnya"
-            style={{ transform: "translateZ(100px)" }}
-            className="absolute right-1 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-all duration-300 cursor-pointer group"
+            style={{ transform: "translateZ(150px)" }}
+            className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-all duration-300 cursor-pointer group"
           >
             <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
           </button>
@@ -349,18 +349,18 @@ export default function Directory3DShowcase() {
 
             if (isCenter) {
               // Center card: pops forward with interactive tilt & drag
-              transform = `translate3d(${currentDrag}px, 0, 75px) rotateY(${
+              transform = `translate3d(${currentDrag}px, 0, 55px) rotateY(${
                 cardTilt.x + dragAngle
               }deg) rotateX(${cardTilt.y}deg) scale(1)`;
               zIndex = 35;
               opacity = 1;
-              filter = "blur(0px) brightness(1)";
+              filter = "none";
               boxShadow =
                 "0 25px 60px -15px rgba(16, 72, 53, 0.16), 0 0 0 2px rgba(16, 185, 129, 0.35), 0 0 25px rgba(16, 185, 129, 0.12)";
               pointerEvents = "auto";
             } else if (isLeft) {
               // Left card: angled in 3D perspective towards center
-              transform = `translate3d(calc(-66% + ${
+              transform = `translate3d(calc(-64% + ${
                 currentDrag * 0.72
               }px), 0, -85px) rotateY(${30 + dragAngle}deg) scale(0.85)`;
               zIndex = 15;
@@ -370,7 +370,7 @@ export default function Directory3DShowcase() {
               pointerEvents = "auto";
             } else if (isRight) {
               // Right card: angled in 3D perspective towards center
-              transform = `translate3d(calc(66% + ${
+              transform = `translate3d(calc(64% + ${
                 currentDrag * 0.72
               }px), 0, -85px) rotateY(${-30 + dragAngle}deg) scale(0.85)`;
               zIndex = 15;
@@ -416,35 +416,35 @@ export default function Directory3DShowcase() {
                     ? "none"
                     : "transform 750ms cubic-bezier(0.19, 1, 0.22, 1), opacity 750ms cubic-bezier(0.19, 1, 0.22, 1), filter 750ms ease, box-shadow 750ms ease",
                 }}
-                className={`absolute w-[310px] sm:w-[370px] lg:w-[410px] h-[310px] sm:h-[330px] rounded-[28px] p-6 sm:p-7 bg-white border border-gray-200/80 will-change-transform flex flex-col justify-between text-left transition-colors duration-300 ${
+                className={`absolute w-[68vw] min-w-[210px] max-w-[300px] sm:w-[370px] sm:max-w-none lg:w-[410px] h-[290px] sm:h-[330px] rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 bg-white border border-gray-200/80 will-change-transform flex flex-col justify-between text-left transition-colors duration-300 ${
                   isCenter
                     ? "ring-2 ring-emerald-500/35 cursor-default"
                     : "cursor-pointer hover:opacity-85 hover:brightness-95"
                 }`}
               >
                 {/* Top Row: Icon on Left & Category Tag on Right */}
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center justify-between gap-2">
                   <div
                     style={{ transform: "translateZ(20px)" }}
-                    className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl ${item.iconBg} ${item.iconColor} flex items-center justify-center shadow-xs shrink-0`}
+                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${item.iconBg} ${item.iconColor} flex items-center justify-center shadow-xs shrink-0`}
                   >
-                    <IconComponent size={22} />
+                    <IconComponent size={20} />
                   </div>
 
                   <span
                     style={{ transform: "translateZ(15px)" }}
-                    className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${item.tagColor.bg} ${item.tagColor.text} border ${item.tagColor.border}`}
+                    className={`px-2.5 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate ${item.tagColor.bg} ${item.tagColor.text} border ${item.tagColor.border}`}
                   >
                     {item.tag}
                   </span>
                 </div>
 
                 {/* Middle: Title & Description */}
-                <div style={{ transform: "translateZ(25px)" }} className="my-2">
-                  <h3 className="text-lg sm:text-xl font-black text-emerald-950 mb-2 leading-snug">
+                <div style={{ transform: "translateZ(25px)" }} className="my-1.5 sm:my-2">
+                  <h3 className="text-[15px] sm:text-xl font-black text-emerald-950 mb-1.5 sm:mb-2 leading-snug line-clamp-2">
                     {item.title}
                   </h3>
-                  <p className="text-xs sm:text-[13px] text-gray-600 line-clamp-3 leading-relaxed">
+                  <p className="text-[11px] sm:text-[13px] text-gray-600 line-clamp-3 leading-relaxed">
                     {item.description}
                   </p>
                 </div>

@@ -128,13 +128,11 @@ export function CinematicReveal({
         opacity: 0,
         x: offset.x,
         y: offset.y,
-        filter: "blur(4px)",
       }}
       whileInView={{
         opacity: 1,
         x: 0,
         y: 0,
-        filter: "blur(0px)",
       }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{
@@ -194,11 +192,10 @@ export function CinematicStaggerItem({
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: distance, filter: "blur(4px)" },
+        hidden: { opacity: 0, y: distance },
         visible: {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
           transition: {
             duration: 0.7,
             ease: [0.16, 1, 0.3, 1],
@@ -234,8 +231,8 @@ export function CinematicTextLine({
   return (
     <div className={`overflow-hidden ${className}`}>
       <motion.div
-        initial={{ opacity: 0, y: distance, filter: "blur(3px)" }}
-        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        initial={{ opacity: 0, y: distance }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{
           duration,

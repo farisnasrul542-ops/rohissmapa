@@ -273,10 +273,10 @@ export default function Gallery3DShowcase({
                 prevSlide();
               }}
               aria-label="Foto Sebelumnya"
-              style={{ transform: "translateZ(120px)" }}
-              className="absolute left-2 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/75 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center backdrop-blur-md border border-white/25 shadow-2xl transition-all duration-300 cursor-pointer group"
+              style={{ transform: "translateZ(150px)" }}
+              className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/75 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center backdrop-blur-md border border-white/25 shadow-2xl transition-all duration-300 cursor-pointer group"
             >
-              <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-0.5 transition-transform" />
             </button>
 
             {/* Right Floating Arrow Navigation Button */}
@@ -287,10 +287,10 @@ export default function Gallery3DShowcase({
                 nextSlide();
               }}
               aria-label="Foto Berikutnya"
-              style={{ transform: "translateZ(120px)" }}
-              className="absolute right-2 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/75 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center backdrop-blur-md border border-white/25 shadow-2xl transition-all duration-300 cursor-pointer group"
+              style={{ transform: "translateZ(150px)" }}
+              className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/75 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center backdrop-blur-md border border-white/25 shadow-2xl transition-all duration-300 cursor-pointer group"
             >
-              <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-0.5 transition-transform" />
             </button>
 
             {/* 3D CARDS: Center, Left Angled, and Right Angled in Physical Space */}
@@ -320,32 +320,32 @@ export default function Gallery3DShowcase({
                 const tiltX = cardTilt.x;
                 const tiltY = cardTilt.y;
                 transform = `translate3d(${currentDrag}px, 0, ${
-                  isHovered ? "110px" : "80px"
+                  isHovered ? "85px" : "55px"
                 }) rotateY(${tiltX + dragAngle}deg) rotateX(${tiltY}deg) scale(1)`;
                 zIndex = 35;
                 opacity = 1;
-                filter = "blur(0px) brightness(1)";
+                filter = "none";
                 boxShadow =
-                  "0 35px 85px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(16, 185, 129, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.22)";
+                  "0 35px 85px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(16, 185, 129, 0.28), 0 0 0 2px rgba(255, 255, 255, 0.28)";
                 pointerEvents = "auto";
               } else if (isLeft) {
                 // Left flanking card: angled in 3D perspective towards center, translates with drag
-                transform = `translate3d(calc(-64% + ${currentDrag * 0.72}px), 0, -110px) rotateY(${
-                  36 + dragAngle
-                }deg) scale(0.82)`;
+                transform = `translate3d(calc(-64% + ${currentDrag * 0.72}px), 0, -100px) rotateY(${
+                  34 + dragAngle
+                }deg) scale(0.84)`;
                 zIndex = 15;
-                opacity = 0.55;
-                filter = "blur(1px) brightness(0.68)";
+                opacity = 0.58;
+                filter = "blur(0.8px) brightness(0.72)";
                 boxShadow = "0 25px 50px -10px rgba(0, 0, 0, 0.8)";
                 pointerEvents = "auto";
               } else if (isRight) {
                 // Right flanking card: angled in 3D perspective towards center, translates with drag
-                transform = `translate3d(calc(64% + ${currentDrag * 0.72}px), 0, -110px) rotateY(${
-                  -36 + dragAngle
-                }deg) scale(0.82)`;
+                transform = `translate3d(calc(64% + ${currentDrag * 0.72}px), 0, -100px) rotateY(${
+                  -34 + dragAngle
+                }deg) scale(0.84)`;
                 zIndex = 15;
-                opacity = 0.55;
-                filter = "blur(1px) brightness(0.68)";
+                opacity = 0.58;
+                filter = "blur(0.8px) brightness(0.72)";
                 boxShadow = "0 25px 50px -10px rgba(0, 0, 0, 0.8)";
                 pointerEvents = "auto";
               } else if (dist < -1) {
@@ -394,9 +394,9 @@ export default function Gallery3DShowcase({
                       ? "transform 140ms ease-out, box-shadow 300ms ease, opacity 850ms cubic-bezier(0.19, 1, 0.22, 1)"
                       : "transform 900ms cubic-bezier(0.19, 1, 0.22, 1), opacity 900ms cubic-bezier(0.19, 1, 0.22, 1), filter 900ms ease, box-shadow 900ms ease",
                   }}
-                  className={`absolute w-[320px] sm:w-[480px] lg:w-[620px] h-[440px] sm:h-[490px] lg:h-[530px] rounded-[32px] overflow-hidden bg-emerald-950 will-change-transform border border-white/20 select-none ${
+                  className={`absolute w-[70vw] min-w-[215px] max-w-[315px] sm:w-[480px] sm:max-w-none lg:w-[620px] h-[410px] sm:h-[490px] lg:h-[530px] rounded-[26px] sm:rounded-[32px] overflow-hidden bg-emerald-950 will-change-transform border-[2px] border-white/25 select-none ${
                     isCenter
-                      ? "ring-1 ring-emerald-400/40"
+                      ? "ring-4 ring-white/10"
                       : "cursor-pointer hover:opacity-80 hover:brightness-85"
                   }`}
                 >

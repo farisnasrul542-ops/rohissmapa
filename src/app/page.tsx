@@ -765,14 +765,13 @@ export default function HomePage() {
               </p>
             </CinematicReveal>
 
-          {/* 3D Coverflow Stage with Real CSS 3D Perspective & Real-time Drag */}
-          <CinematicReveal direction="up" delay={0.2} distance={24}>
+          {/* 3D Coverflow Stage with Real CSS 3D Perspective & Real-time Drag (All-DPI Responsive) */}
           <div
-            className={`relative max-w-6xl mx-auto h-[570px] sm:h-[610px] flex items-center justify-center select-none ${
+            className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-6xl h-[495px] sm:h-[600px] flex items-center justify-center select-none overflow-visible ${
               isAgendaDragging ? "cursor-grabbing" : "cursor-grab"
             }`}
             style={{
-              perspective: "1300px",
+              perspective: "1200px",
               perspectiveOrigin: "50% 50%",
               transformStyle: "preserve-3d",
             }}
@@ -799,24 +798,26 @@ export default function HomePage() {
             onTouchEnd={handleAgendaDragEnd}
             onTouchCancel={handleAgendaDragEnd}
           >
-            {/* Left Floating Arrow Button */}
+            {/* Left Floating Arrow Button (Elevated in 3D Z-space so it never hides behind cards) */}
             <button
               type="button"
               onClick={prevAgenda}
               aria-label="Agenda Sebelumnya"
-              className="absolute left-2 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/70 backdrop-blur-md border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-all duration-300 shadow-2xl cursor-pointer"
+              style={{ transform: "translateZ(150px)" }}
+              className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/70 backdrop-blur-md border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-all duration-300 shadow-2xl cursor-pointer"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            {/* Right Floating Arrow Button */}
+            {/* Right Floating Arrow Button (Elevated in 3D Z-space so it never hides behind cards) */}
             <button
               type="button"
               onClick={nextAgenda}
               aria-label="Agenda Berikutnya"
-              className="absolute right-2 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/70 backdrop-blur-md border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-all duration-300 shadow-2xl cursor-pointer"
+              style={{ transform: "translateZ(150px)" }}
+              className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/70 backdrop-blur-md border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-all duration-300 shadow-2xl cursor-pointer"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
             {/* Cards Slider with True 3D Transforms & Real-time Drag Physics */}
@@ -842,38 +843,38 @@ export default function HomePage() {
 
               if (isCenter) {
                 // Front and center in 3D space, translates horizontally with drag & responds to mouse tilt
-                transform = `translate3d(${currentDrag}px, 0, 95px) rotateY(${cardTilt.x + dragAngle}deg) rotateX(${cardTilt.y}deg) scale(1)`;
+                transform = `translate3d(${currentDrag}px, 0, 55px) rotateY(${cardTilt.x + dragAngle}deg) rotateX(${cardTilt.y}deg) scale(1)`;
                 zIndex = 35;
                 opacity = 1;
-                filter = "blur(0px) brightness(1)";
+                filter = "none";
                 boxShadow =
-                  "0 35px 75px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(16, 185, 129, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.2)";
+                  "0 35px 75px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(16, 185, 129, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.32)";
                 pointerEvents = "auto";
               } else if (isLeft) {
                 // Turned in 3D perspective towards center, follows drag
-                transform = `translate3d(calc(-68% + ${currentDrag * 0.72}px), 0, -90px) rotateY(${32 + dragAngle}deg) scale(0.86)`;
+                transform = `translate3d(calc(-64% + ${currentDrag * 0.72}px), 0, -85px) rotateY(${30 + dragAngle}deg) scale(0.86)`;
                 zIndex = 15;
-                opacity = 0.52;
-                filter = "blur(1px) brightness(0.72)";
+                opacity = 0.6;
+                filter = "blur(0.6px) brightness(0.75)";
                 boxShadow = "0 25px 50px -10px rgba(0, 0, 0, 0.75)";
                 pointerEvents = "auto";
               } else if (isRight) {
                 // Turned in 3D perspective towards center, follows drag
-                transform = `translate3d(calc(68% + ${currentDrag * 0.72}px), 0, -90px) rotateY(${-32 + dragAngle}deg) scale(0.86)`;
+                transform = `translate3d(calc(64% + ${currentDrag * 0.72}px), 0, -85px) rotateY(${-30 + dragAngle}deg) scale(0.86)`;
                 zIndex = 15;
-                opacity = 0.52;
-                filter = "blur(1px) brightness(0.72)";
+                opacity = 0.6;
+                filter = "blur(0.6px) brightness(0.75)";
                 boxShadow = "0 25px 50px -10px rgba(0, 0, 0, 0.75)";
                 pointerEvents = "auto";
               } else if (dist < -1) {
                 transform =
-                  "translate3d(-135%, 0, -280px) rotateY(52deg) scale(0.68)";
+                  "translate3d(-130%, 0, -260px) rotateY(50deg) scale(0.68)";
                 zIndex = 1;
                 opacity = 0;
                 filter = "blur(3px)";
               } else {
                 transform =
-                  "translate3d(135%, 0, -280px) rotateY(-52deg) scale(0.68)";
+                  "translate3d(130%, 0, -260px) rotateY(-50deg) scale(0.68)";
                 zIndex = 1;
                 opacity = 0;
                 filter = "blur(3px)";
@@ -901,9 +902,9 @@ export default function HomePage() {
                       ? "none"
                       : "transform 750ms cubic-bezier(0.19, 1, 0.22, 1), opacity 750ms cubic-bezier(0.19, 1, 0.22, 1), filter 750ms ease, box-shadow 750ms ease",
                   }}
-                  className={`absolute w-[305px] sm:w-[395px] lg:w-[435px] rounded-[28px] overflow-hidden bg-white text-gray-900 border border-white/20 will-change-transform ${
+                  className={`absolute w-[68vw] min-w-[210px] max-w-[300px] sm:w-[390px] sm:max-w-none lg:w-[435px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-white text-gray-900 border-[2.5px] border-white/30 will-change-transform ${
                     isCenter
-                      ? "ring-1 ring-emerald-400/30 cursor-default"
+                      ? "ring-4 ring-white/10 cursor-default"
                       : "cursor-pointer hover:opacity-85 hover:brightness-90"
                   }`}
                 >
@@ -922,7 +923,7 @@ export default function HomePage() {
                     {/* Category Pill Tag (Pop-out 3D depth) */}
                     <div
                       style={{ transform: "translateZ(30px)" }}
-                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/25 text-white text-xs font-black uppercase tracking-wider shadow-lg"
+                      className="absolute top-3 left-3 sm:top-4 sm:left-4 px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/25 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-lg"
                     >
                       {event.type}
                     </div>
@@ -930,49 +931,49 @@ export default function HomePage() {
 
                   {/* 3D Realistic Directional Lighting Shading on angled side cards */}
                   {isLeft && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/20 to-transparent pointer-events-none rounded-[28px] z-20" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent pointer-events-none rounded-[24px] sm:rounded-[28px] z-20" />
                   )}
                   {isRight && (
-                    <div className="absolute inset-0 bg-gradient-to-l from-black/55 via-black/20 to-transparent pointer-events-none rounded-[28px] z-20" />
+                    <div className="absolute inset-0 bg-gradient-to-l from-black/45 via-black/15 to-transparent pointer-events-none rounded-[24px] sm:rounded-[28px] z-20" />
                   )}
 
                   {/* Card Content with 3D Pop */}
                   <div
                     style={{ transform: "translateZ(15px)" }}
-                    className="p-6 sm:p-7 flex flex-col justify-between text-left"
+                    className="p-4 sm:p-6 lg:p-7 flex flex-col justify-between text-left"
                   >
                     <div>
                       {/* Date Row */}
-                      <div className="flex items-center gap-2 text-xs font-bold text-amber-700 mb-2">
-                        <Calendar className="w-4 h-4 text-amber-600 shrink-0" />
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold text-amber-700 mb-1.5 sm:mb-2">
+                        <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 shrink-0" />
                         <span>{event.date}</span>
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-base sm:text-lg font-black text-emerald-950 mb-2.5 leading-snug line-clamp-2">
+                      <h3 className="text-[14px] sm:text-lg font-black text-emerald-950 mb-1.5 sm:mb-2.5 leading-snug line-clamp-2">
                         {event.title}
                       </h3>
 
                       {/* Description */}
-                      <p className="text-xs sm:text-[13px] text-gray-600 line-clamp-2 leading-relaxed mb-4">
+                      <p className="text-[11px] sm:text-[13px] text-gray-600 line-clamp-2 leading-relaxed mb-3 sm:mb-4">
                         {event.description}
                       </p>
 
                       {/* Time & Location */}
-                      <div className="space-y-1.5 text-xs text-gray-500 mb-5">
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                          <span>{event.time}</span>
+                      <div className="space-y-1 sm:space-y-1.5 text-[11px] sm:text-xs text-gray-500 mb-3.5 sm:mb-5">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-700 shrink-0" />
+                          <span className="truncate">{event.time}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-700 shrink-0" />
                           <span className="line-clamp-1">{event.location}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Divider & Action Button with 3D Pop */}
-                    <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="pt-3 sm:pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
                       <button
                         type="button"
                         style={{ transform: "translateZ(25px)" }}
@@ -981,12 +982,12 @@ export default function HomePage() {
                           e.stopPropagation();
                           setSelectedEvent(event as unknown as EventItem);
                         }}
-                        className="text-xs sm:text-sm font-black text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 group/btn cursor-pointer"
+                        className="text-[11px] sm:text-sm font-black text-emerald-800 hover:text-emerald-950 flex items-center gap-1 sm:gap-1.5 group/btn cursor-pointer whitespace-nowrap"
                       >
                         <span>Lihat Rincian Acara</span>
-                        <ArrowRight className="w-4 h-4 text-emerald-700 group-hover/btn:translate-x-1.5 transition-transform" />
+                        <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 group-hover/btn:translate-x-1.5 transition-transform shrink-0" />
                       </button>
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      <span className="text-[8.5px] sm:text-[10px] uppercase font-bold tracking-wider px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 whitespace-nowrap shrink-0">
                         Agenda SMAPA
                       </span>
                     </div>
@@ -995,7 +996,6 @@ export default function HomePage() {
               );
             })}
           </div>
-          </CinematicReveal>
 
           {/* Bottom Navigation & Indicator Dots */}
           <div className="flex items-center justify-center gap-4 mt-8 mb-8">
