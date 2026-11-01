@@ -4,7 +4,7 @@
  * - Menyediakan endpoint sinkronisasi data lintas domain (/api/cms-sync) menggunakan Cloudflare Edge Cache API
  */
 
-const CACHE_KEY_URL = "https://rohis-smapa-internal-sync.local/cms-state-v1";
+const CACHE_KEY_URL = "https://rohissmapa.farisnasrul542.workers.dev/api/cms-sync-cache-store";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",

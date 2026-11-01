@@ -397,7 +397,7 @@ export const EVENTS_DATA = [
     speaker: null,
     type: "Sosial",
     status: "upcoming",
-    image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80",
+    image: "https://lh3.googleusercontent.com/d/1k7_grStMevTwva3_h2sLQhGyaPl1Gb0M",
     description: "Penyaluran paket sembako dan bantuan perlengkapan sekolah dari hasil himpunan infak siswa-siswi SMAN 4 Purwokerto untuk warga dhuafa."
   },
   {

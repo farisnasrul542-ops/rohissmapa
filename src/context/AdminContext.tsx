@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { EventItem } from "@/lib/types";
 import { EVENTS_DATA } from "@/lib/constants";
 import {
@@ -103,6 +103,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [toast, setToast] = useState<ToastNotification | null>(null);
 
+  const hasUserModifiedEventsRef = useRef(false);
+  const hasUserModifiedGalleryRef = useRef(false);
+  const hasUserModifiedAspirasiRef = useRef(false);
+  const hasUserModifiedAnnouncementRef = useRef(false);
+  const hasUserModifiedCmsRef = useRef(false);
+
   // Load from localStorage only after initial client mount to guarantee 100% SSR hydration match
   useEffect(() => {
     try {
@@ -151,7 +157,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_admin_events", JSON.stringify(events));
-      pushCloudSync({ rohis_admin_events: events });
+      if (hasUserModifiedEventsRef.current) {
+        pushCloudSync({ rohis_admin_events: events });
+      }
     } catch {}
   }, [events, isInitialized]);
 
@@ -166,7 +174,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_admin_aspirasi", JSON.stringify(aspirasiList));
-      pushCloudSync({ rohis_admin_aspirasi: aspirasiList });
+      if (hasUserModifiedAspirasiRef.current) {
+        pushCloudSync({ rohis_admin_aspirasi: aspirasiList });
+      }
     } catch {}
   }, [aspirasiList, isInitialized]);
 
@@ -174,7 +184,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_admin_gallery", JSON.stringify(gallery));
-      pushCloudSync({ rohis_admin_gallery: gallery });
+      if (hasUserModifiedGalleryRef.current) {
+        pushCloudSync({ rohis_admin_gallery: gallery });
+      }
     } catch {}
   }, [gallery, isInitialized]);
 
@@ -182,7 +194,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_admin_announcement", JSON.stringify(announcement));
-      pushCloudSync({ rohis_admin_announcement: announcement });
+      if (hasUserModifiedAnnouncementRef.current) {
+        pushCloudSync({ rohis_admin_announcement: announcement });
+      }
     } catch {}
   }, [announcement, isInitialized]);
 
@@ -190,7 +204,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_home_cms", JSON.stringify(homeCms));
-      pushCloudSync({ rohis_home_cms: homeCms });
+      if (hasUserModifiedCmsRef.current) {
+        pushCloudSync({ rohis_home_cms: homeCms });
+      }
       if (typeof window !== "undefined") {
         window.dispatchEvent(
           new CustomEvent("rohis_cms_updated", { detail: homeCms })
@@ -207,6 +223,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const updateHomeCms = (
     updated: Partial<HomeCmsData> | ((prev: HomeCmsData) => HomeCmsData)
   ) => {
+    hasUserModifiedCmsRef.current = true;
     if (typeof updated === "function") {
       setHomeCms(updated);
     } else {
@@ -216,6 +233,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   };
 
   const resetHomeCms = () => {
+    hasUserModifiedCmsRef.current = true;
     setHomeCms(DEFAULT_HOME_CMS);
     try {
       localStorage.removeItem("rohis_home_cms");
@@ -246,6 +264,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   // Event actions
   const addEvent = (item: Omit<EventItem, "id" | "slug">) => {
+    hasUserModifiedEventsRef.current = true;
     const id = `EVT-${Date.now().toString().slice(-4)}`;
     const slug = item.title
       .toLowerCase()
@@ -257,6 +276,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateEvent = (id: string, updated: Partial<EventItem>) => {
+    hasUserModifiedEventsRef.current = true;
     setEvents((prev) =>
       prev.map((e) => (e.id === id ? { ...e, ...updated } : e))
     );
@@ -264,11 +284,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteEvent = (id: string) => {
+    hasUserModifiedEventsRef.current = true;
     setEvents((prev) => prev.filter((e) => e.id !== id));
     showToast("Agenda telah dihapus dari sistem.", "warning");
   };
 
   const toggleEventStatus = (id: string, status: EventItem["status"]) => {
+    hasUserModifiedEventsRef.current = true;
     setEvents((prev) =>
       prev.map((e) => (e.id === id ? { ...e, status } : e))
     );
@@ -312,6 +334,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     reply: string,
     status: "pending" | "in_review" | "resolved"
   ) => {
+    hasUserModifiedAspirasiRef.current = true;
     const repliedAt = new Date().toLocaleDateString("id-ID", {
       day: "numeric",
       month: "short",
@@ -333,18 +356,21 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteAspirasi = (id: string) => {
+    hasUserModifiedAspirasiRef.current = true;
     setAspirasiList((prev) => prev.filter((a) => a.id !== id));
     showToast("Aspirasi telah dihapus dari arsip.", "warning");
   };
 
   // Gallery actions
   const addGalleryItem = (item: Omit<GalleryItem, "id">) => {
+    hasUserModifiedGalleryRef.current = true;
     const id = `GAL-${Date.now().toString().slice(-4)}`;
     setGallery((prev) => [{ ...item, id }, ...prev]);
     showToast("Foto dokumentasi berhasil ditambahkan!", "success");
   };
 
   const updateGalleryItem = (id: string, updated: Partial<GalleryItem>) => {
+    hasUserModifiedGalleryRef.current = true;
     setGallery((prev) =>
       prev.map((g) => (g.id === id ? { ...g, ...updated } : g))
     );
@@ -352,12 +378,14 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteGalleryItem = (id: string) => {
+    hasUserModifiedGalleryRef.current = true;
     setGallery((prev) => prev.filter((g) => g.id !== id));
     showToast("Foto dokumentasi telah dihapus.", "warning");
   };
 
   // Announcement actions
   const updateAnnouncement = (updated: Partial<BroadcastAnnouncement>) => {
+    hasUserModifiedAnnouncementRef.current = true;
     setAnnouncement((prev) => ({
       ...prev,
       ...updated,
