@@ -38,6 +38,8 @@ import {
   Camera,
   MapPin,
   Clock,
+  ShieldCheck,
+  Building,
   Send,
   CheckCircle2,
   Quote,
@@ -365,6 +367,51 @@ export default function HomePage() {
                   </Link>
                 </div>
               </CinematicReveal>
+
+              {/* Architectural 3-Column Info Cards (Boxy / Non-Lonjong, All-DPI Responsive & Admin-Synced) */}
+              <div className="mt-8 sm:mt-10 pt-6 sm:pt-7 border-t border-emerald-800/40 grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="relative p-2.5 sm:p-3.5 rounded-lg bg-[#07261c]/85 border border-emerald-700/45 border-l-2 border-l-amber-400/80 shadow-md flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-left transition-colors hover:border-emerald-500/50">
+                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-md bg-emerald-950/90 border border-amber-400/25 flex items-center justify-center text-amber-400 shrink-0">
+                    <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="block text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-emerald-300/75 leading-tight truncate">
+                      {cms.hero?.infoLabel1 || "STATUS ORGANISASI"}
+                    </span>
+                    <span className="block text-[11px] sm:text-xs lg:text-[13px] font-black text-white leading-snug mt-0.5 line-clamp-2 sm:truncate">
+                      {cms.hero?.infoValue1 || "Ekstrakurikuler Resmi"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="relative p-2.5 sm:p-3.5 rounded-lg bg-[#07261c]/85 border border-emerald-700/45 border-l-2 border-l-amber-400/80 shadow-md flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-left transition-colors hover:border-emerald-500/50">
+                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-md bg-emerald-950/90 border border-amber-400/25 flex items-center justify-center text-amber-400 shrink-0">
+                    <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="block text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-emerald-300/75 leading-tight truncate">
+                      {cms.hero?.infoLabel2 || "PUSAT KEGIATAN"}
+                    </span>
+                    <span className="block text-[11px] sm:text-xs lg:text-[13px] font-black text-white leading-snug mt-0.5 line-clamp-2 sm:truncate">
+                      {cms.hero?.infoValue2 || "Musholla Al-Ikhlas"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="relative p-2.5 sm:p-3.5 rounded-lg bg-[#07261c]/85 border border-emerald-700/45 border-l-2 border-l-amber-400/80 shadow-md flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-left transition-colors hover:border-emerald-500/50">
+                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-md bg-emerald-950/90 border border-amber-400/25 flex items-center justify-center text-amber-400 shrink-0">
+                    <Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="block text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-emerald-300/75 leading-tight truncate">
+                      {cms.hero?.infoLabel3 || "NAUNGAN SEKOLAH"}
+                    </span>
+                    <span className="block text-[11px] sm:text-xs lg:text-[13px] font-black text-white leading-snug mt-0.5 line-clamp-2 sm:truncate">
+                      {cms.hero?.infoValue3 || "SMAN 4 Purwokerto"}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </motion.div>
 
             {/* Right Column: Hero Showcase Card with Differential Parallax (Opposing Rate) */}

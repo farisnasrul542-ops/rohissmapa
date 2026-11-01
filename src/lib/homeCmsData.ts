@@ -18,6 +18,12 @@ export interface HomeCmsData {
     btnSecondaryText: string;
     btnSecondaryLink: string;
     showcaseImageUrl?: string;
+    infoLabel1?: string;
+    infoValue1?: string;
+    infoLabel2?: string;
+    infoValue2?: string;
+    infoLabel3?: string;
+    infoValue3?: string;
   };
   stats: Array<{
     id: string;
@@ -110,6 +116,12 @@ export const DEFAULT_HOME_CMS: HomeCmsData = {
     btnSecondaryText: "Lihat Galeri Rohis",
     btnSecondaryLink: "/galeri",
     showcaseImageUrl: "/images/rohis-akhdir-38.jpg",
+    infoLabel1: "STATUS ORGANISASI",
+    infoValue1: "Ekstrakurikuler Resmi",
+    infoLabel2: "PUSAT KEGIATAN",
+    infoValue2: "Musholla Al-Ikhlas",
+    infoLabel3: "NAUNGAN SEKOLAH",
+    infoValue3: "SMAN 4 Purwokerto",
   },
   stats: [
     {
@@ -261,6 +273,30 @@ export function normalizeHomeCms(raw: any): HomeCmsData {
         raw.hero?.showcaseImageUrl ||
         DEFAULT_HOME_CMS.hero.showcaseImageUrl ||
         "/images/rohis-akhdir-38.jpg",
+      infoLabel1:
+        raw.hero?.infoLabel1 ||
+        DEFAULT_HOME_CMS.hero.infoLabel1 ||
+        "STATUS ORGANISASI",
+      infoValue1:
+        raw.hero?.infoValue1 ||
+        DEFAULT_HOME_CMS.hero.infoValue1 ||
+        "Ekstrakurikuler Resmi",
+      infoLabel2:
+        raw.hero?.infoLabel2 ||
+        DEFAULT_HOME_CMS.hero.infoLabel2 ||
+        "PUSAT KEGIATAN",
+      infoValue2:
+        raw.hero?.infoValue2 ||
+        DEFAULT_HOME_CMS.hero.infoValue2 ||
+        "Musholla Al-Ikhlas",
+      infoLabel3:
+        raw.hero?.infoLabel3 ||
+        DEFAULT_HOME_CMS.hero.infoLabel3 ||
+        "NAUNGAN SEKOLAH",
+      infoValue3:
+        raw.hero?.infoValue3 ||
+        DEFAULT_HOME_CMS.hero.infoValue3 ||
+        "SMAN 4 Purwokerto",
     },
     stats:
       Array.isArray(raw.stats) && raw.stats.length > 0
