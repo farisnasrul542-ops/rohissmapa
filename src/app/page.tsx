@@ -561,9 +561,9 @@ export default function HomePage() {
 
       {/* ── 3.5. SAMBUTAN PEMBINA (ADVISORS GREETING SECTION WITH CINEMATIC REVEAL) ── */}
       {cms.sections.showSambutan && (
-        <section className="py-20 lg:py-28 bg-[#f5f2eb]/70 border-y border-emerald-950/5 relative overflow-hidden">
+        <section className="py-14 sm:py-20 lg:py-28 bg-[#f5f2eb]/70 border-y border-emerald-950/5 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
               {/* Left Column: Greeting Message with Interactive Switching */}
               <CinematicReveal direction="up" delay={0.1} className="lg:col-span-7">
                 {/* Badge */}
@@ -573,34 +573,34 @@ export default function HomePage() {
                 </div>
 
                 {/* Title */}
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-950 tracking-tight leading-[1.18] mb-5">
-                  Sambutan <br className="hidden sm:inline" />
-                  <span className="text-emerald-800">
+                <h2 className="text-2xl min-[380px]:text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-950 tracking-tight leading-[1.2] mb-5">
+                  Sambutan{" "}
+                  <span className="text-emerald-800 inline-block">
                     {activePembina.role} ROHIS
                   </span>
                 </h2>
 
-                {/* Interactive Tabs/Buttons to Switch Speeches */}
-                <div className="flex flex-wrap items-center gap-2.5 mb-6 p-1.5 bg-white/90 rounded-2xl w-fit border border-emerald-900/10 shadow-sm">
+                {/* Interactive Tabs/Buttons to Switch Speeches: Responsive for All Mobile DPIs */}
+                <div className="grid grid-cols-2 p-1 sm:p-1.5 bg-white/95 rounded-2xl w-full max-w-[340px] sm:max-w-none sm:w-auto sm:inline-flex sm:items-center sm:gap-2 border border-emerald-900/10 shadow-sm mb-6">
                   {pembinaList.map((p, idx) => (
                     <button
                       key={p.id}
                       type="button"
                       onClick={() => setActivePembinaIndex(idx)}
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 cursor-pointer ${
+                      className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 cursor-pointer whitespace-nowrap ${
                         activePembinaIndex === idx
                           ? "bg-emerald-900 text-white shadow-md shadow-emerald-950/20"
                           : "text-gray-600 hover:text-emerald-950 hover:bg-emerald-50/70"
                       }`}
                     >
                       <span
-                        className={`w-2 h-2 rounded-full ${
+                        className={`w-2 h-2 rounded-full shrink-0 ${
                           activePembinaIndex === idx
                             ? "bg-amber-400 animate-pulse"
                             : "bg-gray-300"
                         }`}
                       />
-                      <span>Sambutan {p.role}</span>
+                      <span className="truncate">Sambutan {p.role}</span>
                     </button>
                   ))}
                 </div>
@@ -611,7 +611,7 @@ export default function HomePage() {
                   className="transition-all duration-300"
                 >
                   {/* Greeting */}
-                  <p className="text-base sm:text-lg font-bold text-emerald-950 mb-4">
+                  <p className="text-base sm:text-lg font-bold text-emerald-950 mb-3 sm:mb-4">
                     {activePembina.salamPembuka}
                   </p>
 
@@ -620,10 +620,10 @@ export default function HomePage() {
                     (para, i) => (
                       <p
                         key={i}
-                        className={`text-sm sm:text-[15px] text-gray-700 leading-relaxed ${
+                        className={`text-[13.5px] sm:text-[15px] text-gray-700 leading-relaxed ${
                           i === activePembina.paragraphs.length - 1
-                            ? "mb-6"
-                            : "mb-4"
+                            ? "mb-5 sm:mb-6"
+                            : "mb-3.5 sm:mb-4"
                         }`}
                       >
                         {para}
@@ -632,31 +632,31 @@ export default function HomePage() {
                   )}
 
                   {/* Closing Greeting */}
-                  <p className="text-base font-bold text-emerald-950 mb-7">
+                  <p className="text-base font-bold text-emerald-950 mb-6 sm:mb-7">
                     {activePembina.salamPenutup}
                   </p>
                 </div>
 
                 {/* Action Buttons: Switcher Button + Profile Link */}
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-col min-[420px]:flex-row items-stretch min-[420px]:items-center gap-2.5 sm:gap-3">
                   <button
                     type="button"
                     onClick={() =>
                       setActivePembinaIndex(activePembinaIndex === 0 ? 1 : 0)
                     }
-                    className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-emerald-900 text-white shadow-md shadow-emerald-950/15 hover:bg-emerald-950 hover:shadow-lg text-sm font-bold transition-all duration-300 cursor-pointer group"
+                    className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-emerald-900 text-white shadow-md shadow-emerald-950/15 hover:bg-emerald-950 hover:shadow-lg text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer group"
                   >
                     <span>
                       {activePembinaIndex === 0
                         ? "Lihat Sambutan Pembina 2"
                         : "Lihat Sambutan Pembina 1"}
                     </span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </button>
 
                   <Link
                     href="/tentang"
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white text-emerald-950 border border-emerald-900/15 shadow-sm hover:bg-emerald-50 text-sm font-semibold transition-all duration-300"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3 rounded-full bg-white text-emerald-950 border border-emerald-900/15 shadow-sm hover:bg-emerald-50 text-xs sm:text-sm font-semibold transition-all duration-300 text-center"
                   >
                     <span>Profil Lengkap</span>
                   </Link>
@@ -665,15 +665,15 @@ export default function HomePage() {
 
               {/* Right Column: 2 Pembina Card (Clickable & Clean without Period) */}
               <CinematicReveal direction="right" delay={0.2} className="lg:col-span-5">
-                <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-emerald-950/5 border border-emerald-900/10 relative">
+                <div className="bg-white rounded-3xl p-4 sm:p-8 shadow-xl shadow-emerald-950/5 border border-emerald-900/10 relative">
                   {/* 2 Pembina Grid */}
-                  <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-6">
                     {pembinaList.map((pembina, idx) => (
                       <button
                         key={pembina.id}
                         type="button"
                         onClick={() => setActivePembinaIndex(idx)}
-                        className={`flex flex-col items-center text-center p-3 sm:p-4 rounded-2xl transition-all duration-300 cursor-pointer group ${
+                        className={`flex flex-col items-center text-center p-2.5 sm:p-4 rounded-2xl transition-all duration-300 cursor-pointer group ${
                           activePembinaIndex === idx
                             ? "bg-emerald-50/70 border-2 border-emerald-500/40 shadow-sm ring-2 ring-emerald-500/10 scale-[1.02]"
                             : "border-2 border-transparent hover:bg-gray-50/80 opacity-80 hover:opacity-100"
@@ -681,7 +681,7 @@ export default function HomePage() {
                       >
                         {/* Avatar Circle with Ring */}
                         <div
-                          className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 mb-3.5 transition-transform duration-300 group-hover:scale-105 shadow-md ${
+                          className={`relative w-16 h-16 min-[380px]:w-20 min-[380px]:h-20 sm:w-24 sm:h-24 rounded-full p-1 mb-2.5 sm:mb-3.5 transition-transform duration-300 group-hover:scale-105 shadow-md ${
                             activePembinaIndex === idx
                               ? "ring-4 ring-emerald-600 bg-emerald-950 scale-105"
                               : "ring-2 ring-gray-200 bg-emerald-950"
@@ -700,13 +700,13 @@ export default function HomePage() {
                         </div>
 
                         {/* Name */}
-                        <h3 className="font-black text-xs sm:text-sm text-emerald-950 leading-snug min-h-[2.5rem] flex items-center justify-center">
+                        <h3 className="font-black text-xs sm:text-sm text-emerald-950 leading-snug min-h-[2.2rem] sm:min-h-[2.5rem] flex items-center justify-center">
                           {pembina.name}
                         </h3>
 
                         {/* Role Badge: Strictly only 'Pembina 1' / 'Pembina 2' */}
                         <div
-                          className={`inline-block mt-2.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition-colors ${
+                          className={`inline-block mt-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider transition-colors ${
                             activePembinaIndex === idx
                               ? "bg-emerald-800 text-white shadow-sm"
                               : "bg-gray-100 text-gray-700 group-hover:bg-gray-200"
@@ -717,7 +717,7 @@ export default function HomePage() {
 
                         {/* Active Indicator Cue */}
                         {activePembinaIndex === idx && (
-                          <span className="mt-2 text-[10px] sm:text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                          <span className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] font-bold text-emerald-700 flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping inline-block" />
                             <span>Sedang Dibaca</span>
                           </span>
