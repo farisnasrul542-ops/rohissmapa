@@ -59,6 +59,8 @@ export default function HomePage() {
   const [agendaDragOffset, setAgendaDragOffset] = useState(0);
   const [isAgendaDragging, setIsAgendaDragging] = useState(false);
   const agendaDragStartXRef = useRef<number | null>(null);
+  const agendaDragDeltaRef = useRef(0);
+  const agendaRafRef = useRef<number | null>(null);
   const isAgendaDragActiveRef = useRef(false);
   const agendaHasMovedRef = useRef(false);
   const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
@@ -194,6 +196,7 @@ export default function HomePage() {
 
   const handleAgendaDragStart = (clientX: number) => {
     agendaDragStartXRef.current = clientX;
+    agendaDragDeltaRef.current = 0;
     isAgendaDragActiveRef.current = true;
     setIsAgendaDragging(true);
     agendaHasMovedRef.current = false;
@@ -202,26 +205,40 @@ export default function HomePage() {
 
   const handleAgendaDragMove = (clientX: number) => {
     if (!isAgendaDragActiveRef.current || agendaDragStartXRef.current === null) return;
-    const delta = clientX - agendaDragStartXRef.current;
-    if (Math.abs(delta) > 5) {
+    // Reduksi resistensi geser agar terasa ringan di jari
+    const rawDelta = clientX - agendaDragStartXRef.current;
+    const delta = Math.max(-180, Math.min(180, rawDelta));
+    agendaDragDeltaRef.current = delta;
+    if (Math.abs(rawDelta) > 5) {
       agendaHasMovedRef.current = true;
     }
-    setAgendaDragOffset(delta);
+    if (agendaRafRef.current === null) {
+      agendaRafRef.current = requestAnimationFrame(() => {
+        setAgendaDragOffset(agendaDragDeltaRef.current);
+        agendaRafRef.current = null;
+      });
+    }
   };
 
   const handleAgendaDragEnd = () => {
     if (!isAgendaDragActiveRef.current) return;
     isAgendaDragActiveRef.current = false;
+    if (agendaRafRef.current !== null) {
+      cancelAnimationFrame(agendaRafRef.current);
+      agendaRafRef.current = null;
+    }
     setIsAgendaDragging(false);
     setIsAgendaPaused(false);
 
-    const threshold = 65;
-    if (agendaDragOffset < -threshold) {
+    const finalDelta = agendaDragDeltaRef.current;
+    const threshold = 32;
+    if (finalDelta < -threshold) {
       nextAgenda();
-    } else if (agendaDragOffset > threshold) {
+    } else if (finalDelta > threshold) {
       prevAgenda();
     }
 
+    agendaDragDeltaRef.current = 0;
     setAgendaDragOffset(0);
     agendaDragStartXRef.current = null;
     setTimeout(() => {
@@ -794,15 +811,16 @@ export default function HomePage() {
               </p>
             </CinematicReveal>
 
-          {/* 3D Coverflow Stage with Real CSS 3D Perspective & Real-time Drag (All-DPI Responsive) */}
+          {/* 3D Coverflow Stage with Hardware-Accelerated 60/120fps Touch Physics */}
           <div
             className={`relative -mx-4 sm:mx-auto w-[100vw] sm:w-full max-w-6xl h-[495px] sm:h-[600px] flex items-center justify-center select-none overflow-visible ${
               isAgendaDragging ? "cursor-grabbing" : "cursor-grab"
             }`}
             style={{
-              perspective: "1200px",
+              perspective: "1100px",
               perspectiveOrigin: "50% 50%",
               transformStyle: "preserve-3d",
+              touchAction: "pan-y",
             }}
             onMouseEnter={() => setIsAgendaPaused(true)}
             onMouseLeave={() => {
@@ -833,7 +851,7 @@ export default function HomePage() {
               onClick={prevAgenda}
               aria-label="Agenda Sebelumnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/70 backdrop-blur-md border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-all duration-300 shadow-2xl cursor-pointer"
+              className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
@@ -844,12 +862,12 @@ export default function HomePage() {
               onClick={nextAgenda}
               aria-label="Agenda Berikutnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/70 backdrop-blur-md border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-all duration-300 shadow-2xl cursor-pointer"
+              className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/80 border border-white/25 text-white flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-transform duration-200 shadow-xl cursor-pointer"
             >
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            {/* Cards Slider with True 3D Transforms & Real-time Drag Physics */}
+            {/* Cards Slider with Lightweight GPU-Composited 3D Transforms */}
             {eventsList.map((event, idx) => {
               const total = eventsList.length;
               let dist = (idx - agendaIndex + total) % total;
@@ -858,55 +876,40 @@ export default function HomePage() {
               const isCenter = dist === 0;
               const isLeft = dist === -1;
               const isRight = dist === 1;
+              const isVisible = isCenter || isLeft || isRight;
 
               const currentDrag = isAgendaDragging ? agendaDragOffset : 0;
-              const dragAngle = Number(((currentDrag / 280) * 14).toFixed(2));
+              const dragAngle = Number(((currentDrag / 300) * 10).toFixed(2));
 
-              // True 3D Geometry calculations
+              // Pure GPU-composited 3D Geometry (transform + opacity only, no CSS filter blur)
               let transform = "";
               let zIndex = 1;
               let opacity = 0;
-              let filter = "none";
-              let boxShadow = "none";
               let pointerEvents: "auto" | "none" = "none";
 
               if (isCenter) {
-                // Front and center in 3D space, translates horizontally with drag & responds to mouse tilt
-                transform = `translate3d(${currentDrag}px, 0, 55px) rotateY(${cardTilt.x + dragAngle}deg) rotateX(${cardTilt.y}deg) scale(1)`;
+                transform = `translate3d(${currentDrag}px, 0, 45px) rotateY(${cardTilt.x + dragAngle}deg) rotateX(${cardTilt.y}deg) scale(1)`;
                 zIndex = 35;
                 opacity = 1;
-                filter = "none";
-                boxShadow =
-                  "0 35px 75px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(16, 185, 129, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.32)";
                 pointerEvents = "auto";
               } else if (isLeft) {
-                // Turned in 3D perspective towards center, follows drag
-                transform = `translate3d(calc(-64% + ${currentDrag * 0.72}px), 0, -85px) rotateY(${30 + dragAngle}deg) scale(0.86)`;
+                transform = `translate3d(calc(-62% + ${currentDrag * 0.65}px), 0, -75px) rotateY(${26 + dragAngle}deg) scale(0.86)`;
                 zIndex = 15;
-                opacity = 0.6;
-                filter = "blur(0.6px) brightness(0.75)";
-                boxShadow = "0 25px 50px -10px rgba(0, 0, 0, 0.75)";
+                opacity = 0.62;
                 pointerEvents = "auto";
               } else if (isRight) {
-                // Turned in 3D perspective towards center, follows drag
-                transform = `translate3d(calc(64% + ${currentDrag * 0.72}px), 0, -85px) rotateY(${-30 + dragAngle}deg) scale(0.86)`;
+                transform = `translate3d(calc(62% + ${currentDrag * 0.65}px), 0, -75px) rotateY(${-26 + dragAngle}deg) scale(0.86)`;
                 zIndex = 15;
-                opacity = 0.6;
-                filter = "blur(0.6px) brightness(0.75)";
-                boxShadow = "0 25px 50px -10px rgba(0, 0, 0, 0.75)";
+                opacity = 0.62;
                 pointerEvents = "auto";
               } else if (dist < -1) {
-                transform =
-                  "translate3d(-130%, 0, -260px) rotateY(50deg) scale(0.68)";
+                transform = "translate3d(-115%, 0, -180px) rotateY(38deg) scale(0.72)";
                 zIndex = 1;
                 opacity = 0;
-                filter = "blur(3px)";
               } else {
-                transform =
-                  "translate3d(130%, 0, -260px) rotateY(-50deg) scale(0.68)";
+                transform = "translate3d(115%, 0, -180px) rotateY(-38deg) scale(0.72)";
                 zIndex = 1;
                 opacity = 0;
-                filter = "blur(3px)";
               }
 
               return (
@@ -923,54 +926,50 @@ export default function HomePage() {
                     transform,
                     zIndex,
                     opacity,
-                    filter,
-                    boxShadow,
                     pointerEvents,
-                    transformStyle: "preserve-3d",
+                    visibility: isVisible ? "visible" : "hidden",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
                     transition: isAgendaDragging
                       ? "none"
-                      : "transform 750ms cubic-bezier(0.19, 1, 0.22, 1), opacity 750ms cubic-bezier(0.19, 1, 0.22, 1), filter 750ms ease, box-shadow 750ms ease",
+                      : "transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
-                  className={`absolute w-[68vw] min-w-[210px] max-w-[300px] sm:w-[390px] sm:max-w-none lg:w-[435px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-white text-gray-900 border-[2.5px] border-white/30 will-change-transform ${
+                  className={`absolute w-[68vw] min-w-[210px] max-w-[300px] sm:w-[390px] sm:max-w-none lg:w-[435px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-white text-gray-900 border-[2px] border-white/30 will-change-transform ${
                     isCenter
-                      ? "ring-4 ring-white/10 cursor-default"
-                      : "cursor-pointer hover:opacity-85 hover:brightness-90"
+                      ? "shadow-2xl ring-2 ring-white/15 cursor-default"
+                      : "shadow-xl cursor-pointer hover:opacity-85"
                   }`}
                 >
                   {/* Photo Header with Category Badge */}
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-emerald-950">
                     <img
+                      draggable={false}
+                      decoding="async"
                       src={parseImageCrop(event.image).src}
                       alt={event.title}
                       referrerPolicy="no-referrer"
                       onError={(e) => handleGoogleDriveImageError(e, event.image)}
                       style={getImageCropStyle(event.image)}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover select-none"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
-                    {/* Category Pill Tag (Pop-out 3D depth) */}
-                    <div
-                      style={{ transform: "translateZ(30px)" }}
-                      className="absolute top-3 left-3 sm:top-4 sm:left-4 px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/25 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-lg"
-                    >
+                    {/* Category Pill Tag */}
+                    <div className="absolute top-3 left-3 sm:top-4 sm:left-4 px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-black/80 border border-white/25 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-md">
                       {event.type}
                     </div>
                   </div>
 
-                  {/* 3D Realistic Directional Lighting Shading on angled side cards */}
+                  {/* Lightweight Directional Shading on angled side cards */}
                   {isLeft && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent pointer-events-none rounded-[24px] sm:rounded-[28px] z-20" />
+                    <div className="absolute inset-0 bg-black/30 pointer-events-none z-20" />
                   )}
                   {isRight && (
-                    <div className="absolute inset-0 bg-gradient-to-l from-black/45 via-black/15 to-transparent pointer-events-none rounded-[24px] sm:rounded-[28px] z-20" />
+                    <div className="absolute inset-0 bg-black/30 pointer-events-none z-20" />
                   )}
 
-                  {/* Card Content with 3D Pop */}
-                  <div
-                    style={{ transform: "translateZ(15px)" }}
-                    className="p-4 sm:p-6 lg:p-7 flex flex-col justify-between text-left"
-                  >
+                  {/* Card Content */}
+                  <div className="p-4 sm:p-6 lg:p-7 flex flex-col justify-between text-left">
                     <div>
                       {/* Date Row */}
                       <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold text-amber-700 mb-1.5 sm:mb-2">
@@ -1001,11 +1000,10 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    {/* Divider & Action Button with 3D Pop */}
+                    {/* Divider & Action Button */}
                     <div className="pt-3 sm:pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
                       <button
                         type="button"
-                        style={{ transform: "translateZ(25px)" }}
                         onClick={(e) => {
                           if (agendaHasMovedRef.current) return;
                           e.stopPropagation();

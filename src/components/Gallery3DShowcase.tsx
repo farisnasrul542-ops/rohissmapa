@@ -58,10 +58,12 @@ export default function Gallery3DShowcase({
   const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 });
   const [progressKey, setProgressKey] = useState(0);
 
-  // Real-time Drag / Swipe Physics state
+  // Real-time Drag / Swipe Physics state (rAF-throttled for 60/120fps mobile)
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartXRef = useRef<number | null>(null);
+  const dragDeltaRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
   const isDragActiveRef = useRef(false);
   const hasMovedRef = useRef(false);
 
@@ -112,9 +114,10 @@ export default function Gallery3DShowcase({
     setProgressKey((prev) => prev + 1);
   };
 
-  // Real-time Drag Handlers
+  // Real-time Drag Handlers (rAF-throttled)
   const handleDragStart = (clientX: number) => {
     dragStartXRef.current = clientX;
+    dragDeltaRef.current = 0;
     isDragActiveRef.current = true;
     setIsDragging(true);
     hasMovedRef.current = false;
@@ -122,25 +125,38 @@ export default function Gallery3DShowcase({
 
   const handleDragMove = (clientX: number) => {
     if (!isDragActiveRef.current || dragStartXRef.current === null) return;
-    const delta = clientX - dragStartXRef.current;
-    if (Math.abs(delta) > 5) {
+    const rawDelta = clientX - dragStartXRef.current;
+    const delta = Math.max(-180, Math.min(180, rawDelta));
+    dragDeltaRef.current = delta;
+    if (Math.abs(rawDelta) > 5) {
       hasMovedRef.current = true;
     }
-    setDragOffset(delta);
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(() => {
+        setDragOffset(dragDeltaRef.current);
+        rafRef.current = null;
+      });
+    }
   };
 
   const handleDragEnd = () => {
     if (!isDragActiveRef.current) return;
     isDragActiveRef.current = false;
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     setIsDragging(false);
 
-    const threshold = 65;
-    if (dragOffset < -threshold) {
+    const finalDelta = dragDeltaRef.current;
+    const threshold = 32;
+    if (finalDelta < -threshold) {
       nextSlide();
-    } else if (dragOffset > threshold) {
+    } else if (finalDelta > threshold) {
       prevSlide();
     }
 
+    dragDeltaRef.current = 0;
     setDragOffset(0);
     dragStartXRef.current = null;
     setTimeout(() => {
@@ -231,8 +247,9 @@ export default function Gallery3DShowcase({
             isDragging ? "cursor-grabbing" : "cursor-grab"
           }`}
           style={{
-            perspective: "1150px",
+            perspective: "1100px",
             perspectiveOrigin: "50% 50%",
+            touchAction: "pan-y",
           }}
           onMouseDown={(e) => {
             if (e.button !== 0) return;
@@ -257,12 +274,9 @@ export default function Gallery3DShowcase({
         >
           {/* Main 3D Stage Container */}
           <div
-            className={`relative w-full h-[480px] sm:h-[540px] lg:h-[600px] flex items-center justify-center ${
-              !isHovered && !isDragging ? "animate-float-levitate" : ""
-            }`}
+            className="relative w-full h-[480px] sm:h-[540px] lg:h-[600px] flex items-center justify-center"
             style={{
               transformStyle: "preserve-3d",
-              transition: isDragging ? "none" : "transform 700ms ease-out",
             }}
           >
             {/* Left Floating Arrow Navigation Button */}
@@ -274,7 +288,7 @@ export default function Gallery3DShowcase({
               }}
               aria-label="Foto Sebelumnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/75 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center backdrop-blur-md border border-white/25 shadow-2xl transition-all duration-300 cursor-pointer group"
+              className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/80 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center border border-white/25 shadow-xl transition-transform duration-200 cursor-pointer group"
             >
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-0.5 transition-transform" />
             </button>
@@ -288,7 +302,7 @@ export default function Gallery3DShowcase({
               }}
               aria-label="Foto Berikutnya"
               style={{ transform: "translateZ(150px)" }}
-              className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/75 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center backdrop-blur-md border border-white/25 shadow-2xl transition-all duration-300 cursor-pointer group"
+              className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-13 sm:h-13 rounded-full bg-black/80 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center border border-white/25 shadow-xl transition-transform duration-200 cursor-pointer group"
             >
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-0.5 transition-transform" />
             </button>
@@ -302,64 +316,49 @@ export default function Gallery3DShowcase({
               const isCenter = dist === 0;
               const isLeft = dist === -1;
               const isRight = dist === 1;
+              const isVisible = isCenter || isLeft || isRight;
 
               // Real-time Drag offsets & angles
               const currentDrag = isDragging ? dragOffset : 0;
-              const dragAngle = Number(((currentDrag / 280) * 15).toFixed(2));
+              const dragAngle = Number(((currentDrag / 300) * 10).toFixed(2));
 
-              // Dramatic 3D Geometry calculations
+              // Pure GPU-composited 3D Geometry (transform + opacity only)
               let transform = "";
               let zIndex = 1;
               let opacity = 0;
-              let filter = "none";
-              let boxShadow = "none";
               let pointerEvents: "auto" | "none" = "none";
 
               if (isCenter) {
-                // Center active card: follows drag in real time + interactive mouse tilt
                 const tiltX = cardTilt.x;
                 const tiltY = cardTilt.y;
                 transform = `translate3d(${currentDrag}px, 0, ${
-                  isHovered ? "85px" : "55px"
+                  isHovered ? "65px" : "45px"
                 }) rotateY(${tiltX + dragAngle}deg) rotateX(${tiltY}deg) scale(1)`;
                 zIndex = 35;
                 opacity = 1;
-                filter = "none";
-                boxShadow =
-                  "0 35px 85px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(16, 185, 129, 0.28), 0 0 0 2px rgba(255, 255, 255, 0.28)";
                 pointerEvents = "auto";
               } else if (isLeft) {
-                // Left flanking card: angled in 3D perspective towards center, translates with drag
-                transform = `translate3d(calc(-64% + ${currentDrag * 0.72}px), 0, -100px) rotateY(${
-                  34 + dragAngle
-                }deg) scale(0.84)`;
+                transform = `translate3d(calc(-62% + ${currentDrag * 0.65}px), 0, -85px) rotateY(${
+                  28 + dragAngle
+                }deg) scale(0.85)`;
                 zIndex = 15;
-                opacity = 0.58;
-                filter = "blur(0.8px) brightness(0.72)";
-                boxShadow = "0 25px 50px -10px rgba(0, 0, 0, 0.8)";
+                opacity = 0.6;
                 pointerEvents = "auto";
               } else if (isRight) {
-                // Right flanking card: angled in 3D perspective towards center, translates with drag
-                transform = `translate3d(calc(64% + ${currentDrag * 0.72}px), 0, -100px) rotateY(${
-                  -34 + dragAngle
-                }deg) scale(0.84)`;
+                transform = `translate3d(calc(62% + ${currentDrag * 0.65}px), 0, -85px) rotateY(${
+                  -28 + dragAngle
+                }deg) scale(0.85)`;
                 zIndex = 15;
-                opacity = 0.58;
-                filter = "blur(0.8px) brightness(0.72)";
-                boxShadow = "0 25px 50px -10px rgba(0, 0, 0, 0.8)";
+                opacity = 0.6;
                 pointerEvents = "auto";
               } else if (dist < -1) {
-                transform =
-                  "translate3d(-125%, 0, -280px) rotateY(52deg) scale(0.65)";
+                transform = "translate3d(-115%, 0, -200px) rotateY(40deg) scale(0.7)";
                 zIndex = 1;
                 opacity = 0;
-                filter = "blur(3px)";
               } else {
-                transform =
-                  "translate3d(125%, 0, -280px) rotateY(-52deg) scale(0.65)";
+                transform = "translate3d(115%, 0, -200px) rotateY(-40deg) scale(0.7)";
                 zIndex = 1;
                 opacity = 0;
-                filter = "blur(3px)";
               }
 
               const itemImage =
@@ -384,71 +383,67 @@ export default function Gallery3DShowcase({
                     transform,
                     zIndex,
                     opacity,
-                    filter,
-                    boxShadow,
                     pointerEvents,
-                    transformStyle: "preserve-3d",
+                    visibility: isVisible ? "visible" : "hidden",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
                     transition: isDragging
                       ? "none"
                       : isCenter && isHovered
-                      ? "transform 140ms ease-out, box-shadow 300ms ease, opacity 850ms cubic-bezier(0.19, 1, 0.22, 1)"
-                      : "transform 900ms cubic-bezier(0.19, 1, 0.22, 1), opacity 900ms cubic-bezier(0.19, 1, 0.22, 1), filter 900ms ease, box-shadow 900ms ease",
+                      ? "transform 160ms ease-out, opacity 420ms cubic-bezier(0.22, 1, 0.36, 1)"
+                      : "transform 440ms cubic-bezier(0.22, 1, 0.36, 1), opacity 440ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
                   className={`absolute w-[70vw] min-w-[215px] max-w-[315px] sm:w-[480px] sm:max-w-none lg:w-[620px] h-[410px] sm:h-[490px] lg:h-[530px] rounded-[26px] sm:rounded-[32px] overflow-hidden bg-emerald-950 will-change-transform border-[2px] border-white/25 select-none ${
                     isCenter
-                      ? "ring-4 ring-white/10"
-                      : "cursor-pointer hover:opacity-80 hover:brightness-85"
+                      ? "shadow-2xl ring-2 ring-white/15"
+                      : "shadow-xl cursor-pointer hover:opacity-80"
                   }`}
                 >
-                  {/* Layer 0: Background Photo with Slow Cinematic Zoom */}
+                  {/* Layer 0: Background Photo */}
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <img
                       draggable={false}
+                      decoding="async"
                       src={parseImageCrop(itemImage).src}
                       alt={item.title}
                       referrerPolicy="no-referrer"
                       onError={(e) => handleGoogleDriveImageError(e, itemImage)}
                       style={getImageCropStyle(itemImage)}
-                      className="w-full h-full transition-transform duration-1000 ease-out select-none"
+                      className="w-full h-full select-none"
                     />
 
                     {/* Multi-Stop Cinematic Overlay Gradients */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#041a13] via-[#041a13]/65 to-transparent opacity-95 pointer-events-none" />
                     <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(4,26,19,0.8)_100%)] pointer-events-none" />
                   </div>
 
-                  {/* 3D Realistic Directional Lighting Shading for angled side cards */}
+                  {/* Lightweight Directional Shading for angled side cards */}
                   {isLeft && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/40 to-black/80 pointer-events-none z-20" />
+                    <div className="absolute inset-0 bg-black/35 pointer-events-none z-20" />
                   )}
                   {isRight && (
-                    <div className="absolute inset-0 bg-gradient-to-l from-transparent via-black/40 to-black/80 pointer-events-none z-20" />
+                    <div className="absolute inset-0 bg-black/35 pointer-events-none z-20" />
                   )}
 
                   {/* Layer 1: 3D Glare Lighting Sheen (Active on Center Card) */}
-                  {isCenter && !isDragging && (
+                  {isCenter && !isDragging && isHovered && (
                     <div
                       style={{
-                        transform: "translateZ(35px)",
                         background: `radial-gradient(circle 400px at ${glarePos.x}% ${glarePos.y}%, rgba(255,255,255,${glarePos.opacity}) 0%, transparent 80%)`,
                       }}
                       className="absolute inset-0 pointer-events-none transition-opacity duration-300"
                     />
                   )}
 
-                  {/* Layer 2: Top Floating Info Badges (3D Pop: 65px) */}
-                  <div
-                    style={{ transform: "translateZ(65px)" }}
-                    className="absolute top-5 sm:top-6 left-5 sm:left-7 right-5 sm:right-7 flex items-center justify-between gap-3 pointer-events-none z-20"
-                  >
+                  {/* Layer 2: Top Floating Info Badges */}
+                  <div className="absolute top-5 sm:top-6 left-5 sm:left-7 right-5 sm:right-7 flex items-center justify-between gap-3 pointer-events-none z-20">
                     {/* Category Pill Tag */}
                     <div className="flex items-center gap-2">
-                      <span className="px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-600/90 text-white backdrop-blur-md border border-white/25 shadow-lg">
+                      <span className="px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-600 text-white border border-white/25 shadow-md">
                         {item.category}
                       </span>
                       {item.emoji && (
-                        <span className="w-7 h-7 rounded-full bg-white/90 text-xs flex items-center justify-center shadow-md backdrop-blur-sm">
+                        <span className="w-7 h-7 rounded-full bg-white text-xs flex items-center justify-center shadow-md">
                           {item.emoji}
                         </span>
                       )}
@@ -468,7 +463,7 @@ export default function Gallery3DShowcase({
                               ? "Lanjutkan putar otomatis"
                               : "Jeda putar otomatis"
                           }
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide bg-black/65 hover:bg-black/85 text-emerald-300 backdrop-blur-md border border-white/15 transition-all shadow-md cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide bg-black/75 hover:bg-black/90 text-emerald-300 border border-white/15 transition-colors shadow-md cursor-pointer"
                         >
                           {isPaused || isHovered || isDragging ? (
                             <>
@@ -489,26 +484,16 @@ export default function Gallery3DShowcase({
                           )}
                         </button>
 
-                        <div className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white/90 bg-black/65 backdrop-blur-md border border-white/15 shadow-md">
+                        <div className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white/90 bg-black/75 border border-white/15 shadow-md">
                           {currentIndex + 1} / {total}
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Layer 3: Main Foreground Content (3D Pop: 85px on center) */}
-                  <div
-                    style={{ transform: "translateZ(85px)" }}
-                    className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10 z-20 pointer-events-auto"
-                  >
-                    <div
-                      key={isCenter ? `center-content-${currentIndex}` : `side-${item.id}`}
-                      className={
-                        isCenter && !isDragging
-                          ? "animate-[slideUpFade_700ms_cubic-bezier(0.16,1,0.3,1)]"
-                          : ""
-                      }
-                    >
+                  {/* Layer 3: Main Foreground Content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10 z-20 pointer-events-auto">
+                    <div>
                       {/* Date Badge */}
                       <div className="inline-flex items-center gap-2 text-xs font-semibold text-amber-300 bg-amber-400/15 border border-amber-400/30 px-3 py-1 rounded-full mb-2.5 shadow">
                         <Calendar size={13} className="text-amber-300" />
@@ -516,18 +501,18 @@ export default function Gallery3DShowcase({
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-lg sm:text-2xl lg:text-3xl font-black text-white leading-snug tracking-tight mb-2 drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
+                      <h3 className="text-lg sm:text-2xl lg:text-3xl font-black text-white leading-snug tracking-tight mb-2">
                         {item.title}
                       </h3>
 
                       {/* Description (visible on center) */}
                       {isCenter && (
-                        <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed max-w-xl line-clamp-2 sm:line-clamp-3 mb-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+                        <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed max-w-xl line-clamp-2 sm:line-clamp-3 mb-4">
                           {itemDesc}
                         </p>
                       )}
 
-                      {/* Action Links & 3D Pop Hint */}
+                      {/* Action Links */}
                       {isCenter && (
                         <div className="flex flex-wrap items-center gap-3 pt-1">
                           <Link
@@ -535,8 +520,7 @@ export default function Gallery3DShowcase({
                             onClick={(e) => {
                               if (hasMovedRef.current) e.preventDefault();
                             }}
-                            style={{ transform: "translateZ(30px)" }}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-emerald-950 text-xs sm:text-sm font-black tracking-wide shadow-xl shadow-emerald-500/30 transition-all duration-300 group"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-emerald-950 text-xs sm:text-sm font-black tracking-wide shadow-lg transition-transform duration-200 group"
                           >
                             <span>Lihat Dokumentasi Lengkap</span>
                             <ArrowRight
@@ -556,10 +540,7 @@ export default function Gallery3DShowcase({
 
                   {/* Layer 4: 4-Second Animated Progress Bar on Center Card */}
                   {isCenter && (
-                    <div
-                      style={{ transform: "translateZ(40px)" }}
-                      className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-20 overflow-hidden"
-                    >
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-20 overflow-hidden">
                       <div
                         key={progressKey}
                         style={{

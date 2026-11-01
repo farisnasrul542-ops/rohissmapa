@@ -157,6 +157,8 @@ export default function Directory3DShowcase() {
   const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
 
   const dragStartXRef = useRef<number | null>(null);
+  const dragDeltaRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
   const isDragActiveRef = useRef(false);
   const hasMovedRef = useRef(false);
 
@@ -185,9 +187,10 @@ export default function Directory3DShowcase() {
     return () => clearInterval(timer);
   }, [isPaused, isDragging, nextItem]);
 
-  // Real-time Drag Handlers
+  // Real-time Drag Handlers (rAF-throttled for 60/120fps mobile)
   const handleDragStart = (clientX: number) => {
     dragStartXRef.current = clientX;
+    dragDeltaRef.current = 0;
     isDragActiveRef.current = true;
     setIsDragging(true);
     hasMovedRef.current = false;
@@ -195,25 +198,38 @@ export default function Directory3DShowcase() {
 
   const handleDragMove = (clientX: number) => {
     if (!isDragActiveRef.current || dragStartXRef.current === null) return;
-    const delta = clientX - dragStartXRef.current;
-    if (Math.abs(delta) > 5) {
+    const rawDelta = clientX - dragStartXRef.current;
+    const delta = Math.max(-180, Math.min(180, rawDelta));
+    dragDeltaRef.current = delta;
+    if (Math.abs(rawDelta) > 5) {
       hasMovedRef.current = true;
     }
-    setDragOffset(delta);
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(() => {
+        setDragOffset(dragDeltaRef.current);
+        rafRef.current = null;
+      });
+    }
   };
 
   const handleDragEnd = () => {
     if (!isDragActiveRef.current) return;
     isDragActiveRef.current = false;
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     setIsDragging(false);
 
-    const threshold = 60;
-    if (dragOffset < -threshold) {
+    const finalDelta = dragDeltaRef.current;
+    const threshold = 32;
+    if (finalDelta < -threshold) {
       nextItem();
-    } else if (dragOffset > threshold) {
+    } else if (finalDelta > threshold) {
       prevItem();
     }
 
+    dragDeltaRef.current = 0;
     setDragOffset(0);
     dragStartXRef.current = null;
     setTimeout(() => {
@@ -273,9 +289,10 @@ export default function Directory3DShowcase() {
             isDragging ? "cursor-grabbing" : "cursor-grab"
           }`}
           style={{
-            perspective: "1200px",
+            perspective: "1100px",
             perspectiveOrigin: "50% 50%",
             transformStyle: "preserve-3d",
+            touchAction: "pan-y",
           }}
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => {
@@ -309,7 +326,7 @@ export default function Directory3DShowcase() {
             }}
             aria-label="Menu Sebelumnya"
             style={{ transform: "translateZ(150px)" }}
-            className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-all duration-300 cursor-pointer group"
+            className="absolute left-2.5 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-transform duration-200 cursor-pointer group"
           >
             <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -323,7 +340,7 @@ export default function Directory3DShowcase() {
             }}
             aria-label="Menu Berikutnya"
             style={{ transform: "translateZ(150px)" }}
-            className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-all duration-300 cursor-pointer group"
+            className="absolute right-2.5 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-emerald-50 active:scale-95 text-gray-700 hover:text-emerald-900 border border-gray-200/80 shadow-lg flex items-center justify-center transition-transform duration-200 cursor-pointer group"
           >
             <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
           </button>
@@ -336,60 +353,47 @@ export default function Directory3DShowcase() {
             const isCenter = dist === 0;
             const isLeft = dist === -1;
             const isRight = dist === 1;
+            const isVisible = isCenter || isLeft || isRight;
 
             const currentDrag = isDragging ? dragOffset : 0;
-            const dragAngle = Number(((currentDrag / 260) * 12).toFixed(2));
+            const dragAngle = Number(((currentDrag / 280) * 10).toFixed(2));
 
             let transform = "";
             let zIndex = 1;
             let opacity = 0;
-            let filter = "none";
-            let boxShadow = "none";
             let pointerEvents: "auto" | "none" = "none";
 
             if (isCenter) {
-              // Center card: pops forward with interactive tilt & drag
-              transform = `translate3d(${currentDrag}px, 0, 55px) rotateY(${
+              transform = `translate3d(${currentDrag}px, 0, 45px) rotateY(${
                 cardTilt.x + dragAngle
               }deg) rotateX(${cardTilt.y}deg) scale(1)`;
               zIndex = 35;
               opacity = 1;
-              filter = "none";
-              boxShadow =
-                "0 25px 60px -15px rgba(16, 72, 53, 0.16), 0 0 0 2px rgba(16, 185, 129, 0.35), 0 0 25px rgba(16, 185, 129, 0.12)";
               pointerEvents = "auto";
             } else if (isLeft) {
-              // Left card: angled in 3D perspective towards center
-              transform = `translate3d(calc(-64% + ${
-                currentDrag * 0.72
-              }px), 0, -85px) rotateY(${30 + dragAngle}deg) scale(0.85)`;
+              transform = `translate3d(calc(-62% + ${
+                currentDrag * 0.65
+              }px), 0, -75px) rotateY(${26 + dragAngle}deg) scale(0.86)`;
               zIndex = 15;
               opacity = 0.65;
-              filter = "blur(0.5px) brightness(0.92)";
-              boxShadow = "0 15px 35px -10px rgba(0, 0, 0, 0.08)";
               pointerEvents = "auto";
             } else if (isRight) {
-              // Right card: angled in 3D perspective towards center
-              transform = `translate3d(calc(64% + ${
-                currentDrag * 0.72
-              }px), 0, -85px) rotateY(${-30 + dragAngle}deg) scale(0.85)`;
+              transform = `translate3d(calc(62% + ${
+                currentDrag * 0.65
+              }px), 0, -75px) rotateY(${-26 + dragAngle}deg) scale(0.86)`;
               zIndex = 15;
               opacity = 0.65;
-              filter = "blur(0.5px) brightness(0.92)";
-              boxShadow = "0 15px 35px -10px rgba(0, 0, 0, 0.08)";
               pointerEvents = "auto";
             } else if (dist < -1) {
               transform =
-                "translate3d(-130%, 0, -220px) rotateY(48deg) scale(0.68)";
+                "translate3d(-115%, 0, -180px) rotateY(38deg) scale(0.72)";
               zIndex = 1;
               opacity = 0;
-              filter = "blur(2px)";
             } else {
               transform =
-                "translate3d(130%, 0, -220px) rotateY(-48deg) scale(0.68)";
+                "translate3d(115%, 0, -180px) rotateY(-38deg) scale(0.72)";
               zIndex = 1;
               opacity = 0;
-              filter = "blur(2px)";
             }
 
             const IconComponent = item.icon;
@@ -408,31 +412,29 @@ export default function Directory3DShowcase() {
                   transform,
                   zIndex,
                   opacity,
-                  filter,
-                  boxShadow,
                   pointerEvents,
-                  transformStyle: "preserve-3d",
+                  visibility: isVisible ? "visible" : "hidden",
+                  backfaceVisibility: "hidden",
+                  WebkitBackfaceVisibility: "hidden",
                   transition: isDragging
                     ? "none"
-                    : "transform 750ms cubic-bezier(0.19, 1, 0.22, 1), opacity 750ms cubic-bezier(0.19, 1, 0.22, 1), filter 750ms ease, box-shadow 750ms ease",
+                    : "transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
-                className={`absolute w-[68vw] min-w-[210px] max-w-[300px] sm:w-[370px] sm:max-w-none lg:w-[410px] h-[290px] sm:h-[330px] rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 bg-white border border-gray-200/80 will-change-transform flex flex-col justify-between text-left transition-colors duration-300 ${
+                className={`absolute w-[68vw] min-w-[210px] max-w-[300px] sm:w-[370px] sm:max-w-none lg:w-[410px] h-[290px] sm:h-[330px] rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 bg-white border border-gray-200/80 will-change-transform flex flex-col justify-between text-left ${
                   isCenter
-                    ? "ring-2 ring-emerald-500/35 cursor-default"
-                    : "cursor-pointer hover:opacity-85 hover:brightness-95"
+                    ? "shadow-xl ring-2 ring-emerald-500/35 cursor-default"
+                    : "shadow-md cursor-pointer hover:opacity-85"
                 }`}
               >
                 {/* Top Row: Icon on Left & Category Tag on Right */}
                 <div className="flex items-center justify-between gap-2">
                   <div
-                    style={{ transform: "translateZ(20px)" }}
                     className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${item.iconBg} ${item.iconColor} flex items-center justify-center shadow-xs shrink-0`}
                   >
                     <IconComponent size={20} />
                   </div>
 
                   <span
-                    style={{ transform: "translateZ(15px)" }}
                     className={`px-2.5 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate ${item.tagColor.bg} ${item.tagColor.text} border ${item.tagColor.border}`}
                   >
                     {item.tag}
@@ -440,7 +442,7 @@ export default function Directory3DShowcase() {
                 </div>
 
                 {/* Middle: Title & Description */}
-                <div style={{ transform: "translateZ(25px)" }} className="my-1.5 sm:my-2">
+                <div className="my-1.5 sm:my-2">
                   <h3 className="text-[15px] sm:text-xl font-black text-emerald-950 mb-1.5 sm:mb-2 leading-snug line-clamp-2">
                     {item.title}
                   </h3>
@@ -450,16 +452,13 @@ export default function Directory3DShowcase() {
                 </div>
 
                 {/* Bottom: Action Link */}
-                <div
-                  style={{ transform: "translateZ(30px)" }}
-                  className="pt-3 border-t border-gray-100 flex items-center justify-between"
-                >
+                <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
                   <Link
                     href={item.link}
                     onClick={(e) => {
                       if (hasMovedRef.current) e.preventDefault();
                     }}
-                    className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-black transition-all group/link ${
+                    className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-black transition-colors group/link ${
                       isCenter
                         ? "text-emerald-700 hover:text-emerald-950"
                         : "text-gray-500 hover:text-emerald-800"
