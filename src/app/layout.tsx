@@ -9,7 +9,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rohis-sman4purwokerto.sch.id"),
+  metadataBase: new URL("https://rohis-sman4pwt.web.id"),
   referrer: "no-referrer",
   title: "ROHIS SMA Negeri 4 Purwokerto — Platform Digital Resmi Pelajar Muslim SMAPA",
   description: "Wadah pembinaan karakter, ukhuwah Islamiyah, dan dakwah pelajar SMA Negeri 4 Purwokerto, Jawa Tengah.",
@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Rohis SMA Negeri 4 Purwokerto" }],
   openGraph: {
+    url: "https://rohis-sman4pwt.web.id/",
     title: "ROHIS SMA Negeri 4 Purwokerto — Berilmu, Berakhlak Mulia, dan Berprestasi",
     description: "Platform digital resmi Kerohanian Islam (ROHIS) SMA Negeri 4 Purwokerto.",
     siteName: "ROHIS SMAN 4 PURWOKERTO",
@@ -57,6 +58,24 @@ export default function RootLayout({
     <html lang="id" className="h-full scroll-smooth" suppressHydrationWarning>
       <head>
         <meta name="referrer" content="no-referrer" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var h = window.location.hostname.toLowerCase();
+                var p = window.location.pathname;
+                // Jika membuka domain khusus admin (workers.dev) di root "/", langsung arahkan ke /admin sebelum halaman dimuat
+                if (h.includes("workers.dev") && (p === "/" || p === "" || p === "/index.html")) {
+                  window.location.replace("/admin");
+                }
+                // Jika membuka domain umum (rohis-sman4pwt.web.id) dan mencoba akses /admin atau /login, langsung tolak dan kembalikan ke beranda umum
+                if (h.includes("rohis-sman4pwt.web.id") && (p.startsWith("/admin") || p.startsWith("/login"))) {
+                  window.location.replace("/");
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col font-sans antialiased text-gray-900 bg-[#fafaf7]" suppressHydrationWarning>
         <SmoothScroll>{children}</SmoothScroll>

@@ -14,6 +14,8 @@ export const SITE = {
   instagram: "@rohis_smapa",
   instagramUrl: "https://www.instagram.com/rohis_smapa/",
   youtubeUrl: "https://www.youtube.com/@sman4purwokerto",
+  publicUrl: "https://rohis-sman4pwt.web.id/",
+  adminUrl: "https://rohissmapa.farisnasrul542.workers.dev/",
   period: "2026/2027",
   establishedYear: "1985",
   schoolName: "SMA Negeri 4 Purwokerto",

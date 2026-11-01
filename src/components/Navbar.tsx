@@ -133,18 +133,10 @@ export default function Navbar() {
             <div className="hidden sm:flex items-center gap-2">
               <Link
                 href="/aspirasi"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all border border-emerald-900/10 shadow-2xs hover:scale-[1.02] active:scale-[0.98]"
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all border border-emerald-900/10 shadow-2xs hover:scale-[1.02] active:scale-[0.98]"
               >
                 <MessageSquareHeart size={14} className="text-emerald-700" />
-                <span>Aspirasi</span>
-              </Link>
-              <Link
-                href="/admin"
-                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-gray-700 hover:text-emerald-900 bg-gray-100/90 hover:bg-emerald-50 rounded-xl transition-all border border-gray-200"
-                title="Panel Pengurus BPH"
-              >
-                <ShieldCheck size={14} className="text-emerald-700" />
-                <span>Admin</span>
+                <span>Kotak Aspirasi</span>
               </Link>
             </div>
 
@@ -269,26 +261,18 @@ export default function Navbar() {
                   );
                 })}
 
-                {/* Bottom Quick Action CTAs */}
-                <div className="pt-3 border-t border-gray-100 grid grid-cols-2 gap-2.5">
+                {/* Bottom Quick Action CTA */}
+                <div className="pt-3 border-t border-gray-100">
                   <Link
                     href="/aspirasi"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-900/10 text-emerald-900 transition-all text-center group"
+                    className="flex items-center justify-center gap-3 p-3.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-900/10 text-emerald-900 transition-all text-center group"
                   >
-                    <MessageSquareHeart size={20} className="text-emerald-700 mb-1 group-hover:scale-110 transition-transform" />
-                    <span className="text-xs font-bold">Kotak Aspirasi</span>
-                    <span className="text-[10px] text-emerald-700/70">Suara Siswa SMAPA</span>
-                  </Link>
-
-                  <Link
-                    href="/admin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-amber-50 hover:bg-amber-100/80 border border-amber-300/60 text-emerald-950 transition-all text-center group"
-                  >
-                    <ShieldCheck size={20} className="text-amber-600 mb-1 group-hover:scale-110 transition-transform" />
-                    <span className="text-xs font-bold">Panel Admin</span>
-                    <span className="text-[10px] text-amber-700/80">Khusus BPH Rohis</span>
+                    <MessageSquareHeart size={20} className="text-emerald-700 group-hover:scale-110 transition-transform" />
+                    <div className="text-left">
+                      <span className="text-xs font-bold block">Kotak Aspirasi Siswa</span>
+                      <span className="text-[10px] text-emerald-700/70 block">Sampaikan suara & saran ke Rohis SMAPA</span>
+                    </div>
                   </Link>
                 </div>
               </div>

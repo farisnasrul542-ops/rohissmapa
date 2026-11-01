@@ -14,6 +14,7 @@ import {
   INITIAL_ANNOUNCEMENT,
 } from "@/lib/adminData";
 import { HomeCmsData, DEFAULT_HOME_CMS, normalizeHomeCms } from "@/lib/homeCmsData";
+import { pullCloudSync, pushCloudSync } from "@/lib/cloudSync";
 
 interface ToastNotification {
   id: number;
@@ -124,13 +125,33 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       if (savedCms) setHomeCms(normalizeHomeCms(JSON.parse(savedCms)));
     } catch {}
     setIsInitialized(true);
+
+    pullCloudSync().then((synced) => {
+      if (!synced) return;
+      if (Array.isArray(synced.rohis_admin_events) && synced.rohis_admin_events.length > 0) {
+        setEvents(synced.rohis_admin_events);
+      }
+      if (Array.isArray(synced.rohis_admin_gallery) && synced.rohis_admin_gallery.length > 0) {
+        setGallery(synced.rohis_admin_gallery);
+      }
+      if (Array.isArray(synced.rohis_admin_aspirasi) && synced.rohis_admin_aspirasi.length > 0) {
+        setAspirasiList(synced.rohis_admin_aspirasi);
+      }
+      if (synced.rohis_admin_announcement) {
+        setAnnouncement(synced.rohis_admin_announcement);
+      }
+      if (synced.rohis_home_cms) {
+        setHomeCms(normalizeHomeCms(synced.rohis_home_cms));
+      }
+    });
   }, []);
 
-  // Sync to local storage only after initial hydration load
+  // Sync to local storage and Cloud Sync only after initial hydration load
   useEffect(() => {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_admin_events", JSON.stringify(events));
+      pushCloudSync({ rohis_admin_events: events });
     } catch {}
   }, [events, isInitialized]);
 
@@ -145,6 +166,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_admin_aspirasi", JSON.stringify(aspirasiList));
+      pushCloudSync({ rohis_admin_aspirasi: aspirasiList });
     } catch {}
   }, [aspirasiList, isInitialized]);
 
@@ -152,6 +174,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_admin_gallery", JSON.stringify(gallery));
+      pushCloudSync({ rohis_admin_gallery: gallery });
     } catch {}
   }, [gallery, isInitialized]);
 
@@ -159,6 +182,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_admin_announcement", JSON.stringify(announcement));
+      pushCloudSync({ rohis_admin_announcement: announcement });
     } catch {}
   }, [announcement, isInitialized]);
 
@@ -166,6 +190,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!isInitialized) return;
     try {
       localStorage.setItem("rohis_home_cms", JSON.stringify(homeCms));
+      pushCloudSync({ rohis_home_cms: homeCms });
       if (typeof window !== "undefined") {
         window.dispatchEvent(
           new CustomEvent("rohis_cms_updated", { detail: homeCms })

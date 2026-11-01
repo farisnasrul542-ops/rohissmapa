@@ -132,8 +132,8 @@ const DIRECTORY_ITEMS: DirectoryItem[] = [
     link: "/aspirasi",
   },
   {
-    id: "admin",
-    tag: "PANEL PENGURUS BPH",
+    id: "kontak",
+    tag: "SEKRETARIAT & MEDSOS",
     tagColor: {
       bg: "bg-emerald-950",
       text: "text-amber-300",
@@ -141,11 +141,11 @@ const DIRECTORY_ITEMS: DirectoryItem[] = [
     },
     iconBg: "bg-gradient-to-br from-emerald-900 to-emerald-950 shadow-sm",
     iconColor: "text-amber-300",
-    icon: ShieldCheck,
-    title: "Panel Admin & CMS",
+    icon: Building,
+    title: "Kontak & Musholla Al-Ikhlas",
     description:
-      "Dashboard khusus pengurus BPH dan pembina untuk mengelola agenda kegiatan, kotak aspirasi siswa, dan konten website.",
-    link: "/admin",
+      "Informasi pusat kegiatan Musholla Al-Ikhlas SMAN 4 Purwokerto, kanal media sosial resmi, dan layanan informasi dakwah sekolah.",
+    link: "/kontak",
   },
 ];
 

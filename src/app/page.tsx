@@ -29,6 +29,7 @@ import {
 import { DEFAULT_HOME_CMS, HomeCmsData, normalizeHomeCms } from "@/lib/homeCmsData";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
 import { handleGoogleDriveImageError } from "@/lib/driveUtils";
+import { pullCloudSync } from "@/lib/cloudSync";
 import { EventItem } from "@/lib/types";
 import {
   ArrowRight,
@@ -80,6 +81,15 @@ export default function HomePage() {
   const heroGlowScale = useTransform(heroProgress, [0, 1], [1, 1.25]);
 
   useEffect(() => {
+    // Jika diakses menggunakan link khusus Admin (rohissmapa.farisnasrul542.workers.dev), langsung arahkan ke /admin
+    if (
+      typeof window !== "undefined" &&
+      window.location.hostname.toLowerCase().includes("workers.dev")
+    ) {
+      window.location.replace("/admin");
+      return;
+    }
+
     setMounted(true);
     const loadCms = () => {
       try {
@@ -104,6 +114,17 @@ export default function HomePage() {
 
     loadCms();
     loadEvents();
+
+    // Tarik data terbaru dari Cloud Sync (menghubungkan workers.dev -> rohis-sman4pwt.web.id)
+    pullCloudSync().then((synced) => {
+      if (!synced) return;
+      if (synced.rohis_home_cms) {
+        setCms(normalizeHomeCms(synced.rohis_home_cms));
+      }
+      if (Array.isArray(synced.rohis_admin_events) && synced.rohis_admin_events.length > 0) {
+        setEventsList(synced.rohis_admin_events);
+      }
+    });
 
     const handleStorage = (e: StorageEvent) => {
       if (e.key === "rohis_home_cms" && e.newValue) {
@@ -239,6 +260,14 @@ export default function HomePage() {
   ];
 
   const activePembina = pembinaList[activePembinaIndex] || pembinaList[0];
+
+  if (mounted && typeof window !== "undefined" && window.location.hostname.toLowerCase().includes("workers.dev")) {
+    return (
+      <div className="min-h-screen bg-[#041811] flex items-center justify-center text-white text-xs font-bold">
+        Mengarahkan ke Panel Admin Rohis SMAPA...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fafaf7] text-gray-900 selection:bg-emerald-200 selection:text-emerald-900">

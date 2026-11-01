@@ -9,6 +9,7 @@ import { EVENTS_DATA } from "@/lib/constants";
 import { EventItem } from "@/lib/types";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
 import { handleGoogleDriveImageError } from "@/lib/driveUtils";
+import { pullCloudSync } from "@/lib/cloudSync";
 import {
   Calendar,
   MapPin,
@@ -41,6 +42,17 @@ export default function AgendaPage() {
         }
       }
     } catch {}
+
+    pullCloudSync().then((synced) => {
+      if (Array.isArray(synced?.rohis_admin_events) && synced.rohis_admin_events.length > 0) {
+        setEventList(
+          synced.rohis_admin_events.map((e: any) => ({
+            ...e,
+            type: e.category || e.type || "Kajian",
+          }))
+        );
+      }
+    });
   }, []);
 
   const categories = ["Semua", "Kajian", "Pelatihan", "Sosial", "Workshop", "Organisasi", "Lomba"];

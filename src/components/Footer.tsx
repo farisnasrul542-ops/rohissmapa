@@ -104,8 +104,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-amber-300 transition-colors">
-                  Portal Masuk Rohis SMAPA
+                <Link href="/kontak" className="hover:text-amber-300 transition-colors">
+                  Kontak & Sekretariat Musholla
                 </Link>
               </li>
             </ul>
@@ -167,13 +167,6 @@ export default function Footer() {
               <Heart size={13} className="text-amber-400 fill-amber-400 inline" />
               <span>oleh Tim Medinfo Rohis SMAN 4 Purwokerto</span>
             </div>
-            <span>•</span>
-            <Link
-              href="/admin"
-              className="text-amber-300/80 hover:text-amber-300 font-bold transition-colors underline-offset-2 hover:underline"
-            >
-              Portal Admin BPH
-            </Link>
           </div>
         </div>
       </div>

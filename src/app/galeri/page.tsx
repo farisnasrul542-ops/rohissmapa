@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { GALLERY_DATA } from "@/lib/constants";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
 import { handleGoogleDriveImageError } from "@/lib/driveUtils";
+import { pullCloudSync } from "@/lib/cloudSync";
 import { ScrollProgressBar, CinematicReveal } from "@/components/ScrollAnimations";
 import { Calendar, Tag } from "lucide-react";
 
@@ -22,6 +23,12 @@ export default function GaleriPage() {
         }
       }
     } catch {}
+
+    pullCloudSync().then((synced) => {
+      if (Array.isArray(synced?.rohis_admin_gallery) && synced.rohis_admin_gallery.length > 0) {
+        setGalleryList(synced.rohis_admin_gallery);
+      }
+    });
   }, []);
 
   return (

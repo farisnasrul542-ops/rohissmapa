@@ -19,6 +19,7 @@ import {
   Layers,
 } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
+import { logoutAdmin } from "@/lib/adminAuth";
 
 interface AdminSidebarProps {
   mobileOpen: boolean;
@@ -205,26 +206,33 @@ export default function AdminSidebar({
 
         {/* Public Website Gateway */}
         <div className="pt-5 px-2.5 pb-1.5 text-[10px] font-black tracking-widest uppercase text-emerald-400/50">
-          Pintasan Halaman Publik
+          Pintasan Website Umum
         </div>
 
-        <Link
-          href="/"
+        <a
+          href="https://rohis-sman4pwt.web.id/"
           target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-emerald-200/80 hover:text-white hover:bg-white/[0.06] transition-all border border-emerald-800/30 group"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center text-amber-300/80 group-hover:text-amber-300">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center text-amber-300/80 group-hover:text-amber-300 shrink-0">
               <Globe size={15} />
             </div>
-            <span>Beranda Publik</span>
+            <div className="min-w-0">
+              <span className="block truncate">Web Umum (Publik)</span>
+              <span className="block text-[9.5px] text-emerald-400/70 font-mono truncate">
+                rohis-sman4pwt.web.id
+              </span>
+            </div>
           </div>
-          <ExternalLink size={13} className="text-emerald-400/60" />
-        </Link>
+          <ExternalLink size={13} className="text-emerald-400/60 shrink-0" />
+        </a>
 
-        <Link
-          href="/program"
+        <a
+          href="https://rohis-sman4pwt.web.id/program"
           target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-emerald-200/80 hover:text-white hover:bg-white/[0.06] transition-all border border-emerald-800/30 group"
         >
           <div className="flex items-center gap-3">
@@ -234,7 +242,7 @@ export default function AdminSidebar({
             <span>6 Divisi & Proker</span>
           </div>
           <ExternalLink size={13} className="text-emerald-400/60" />
-        </Link>
+        </a>
       </div>
 
       {/* Admin User Profile & Sign Out */}
@@ -254,13 +262,14 @@ export default function AdminSidebar({
             </div>
           </div>
 
-          <Link
-            href="/login"
-            className="p-2 rounded-xl text-emerald-300/80 hover:text-rose-300 hover:bg-rose-500/15 transition-colors shrink-0"
-            title="Keluar dari Panel Admin"
+          <button
+            type="button"
+            onClick={() => logoutAdmin()}
+            className="p-2 rounded-xl text-emerald-300/80 hover:text-rose-300 hover:bg-rose-500/15 transition-colors shrink-0 cursor-pointer"
+            title="Kunci & Keluar dari Panel Admin"
           >
             <LogOut size={15} />
-          </Link>
+          </button>
         </div>
       </div>
     </div>
