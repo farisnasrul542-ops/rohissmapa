@@ -47,7 +47,42 @@ import {
   GraduationCap,
   ChevronLeft,
   ChevronRight,
+  Users,
+  Layers,
+  CalendarCheck2,
+  History,
 } from "lucide-react";
+
+const STAT_METADATA = [
+  {
+    icon: Users,
+    badge: "Kader Solid",
+    iconBg: "bg-emerald-50 text-emerald-700 border-emerald-200/80",
+    badgeBg: "bg-emerald-100/90 text-emerald-800 border-emerald-200/70",
+    glow: "group-hover:border-emerald-400/50",
+  },
+  {
+    icon: Layers,
+    badge: "Struktural",
+    iconBg: "bg-blue-50 text-blue-700 border-blue-200/80",
+    badgeBg: "bg-blue-100/90 text-blue-800 border-blue-200/70",
+    glow: "group-hover:border-blue-400/50",
+  },
+  {
+    icon: CalendarCheck2,
+    badge: "Agenda Syiar",
+    iconBg: "bg-amber-50 text-amber-700 border-amber-200/80",
+    badgeBg: "bg-amber-100/90 text-amber-800 border-amber-200/70",
+    glow: "group-hover:border-amber-400/50",
+  },
+  {
+    icon: History,
+    badge: "Sejarah SMAPA",
+    iconBg: "bg-emerald-50 text-emerald-800 border-emerald-200/80",
+    badgeBg: "bg-emerald-100/90 text-emerald-900 border-emerald-200/70",
+    glow: "group-hover:border-emerald-400/50",
+  },
+];
 
 export default function HomePage() {
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
@@ -432,27 +467,67 @@ export default function HomePage() {
       </section>
       )}
 
-      {/* ── 2. LIVE METRICS & STATS WITH SMOOTH COUNTERS & STAGGER ── */}
+      {/* ── 2. LIVE METRICS & STATS WITH ARCHITECTURAL CARDS (ALL-DPI MOBILE & DESKTOP) ── */}
       {cms.sections.showStats && (
         <section className="relative z-20 -mt-10 sm:-mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-emerald-950/5 border border-emerald-900/10">
-            <CinematicStagger className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {(cms.stats || ORG_STATS).map((stat: any, idx: number) => (
-                <CinematicStaggerItem
-                  key={stat.label || idx}
-                  className={`flex flex-col justify-center ${
-                    idx !== 0 ? "lg:border-l lg:border-gray-100 lg:pl-6" : ""
-                  }`}
-                >
-                  <div className="text-3xl sm:text-4xl font-black text-emerald-950 tracking-tight">
-                    <AnimatedCounter
-                      value={typeof stat.value === "number" ? stat.value : parseInt(stat.value, 10) || 0}
-                      suffix={stat.suffix}
-                    />
-                  </div>
-                  <div className="text-xs sm:text-sm font-bold text-gray-700 mt-1">{stat.label}</div>
-                </CinematicStaggerItem>
-              ))}
+          <div className="bg-white/95 backdrop-blur-xl rounded-[28px] sm:rounded-3xl p-3 sm:p-5 lg:p-6 shadow-xl shadow-emerald-950/8 border border-emerald-900/10 relative overflow-hidden">
+            {/* Subtle Top Glow Accent */}
+            <div className="absolute top-0 left-8 right-8 h-[2px] bg-gradient-to-r from-emerald-500/0 via-amber-400/70 to-emerald-500/0 pointer-events-none" />
+
+            <CinematicStagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
+              {(cms.stats || ORG_STATS).map((stat: any, idx: number) => {
+                const meta = STAT_METADATA[idx % STAT_METADATA.length];
+                const IconComponent = meta.icon;
+                const rawVal =
+                  typeof stat.value === "number"
+                    ? stat.value
+                    : parseInt(stat.value, 10) || 0;
+                const isYear = rawVal >= 1900 && rawVal <= 2100;
+
+                return (
+                  <CinematicStaggerItem key={stat.label || idx} className="h-full">
+                    {/* Responsive Card: Horizontal Tile on Mobile, Vertical Card on Tablet & Desktop */}
+                    <div
+                      className={`h-full flex flex-row sm:flex-col items-center sm:items-start justify-between p-3.5 sm:p-5 lg:p-6 rounded-2xl bg-[#faf9f5]/85 hover:bg-white border border-emerald-900/10 ${meta.glow} hover:shadow-md transition-all duration-300 group`}
+                    >
+                      {/* Top / Left: Icon & Badge */}
+                      <div className="flex items-center gap-3 sm:w-full sm:justify-between mb-0 sm:mb-3">
+                        <div
+                          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 border ${meta.iconBg} group-hover:scale-105 transition-transform duration-300 shadow-2xs`}
+                        >
+                          <IconComponent className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </div>
+                        <span
+                          className={`hidden sm:inline-block text-[10.5px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-2xs ${meta.badgeBg}`}
+                        >
+                          {meta.badge}
+                        </span>
+                      </div>
+
+                      {/* Middle & Bottom Info */}
+                      <div className="flex-1 sm:flex-initial min-w-0 px-3 sm:px-0 sm:w-full">
+                        <div className="flex items-baseline justify-between sm:justify-start gap-2">
+                          <div className="text-2xl min-[380px]:text-3xl lg:text-4xl font-black text-emerald-950 tracking-tight leading-none">
+                            <AnimatedCounter
+                              value={rawVal}
+                              suffix={stat.suffix}
+                              noSeparator={Boolean(stat.noSeparator || isYear)}
+                            />
+                          </div>
+                          <span
+                            className={`sm:hidden text-[9.5px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shrink-0 ${meta.badgeBg}`}
+                          >
+                            {meta.badge}
+                          </span>
+                        </div>
+                        <div className="text-xs sm:text-sm font-bold text-gray-700 mt-1 sm:mt-2 leading-snug line-clamp-2">
+                          {stat.label}
+                        </div>
+                      </div>
+                    </div>
+                  </CinematicStaggerItem>
+                );
+              })}
             </CinematicStagger>
           </div>
         </section>

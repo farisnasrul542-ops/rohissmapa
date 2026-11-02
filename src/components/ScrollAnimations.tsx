@@ -33,6 +33,7 @@ interface AnimatedCounterProps {
   suffix?: string;
   duration?: number;
   className?: string;
+  noSeparator?: boolean;
 }
 
 export function AnimatedCounter({
@@ -40,6 +41,7 @@ export function AnimatedCounter({
   suffix = "",
   duration = 1800,
   className = "",
+  noSeparator = false,
 }: AnimatedCounterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-40px" });
@@ -78,7 +80,7 @@ export function AnimatedCounter({
 
   return (
     <span ref={ref} className={className}>
-      {displayValue.toLocaleString("id-ID")}
+      {noSeparator ? displayValue : displayValue.toLocaleString("id-ID")}
       {suffix && <span className="text-amber-500 font-extrabold">{suffix}</span>}
     </span>
   );
