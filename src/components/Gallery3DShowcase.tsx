@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
-import { handleGoogleDriveImageError } from "@/lib/driveUtils";
+import { handleGoogleDriveImageError, formatGoogleDriveUrl } from "@/lib/driveUtils";
 import {
   Calendar,
   ArrowRight,
@@ -23,7 +23,9 @@ export interface GalleryShowcaseItem {
   date: string;
   image?: string;
   coverImage?: string;
+  imageUrl?: string;
   description?: string;
+  caption?: string;
   emoji?: string;
 }
 
@@ -361,10 +363,12 @@ export default function Gallery3DShowcase({
                 opacity = 0;
               }
 
-              const itemImage =
-                item.image || item.coverImage || "/images/dokumentasi-muskerta.jpg";
+              const rawItemImg =
+                item.image || item.coverImage || item.imageUrl || "/images/dokumentasi-muskerta.jpg";
+              const itemImage = formatGoogleDriveUrl(rawItemImg);
               const itemDesc =
                 item.description ||
+                item.caption ||
                 DEFAULT_DESCRIPTIONS[item.category] ||
                 DEFAULT_DESCRIPTIONS.default;
 
@@ -574,8 +578,9 @@ export default function Gallery3DShowcase({
             <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 max-w-full px-2">
               {safeItems.map((item, idx) => {
                 const isActive = idx === currentIndex;
-                const thumbImage =
-                  item.image || item.coverImage || "/images/dokumentasi-muskerta.jpg";
+                const rawThumbImg =
+                  item.image || item.coverImage || item.imageUrl || "/images/dokumentasi-muskerta.jpg";
+                const thumbImage = formatGoogleDriveUrl(rawThumbImg);
 
                 return (
                   <button

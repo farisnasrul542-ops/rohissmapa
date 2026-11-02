@@ -129,6 +129,19 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
       const savedCms = localStorage.getItem("rohis_home_cms");
       if (savedCms) setHomeCms(normalizeHomeCms(JSON.parse(savedCms)));
+
+      // Otomatis sinkronkan data yang tersimpan di panel admin ke cloud store agar perubahan langsung aktif
+      if (typeof window !== "undefined") {
+        const payloadToSync: any = {};
+        if (savedCms) payloadToSync.rohis_home_cms = JSON.parse(savedCms);
+        if (savedEvents) payloadToSync.rohis_admin_events = JSON.parse(savedEvents);
+        if (savedGallery) payloadToSync.rohis_admin_gallery = JSON.parse(savedGallery);
+        if (savedAspirasi) payloadToSync.rohis_admin_aspirasi = JSON.parse(savedAspirasi);
+        if (savedAnnouncement) payloadToSync.rohis_admin_announcement = JSON.parse(savedAnnouncement);
+        if (Object.keys(payloadToSync).length > 0) {
+          pushCloudSync(payloadToSync);
+        }
+      }
     } catch {}
     setIsInitialized(true);
 
@@ -225,9 +238,17 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   ) => {
     hasUserModifiedCmsRef.current = true;
     if (typeof updated === "function") {
-      setHomeCms(updated);
+      setHomeCms((prev) => {
+        const next = updated(prev);
+        pushCloudSync({ rohis_home_cms: next });
+        return next;
+      });
     } else {
-      setHomeCms((prev) => ({ ...prev, ...updated }));
+      setHomeCms((prev) => {
+        const next = { ...prev, ...updated };
+        pushCloudSync({ rohis_home_cms: next });
+        return next;
+      });
     }
     showToast("Konten Beranda berhasil disimpan & disinkronkan!", "success");
   };
@@ -365,21 +386,32 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const addGalleryItem = (item: Omit<GalleryItem, "id">) => {
     hasUserModifiedGalleryRef.current = true;
     const id = `GAL-${Date.now().toString().slice(-4)}`;
-    setGallery((prev) => [{ ...item, id }, ...prev]);
+    const newItem = { ...item, id };
+    setGallery((prev) => {
+      const updated = [newItem, ...prev];
+      pushCloudSync({ rohis_admin_gallery: updated });
+      return updated;
+    });
     showToast("Foto dokumentasi berhasil ditambahkan!", "success");
   };
 
   const updateGalleryItem = (id: string, updated: Partial<GalleryItem>) => {
     hasUserModifiedGalleryRef.current = true;
-    setGallery((prev) =>
-      prev.map((g) => (g.id === id ? { ...g, ...updated } : g))
-    );
+    setGallery((prev) => {
+      const updatedList = prev.map((g) => (g.id === id ? { ...g, ...updated } : g));
+      pushCloudSync({ rohis_admin_gallery: updatedList });
+      return updatedList;
+    });
     showToast("Foto dokumentasi berhasil diperbarui!", "success");
   };
 
   const deleteGalleryItem = (id: string) => {
     hasUserModifiedGalleryRef.current = true;
-    setGallery((prev) => prev.filter((g) => g.id !== id));
+    setGallery((prev) => {
+      const updatedList = prev.filter((g) => g.id !== id);
+      pushCloudSync({ rohis_admin_gallery: updatedList });
+      return updatedList;
+    });
     showToast("Foto dokumentasi telah dihapus.", "warning");
   };
 

@@ -29,6 +29,7 @@ import {
 import { useAdmin } from "@/context/AdminContext";
 import { HomeCmsData, DEFAULT_HOME_CMS, normalizeHomeCms } from "@/lib/homeCmsData";
 import { formatGoogleDriveUrl } from "@/lib/driveUtils";
+import { pushCloudSync } from "@/lib/cloudSync";
 import ImageCropField from "@/components/admin/ImageCropField";
 
 type SubnavTab =
@@ -101,6 +102,9 @@ export default function HomeCmsEditorPage() {
 
       // 4. Update AdminContext state
       updateHomeCms(safeData);
+
+      // 5. Explicitly push to persistent cloud sync
+      pushCloudSync({ rohis_home_cms: safeData });
     } catch (err) {
       console.error("Gagal menyimpan CMS:", err);
     }

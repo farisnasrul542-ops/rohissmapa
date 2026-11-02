@@ -4,7 +4,7 @@
  * - Menyediakan endpoint sinkronisasi data lintas domain (/api/cms-sync) menggunakan Cloudflare Edge Cache API
  */
 
-const CACHE_KEY_URL = "https://rohissmapa.farisnasrul542.workers.dev/api/cms-sync-cache-store";
+const CLOUD_STORAGE_OBJECT_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a19cc57a9b1075";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -24,22 +24,31 @@ export default {
 
     // 2. Endpoint Sinkronisasi Data Lintas Domain (Admin workers.dev <-> Publik rohis-sman4pwt.web.id)
     if (url.pathname === "/api/cms-sync") {
-      const cache = caches.default;
-      const cacheReq = new Request(CACHE_KEY_URL, { method: "GET" });
-
       if (request.method === "GET") {
-        let cachedRes = await cache.match(cacheReq);
-        if (cachedRes) {
-          const body = await cachedRes.text();
-          return new Response(body, {
-            status: 200,
-            headers: {
-              ...CORS_HEADERS,
-              "Content-Type": "application/json",
-              "Cache-Control": "no-store",
-            },
+        // Coba ambil dari cloud persistent storage terlebih dahulu
+        try {
+          const res = await fetch(CLOUD_STORAGE_OBJECT_URL, {
+            method: "GET",
+            headers: { "Cache-Control": "no-cache" },
           });
-        }
+          if (res.ok) {
+            const json = await res.json();
+            if (json?.data && typeof json.data === "object") {
+              globalThis.__ROHIS_SHARED_STATE__ = {
+                ...globalThis.__ROHIS_SHARED_STATE__,
+                ...json.data,
+              };
+              return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE__), {
+                status: 200,
+                headers: {
+                  ...CORS_HEADERS,
+                  "Content-Type": "application/json",
+                  "Cache-Control": "no-store, no-cache, must-revalidate",
+                },
+              });
+            }
+          }
+        } catch {}
 
         if (globalThis.__ROHIS_SHARED_STATE__) {
           return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE__), {
@@ -47,7 +56,7 @@ export default {
             headers: {
               ...CORS_HEADERS,
               "Content-Type": "application/json",
-              "Cache-Control": "no-store",
+              "Cache-Control": "no-store, no-cache, must-revalidate",
             },
           });
         }
@@ -57,7 +66,7 @@ export default {
           headers: {
             ...CORS_HEADERS,
             "Content-Type": "application/json",
-            "Cache-Control": "no-store",
+            "Cache-Control": "no-store, no-cache, must-revalidate",
           },
         });
       }
@@ -66,10 +75,15 @@ export default {
         try {
           const incoming = await request.json();
           let existing = globalThis.__ROHIS_SHARED_STATE__ || {};
+
+          // Ambil data terbaru dari cloud storage sebelum merge
           try {
-            const prevCached = await cache.match(cacheReq);
-            if (prevCached) {
-              existing = await prevCached.json();
+            const currentRes = await fetch(CLOUD_STORAGE_OBJECT_URL, { cache: "no-store" });
+            if (currentRes.ok) {
+              const currentJson = await currentRes.json();
+              if (currentJson?.data && typeof currentJson.data === "object") {
+                existing = { ...existing, ...currentJson.data };
+              }
             }
           } catch {}
 
@@ -81,16 +95,21 @@ export default {
 
           globalThis.__ROHIS_SHARED_STATE__ = merged;
 
-          const bodyStr = JSON.stringify(merged);
-          const responseToCache = new Response(bodyStr, {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json",
-              "Cache-Control": "public, max-age=31536000",
-            },
-          });
+          // Simpan secara permanen ke cloud persistent store via PUT
+          const savePromise = fetch(CLOUD_STORAGE_OBJECT_URL, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: "rohis_smapa_cms_v1",
+              data: merged,
+            }),
+          }).catch(() => {});
 
-          ctx.waitUntil(cache.put(cacheReq, responseToCache));
+          if (ctx && typeof ctx.waitUntil === "function") {
+            ctx.waitUntil(savePromise);
+          } else {
+            await savePromise;
+          }
 
           return new Response(JSON.stringify({ ok: true, updatedAt: merged.updatedAt }), {
             status: 200,

@@ -99,6 +99,7 @@ export default function HomePage() {
   const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
   const [cms, setCms] = useState<HomeCmsData>(DEFAULT_HOME_CMS);
   const [eventsList, setEventsList] = useState<any[]>([...EVENTS_DATA]);
+  const [galleryList, setGalleryList] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
 
   // Cinematic Hero Parallax Depth Setup
@@ -147,8 +148,21 @@ export default function HomePage() {
       } catch {}
     };
 
+    const loadGallery = () => {
+      try {
+        const savedGallery = localStorage.getItem("rohis_admin_gallery");
+        if (savedGallery) {
+          const parsed = JSON.parse(savedGallery);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setGalleryList(parsed);
+          }
+        }
+      } catch {}
+    };
+
     loadCms();
     loadEvents();
+    loadGallery();
 
     // Tarik data terbaru dari Cloud Sync (menghubungkan workers.dev -> rohis-sman4pwt.web.id)
     pullCloudSync().then((synced) => {
@@ -158,6 +172,9 @@ export default function HomePage() {
       }
       if (Array.isArray(synced.rohis_admin_events) && synced.rohis_admin_events.length > 0) {
         setEventsList(synced.rohis_admin_events);
+      }
+      if (Array.isArray(synced.rohis_admin_gallery) && synced.rohis_admin_gallery.length > 0) {
+        setGalleryList(synced.rohis_admin_gallery);
       }
     });
 
@@ -172,6 +189,14 @@ export default function HomePage() {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed) && parsed.length > 0) {
             setEventsList(parsed);
+          }
+        } catch {}
+      }
+      if (e.key === "rohis_admin_gallery" && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setGalleryList(parsed);
           }
         } catch {}
       }
@@ -1175,11 +1200,20 @@ export default function HomePage() {
       {cms.sections.showGallery && (
         <CinematicReveal direction="up" delay={0.15}>
           <Gallery3DShowcase
-            items={
-              cms.gallery?.items && cms.gallery.items.length > 0
+            items={(() => {
+              const isCmsDefault =
+                JSON.stringify(cms.gallery?.items) ===
+                JSON.stringify(DEFAULT_HOME_CMS.gallery.items);
+              if (!isCmsDefault && cms.gallery?.items && cms.gallery.items.length > 0) {
+                return cms.gallery.items;
+              }
+              if (galleryList.length > 0) {
+                return galleryList;
+              }
+              return cms.gallery?.items && cms.gallery.items.length > 0
                 ? cms.gallery.items
-                : GALLERY_DATA
-            }
+                : GALLERY_DATA;
+            })()}
             tag={cms.gallery?.tag || "Dokumentasi Kegiatan"}
             title={cms.gallery?.title || "Galeri Syiar & Ukhuwah SMAPA"}
             lead={
