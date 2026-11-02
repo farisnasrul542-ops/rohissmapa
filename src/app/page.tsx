@@ -424,49 +424,70 @@ export default function HomePage() {
                     />
                   </div>
 
-                  {/* Gradient Overlay at bottom for clear text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 via-45% to-transparent pointer-events-none" />
-
-                  {/* Top-Right Badge */}
-                  <div className="absolute top-4 right-4 z-10">
-                    <span className="px-3.5 py-1.5 rounded-full bg-[#1b3d30]/90 backdrop-blur-md border border-amber-400/30 text-amber-300 text-[11px] font-black tracking-wider uppercase shadow-lg">
-                      {cms.hero?.showcaseBadge || "RBC X PECETIKAH"}
-                    </span>
-                  </div>
-
-                  {/* Bottom Text Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 z-10 text-left">
-                    {/* Location Badge */}
-                    <div className="flex items-center gap-1.5 text-xs font-black tracking-wider text-amber-400 mb-1.5 uppercase drop-shadow">
-                      <span>📍</span>
-                      <span>{cms.hero?.showcaseLocation || "SMAN 4 PURWOKERTO"}</span>
+                  {/* Top-Right Badge (Boleh dikosongkan) */}
+                  {Boolean(cms.hero?.showcaseBadge?.trim()) && (
+                    <div className="absolute top-4 right-4 z-10">
+                      <span className="px-3.5 py-1.5 rounded-full bg-[#1b3d30]/90 backdrop-blur-md border border-amber-400/30 text-amber-300 text-[11px] font-black tracking-wider uppercase shadow-lg">
+                        {cms.hero.showcaseBadge}
+                      </span>
                     </div>
+                  )}
 
-                    {/* Title */}
-                    <h3 className="text-lg sm:text-xl font-black text-white tracking-tight mb-1.5 uppercase drop-shadow-md">
-                      {cms.hero?.showcaseTitle || "ROHIS AKHDIR 38"}
-                    </h3>
+                  {/* Bottom Text Overlay (Boleh dikosongkan semua atau sebagian) */}
+                  {Boolean(
+                    cms.hero?.showcaseLocation?.trim() ||
+                    cms.hero?.showcaseTitle?.trim() ||
+                    cms.hero?.showcaseDescription?.trim()
+                  ) && (
+                    <>
+                      {/* Gradient Overlay at bottom for clear text readability */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 via-45% to-transparent pointer-events-none" />
 
-                    {/* Description */}
-                    <p className="text-xs sm:text-[13px] text-emerald-100/90 leading-relaxed font-medium line-clamp-2 drop-shadow">
-                      {cms.hero?.showcaseDescription ||
-                        "Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan."}
-                    </p>
+                      <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 z-10 text-left">
+                        {/* Location Badge */}
+                        {Boolean(cms.hero?.showcaseLocation?.trim()) && (
+                          <div className="flex items-center gap-1.5 text-xs font-black tracking-wider text-amber-400 mb-1.5 uppercase drop-shadow">
+                            <span>📍</span>
+                            <span>{cms.hero.showcaseLocation}</span>
+                          </div>
+                        )}
+
+                        {/* Title */}
+                        {Boolean(cms.hero?.showcaseTitle?.trim()) && (
+                          <h3 className="text-lg sm:text-xl font-black text-white tracking-tight mb-1.5 uppercase drop-shadow-md">
+                            {cms.hero.showcaseTitle}
+                          </h3>
+                        )}
+
+                        {/* Description */}
+                        {Boolean(cms.hero?.showcaseDescription?.trim()) && (
+                          <p className="text-xs sm:text-[13px] text-emerald-100/90 leading-relaxed font-medium line-clamp-2 drop-shadow">
+                            {cms.hero.showcaseDescription}
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Bottom Meta Information (Boleh dikosongkan) */}
+                {Boolean(
+                  cms.hero?.showcaseMeta1?.trim() ||
+                  cms.hero?.showcaseMeta2?.trim() ||
+                  cms.hero?.showcaseMeta3?.trim()
+                ) && (
+                  <div className="mt-3.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-[10.5px] sm:text-xs font-black text-emerald-300/85 tracking-wider uppercase px-2 w-full">
+                    {Boolean(cms.hero?.showcaseMeta1?.trim()) && (
+                      <span className="truncate">{cms.hero.showcaseMeta1}</span>
+                    )}
+                    {Boolean(cms.hero?.showcaseMeta2?.trim()) && (
+                      <span className="truncate">{cms.hero.showcaseMeta2}</span>
+                    )}
+                    {Boolean(cms.hero?.showcaseMeta3?.trim()) && (
+                      <span className="truncate">{cms.hero.showcaseMeta3}</span>
+                    )}
                   </div>
-                </div>
-
-                {/* Bottom Meta Information (Responsive Spacing for All DPIs) */}
-                <div className="mt-3.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-[10.5px] sm:text-xs font-black text-emerald-300/85 tracking-wider uppercase px-2 w-full">
-                  <span className="truncate">
-                    {cms.hero?.showcaseMeta1 || "RESMI • LOMBA TINGKAT KAB"}
-                  </span>
-                  <span className="truncate">
-                    {cms.hero?.showcaseMeta2 || "2026 • PURWOKERTO"}
-                  </span>
-                  <span className="truncate">
-                    {cms.hero?.showcaseMeta3 || "15+ SMA / SMK / MA"}
-                  </span>
-                </div>
+                )}
               </div>
             </motion.div>
           </div>

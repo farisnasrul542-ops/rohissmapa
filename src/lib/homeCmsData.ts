@@ -289,33 +289,34 @@ export function normalizeHomeCms(raw: any): HomeCmsData {
         DEFAULT_HOME_CMS.hero.showcaseImageUrl ||
         "/images/rohis-akhdir-38.jpg",
       showcaseBadge:
-        raw.hero?.showcaseBadge ||
-        DEFAULT_HOME_CMS.hero.showcaseBadge ||
-        "RBC X PECETIKAH",
+        typeof raw.hero?.showcaseBadge === "string"
+          ? raw.hero.showcaseBadge
+          : DEFAULT_HOME_CMS.hero.showcaseBadge ?? "RBC X PECETIKAH",
       showcaseLocation:
-        raw.hero?.showcaseLocation ||
-        DEFAULT_HOME_CMS.hero.showcaseLocation ||
-        "SMAN 4 PURWOKERTO",
+        typeof raw.hero?.showcaseLocation === "string"
+          ? raw.hero.showcaseLocation
+          : DEFAULT_HOME_CMS.hero.showcaseLocation ?? "SMAN 4 PURWOKERTO",
       showcaseTitle:
-        raw.hero?.showcaseTitle ||
-        DEFAULT_HOME_CMS.hero.showcaseTitle ||
-        "ROHIS AKHDIR 38",
+        typeof raw.hero?.showcaseTitle === "string"
+          ? raw.hero.showcaseTitle
+          : DEFAULT_HOME_CMS.hero.showcaseTitle ?? "ROHIS AKHDIR 38",
       showcaseDescription:
-        raw.hero?.showcaseDescription ||
-        DEFAULT_HOME_CMS.hero.showcaseDescription ||
-        "Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan.",
+        typeof raw.hero?.showcaseDescription === "string"
+          ? raw.hero.showcaseDescription
+          : DEFAULT_HOME_CMS.hero.showcaseDescription ??
+            "Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan.",
       showcaseMeta1:
-        raw.hero?.showcaseMeta1 ||
-        DEFAULT_HOME_CMS.hero.showcaseMeta1 ||
-        "RESMI • LOMBA TINGKAT KAB",
+        typeof raw.hero?.showcaseMeta1 === "string"
+          ? raw.hero.showcaseMeta1
+          : DEFAULT_HOME_CMS.hero.showcaseMeta1 ?? "RESMI • LOMBA TINGKAT KAB",
       showcaseMeta2:
-        raw.hero?.showcaseMeta2 ||
-        DEFAULT_HOME_CMS.hero.showcaseMeta2 ||
-        "2026 • PURWOKERTO",
+        typeof raw.hero?.showcaseMeta2 === "string"
+          ? raw.hero.showcaseMeta2
+          : DEFAULT_HOME_CMS.hero.showcaseMeta2 ?? "2026 • PURWOKERTO",
       showcaseMeta3:
-        raw.hero?.showcaseMeta3 ||
-        DEFAULT_HOME_CMS.hero.showcaseMeta3 ||
-        "15+ SMA / SMK / MA",
+        typeof raw.hero?.showcaseMeta3 === "string"
+          ? raw.hero.showcaseMeta3
+          : DEFAULT_HOME_CMS.hero.showcaseMeta3 ?? "15+ SMA / SMK / MA",
       infoLabel1:
         raw.hero?.infoLabel1 ||
         DEFAULT_HOME_CMS.hero.infoLabel1 ||

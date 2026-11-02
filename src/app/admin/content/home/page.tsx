@@ -432,7 +432,7 @@ export default function HomeCmsEditorPage() {
                       Kartu Showcase Hero (Foto Utama &amp; Informasi)
                     </h3>
                     <p className="text-[11px] text-gray-500 mt-0.5">
-                      Kelola foto showcase, badge sudut, lokasi, judul, deskripsi, serta 3 butir meta di bawah kartu.
+                      Kelola foto showcase, badge sudut, lokasi, judul, deskripsi, serta 3 butir meta di bawah kartu. Semua kolom teks bersifat opsional dan boleh dikosongkan jika tidak ingin ditampilkan.
                     </p>
                   </div>
                   <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-200/80 text-emerald-900">
@@ -445,80 +445,80 @@ export default function HomeCmsEditorPage() {
                   value={hero?.showcaseImageUrl || "/images/rohis-akhdir-38.jpg"}
                   onChange={(val) => updateHero("showcaseImageUrl", val)}
                   aspectRatio="16:10"
-                  previewBadge={hero?.showcaseBadge || "RBC X PECETIKAH"}
-                  previewTitle={hero?.showcaseTitle || "ROHIS AKHDIR 38"}
-                  previewSubtitle={`📍 ${hero?.showcaseLocation || "SMAN 4 PURWOKERTO"}`}
+                  previewBadge={hero?.showcaseBadge || ""}
+                  previewTitle={hero?.showcaseTitle || ""}
+                  previewSubtitle={hero?.showcaseLocation ? `📍 ${hero.showcaseLocation}` : ""}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
                   <div>
                     <label className="block font-bold text-gray-700 mb-1">
-                      Badge Kanan Atas Foto
+                      Badge Kanan Atas Foto <span className="text-[11px] font-normal text-gray-500">(Opsional)</span>
                     </label>
                     <input
                       type="text"
-                      value={hero?.showcaseBadge ?? "RBC X PECETIKAH"}
+                      value={hero?.showcaseBadge ?? ""}
                       onChange={(e) => updateHero("showcaseBadge", e.target.value)}
-                      placeholder="Contoh: RBC X PECETIKAH"
+                      placeholder="Contoh: RBC X PECETIKAH (Kosongkan jika tidak ingin ada badge)"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 font-bold"
                     />
                   </div>
 
                   <div>
                     <label className="block font-bold text-gray-700 mb-1">
-                      Lokasi Pin Foto
+                      Lokasi Pin Foto <span className="text-[11px] font-normal text-gray-500">(Opsional)</span>
                     </label>
                     <input
                       type="text"
-                      value={hero?.showcaseLocation ?? "SMAN 4 PURWOKERTO"}
+                      value={hero?.showcaseLocation ?? ""}
                       onChange={(e) => updateHero("showcaseLocation", e.target.value)}
-                      placeholder="Contoh: SMAN 4 PURWOKERTO"
+                      placeholder="Contoh: SMAN 4 PURWOKERTO (Kosongkan jika tidak ingin ada lokasi)"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 font-bold"
                     />
                   </div>
 
                   <div className="md:col-span-2">
                     <label className="block font-bold text-gray-700 mb-1">
-                      Judul Kartu Foto
+                      Judul Kartu Foto <span className="text-[11px] font-normal text-gray-500">(Opsional)</span>
                     </label>
                     <input
                       type="text"
-                      value={hero?.showcaseTitle ?? "ROHIS AKHDIR 38"}
+                      value={hero?.showcaseTitle ?? ""}
                       onChange={(e) => updateHero("showcaseTitle", e.target.value)}
-                      placeholder="Contoh: ROHIS AKHDIR 38"
+                      placeholder="Contoh: ROHIS AKHDIR 38 (Kosongkan jika tidak ingin ada judul)"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 font-black text-sm"
                     />
                   </div>
 
                   <div className="md:col-span-2">
                     <label className="block font-bold text-gray-700 mb-1">
-                      Deskripsi Singkat di Atas Foto
+                      Deskripsi Singkat di Atas Foto <span className="text-[11px] font-normal text-gray-500">(Opsional)</span>
                     </label>
                     <textarea
                       rows={2}
-                      value={
-                        hero?.showcaseDescription ??
-                        "Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan."
-                      }
+                      value={hero?.showcaseDescription ?? ""}
                       onChange={(e) => updateHero("showcaseDescription", e.target.value)}
-                      placeholder="Contoh: Pertemuan akbar dan kaderisasi generasi ke-38..."
+                      placeholder="Contoh: Pertemuan akbar dan kaderisasi... (Kosongkan jika tidak ingin ada deskripsi)"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 text-xs"
                     />
                   </div>
 
                   {/* 3 Meta Info Bawah */}
                   <div className="md:col-span-2 pt-2 border-t border-emerald-900/10">
-                    <label className="block font-bold text-emerald-950 mb-2">
+                    <label className="block font-bold text-emerald-950 mb-1">
                       3 Butir Informasi Meta (Di Bawah Kartu Foto)
                     </label>
+                    <p className="text-[11px] text-gray-500 mb-2">
+                      Semua butir boleh dikosongkan. Jika semua dikosongkan, baris info ini akan otomatis disembunyikan.
+                    </p>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                       <div>
                         <span className="text-[10px] text-gray-500 font-semibold block mb-1">
-                          Meta Kiri
+                          Meta Kiri (Opsional)
                         </span>
                         <input
                           type="text"
-                          value={hero?.showcaseMeta1 ?? "RESMI • LOMBA TINGKAT KAB"}
+                          value={hero?.showcaseMeta1 ?? ""}
                           onChange={(e) => updateHero("showcaseMeta1", e.target.value)}
                           placeholder="Contoh: RESMI • LOMBA TINGKAT KAB"
                           className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 text-[11px] font-bold"
@@ -526,11 +526,11 @@ export default function HomeCmsEditorPage() {
                       </div>
                       <div>
                         <span className="text-[10px] text-gray-500 font-semibold block mb-1">
-                          Meta Tengah
+                          Meta Tengah (Opsional)
                         </span>
                         <input
                           type="text"
-                          value={hero?.showcaseMeta2 ?? "2026 • PURWOKERTO"}
+                          value={hero?.showcaseMeta2 ?? ""}
                           onChange={(e) => updateHero("showcaseMeta2", e.target.value)}
                           placeholder="Contoh: 2026 • PURWOKERTO"
                           className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 text-[11px] font-bold"
@@ -538,11 +538,11 @@ export default function HomeCmsEditorPage() {
                       </div>
                       <div>
                         <span className="text-[10px] text-gray-500 font-semibold block mb-1">
-                          Meta Kanan
+                          Meta Kanan (Opsional)
                         </span>
                         <input
                           type="text"
-                          value={hero?.showcaseMeta3 ?? "15+ SMA / SMK / MA"}
+                          value={hero?.showcaseMeta3 ?? ""}
                           onChange={(e) => updateHero("showcaseMeta3", e.target.value)}
                           placeholder="Contoh: 15+ SMA / SMK / MA"
                           className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 text-[11px] font-bold"
