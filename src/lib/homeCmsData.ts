@@ -18,6 +18,13 @@ export interface HomeCmsData {
     btnSecondaryText: string;
     btnSecondaryLink: string;
     showcaseImageUrl?: string;
+    showcaseBadge?: string;
+    showcaseLocation?: string;
+    showcaseTitle?: string;
+    showcaseDescription?: string;
+    showcaseMeta1?: string;
+    showcaseMeta2?: string;
+    showcaseMeta3?: string;
     infoLabel1?: string;
     infoValue1?: string;
     infoLabel2?: string;
@@ -116,6 +123,14 @@ export const DEFAULT_HOME_CMS: HomeCmsData = {
     btnSecondaryText: "Lihat Galeri Rohis",
     btnSecondaryLink: "/galeri",
     showcaseImageUrl: "/images/rohis-akhdir-38.jpg",
+    showcaseBadge: "RBC X PECETIKAH",
+    showcaseLocation: "SMAN 4 PURWOKERTO",
+    showcaseTitle: "ROHIS AKHDIR 38",
+    showcaseDescription:
+      "Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan.",
+    showcaseMeta1: "RESMI • LOMBA TINGKAT KAB",
+    showcaseMeta2: "2026 • PURWOKERTO",
+    showcaseMeta3: "15+ SMA / SMK / MA",
     infoLabel1: "STATUS ORGANISASI",
     infoValue1: "Ekstrakurikuler Resmi",
     infoLabel2: "PUSAT KEGIATAN",
@@ -273,6 +288,34 @@ export function normalizeHomeCms(raw: any): HomeCmsData {
         raw.hero?.showcaseImageUrl ||
         DEFAULT_HOME_CMS.hero.showcaseImageUrl ||
         "/images/rohis-akhdir-38.jpg",
+      showcaseBadge:
+        raw.hero?.showcaseBadge ||
+        DEFAULT_HOME_CMS.hero.showcaseBadge ||
+        "RBC X PECETIKAH",
+      showcaseLocation:
+        raw.hero?.showcaseLocation ||
+        DEFAULT_HOME_CMS.hero.showcaseLocation ||
+        "SMAN 4 PURWOKERTO",
+      showcaseTitle:
+        raw.hero?.showcaseTitle ||
+        DEFAULT_HOME_CMS.hero.showcaseTitle ||
+        "ROHIS AKHDIR 38",
+      showcaseDescription:
+        raw.hero?.showcaseDescription ||
+        DEFAULT_HOME_CMS.hero.showcaseDescription ||
+        "Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan.",
+      showcaseMeta1:
+        raw.hero?.showcaseMeta1 ||
+        DEFAULT_HOME_CMS.hero.showcaseMeta1 ||
+        "RESMI • LOMBA TINGKAT KAB",
+      showcaseMeta2:
+        raw.hero?.showcaseMeta2 ||
+        DEFAULT_HOME_CMS.hero.showcaseMeta2 ||
+        "2026 • PURWOKERTO",
+      showcaseMeta3:
+        raw.hero?.showcaseMeta3 ||
+        DEFAULT_HOME_CMS.hero.showcaseMeta3 ||
+        "15+ SMA / SMK / MA",
       infoLabel1:
         raw.hero?.infoLabel1 ||
         DEFAULT_HOME_CMS.hero.infoLabel1 ||

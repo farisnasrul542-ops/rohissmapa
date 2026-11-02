@@ -423,16 +423,135 @@ export default function HomeCmsEditorPage() {
               />
             </div>
 
-            <div className="md:col-span-2 pt-3 border-t border-gray-100">
-              <ImageCropField
-                label="Foto Kartu Utama Hero (ROHIS AKHDIR 38)"
-                value={hero?.showcaseImageUrl || "/images/rohis-akhdir-38.jpg"}
-                onChange={(val) => updateHero("showcaseImageUrl", val)}
-                aspectRatio="16:10"
-                previewBadge="RBC X PECETIKAH"
-                previewTitle="ROHIS AKHDIR 38"
-                previewSubtitle="📍 SMAN 4 PURWOKERTO"
-              />
+            {/* Kartu Showcase Hero: Foto, Judul, Badge, Lokasi, Deskripsi & Meta Bawah */}
+            <div className="md:col-span-2 pt-4 border-t border-gray-100 space-y-4">
+              <div className="bg-emerald-50/60 rounded-2xl p-4 sm:p-5 border border-emerald-900/10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-black text-emerald-950 text-sm">
+                      Kartu Showcase Hero (Foto Utama &amp; Informasi)
+                    </h3>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      Kelola foto showcase, badge sudut, lokasi, judul, deskripsi, serta 3 butir meta di bawah kartu.
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-200/80 text-emerald-900">
+                    Hero Showcase
+                  </span>
+                </div>
+
+                <ImageCropField
+                  label="Foto Kartu Utama Hero"
+                  value={hero?.showcaseImageUrl || "/images/rohis-akhdir-38.jpg"}
+                  onChange={(val) => updateHero("showcaseImageUrl", val)}
+                  aspectRatio="16:10"
+                  previewBadge={hero?.showcaseBadge || "RBC X PECETIKAH"}
+                  previewTitle={hero?.showcaseTitle || "ROHIS AKHDIR 38"}
+                  previewSubtitle={`📍 ${hero?.showcaseLocation || "SMAN 4 PURWOKERTO"}`}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+                  <div>
+                    <label className="block font-bold text-gray-700 mb-1">
+                      Badge Kanan Atas Foto
+                    </label>
+                    <input
+                      type="text"
+                      value={hero?.showcaseBadge ?? "RBC X PECETIKAH"}
+                      onChange={(e) => updateHero("showcaseBadge", e.target.value)}
+                      placeholder="Contoh: RBC X PECETIKAH"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-gray-700 mb-1">
+                      Lokasi Pin Foto
+                    </label>
+                    <input
+                      type="text"
+                      value={hero?.showcaseLocation ?? "SMAN 4 PURWOKERTO"}
+                      onChange={(e) => updateHero("showcaseLocation", e.target.value)}
+                      placeholder="Contoh: SMAN 4 PURWOKERTO"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 font-bold"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block font-bold text-gray-700 mb-1">
+                      Judul Kartu Foto
+                    </label>
+                    <input
+                      type="text"
+                      value={hero?.showcaseTitle ?? "ROHIS AKHDIR 38"}
+                      onChange={(e) => updateHero("showcaseTitle", e.target.value)}
+                      placeholder="Contoh: ROHIS AKHDIR 38"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 font-black text-sm"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block font-bold text-gray-700 mb-1">
+                      Deskripsi Singkat di Atas Foto
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={
+                        hero?.showcaseDescription ??
+                        "Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan."
+                      }
+                      onChange={(e) => updateHero("showcaseDescription", e.target.value)}
+                      placeholder="Contoh: Pertemuan akbar dan kaderisasi generasi ke-38..."
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 text-xs"
+                    />
+                  </div>
+
+                  {/* 3 Meta Info Bawah */}
+                  <div className="md:col-span-2 pt-2 border-t border-emerald-900/10">
+                    <label className="block font-bold text-emerald-950 mb-2">
+                      3 Butir Informasi Meta (Di Bawah Kartu Foto)
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      <div>
+                        <span className="text-[10px] text-gray-500 font-semibold block mb-1">
+                          Meta Kiri
+                        </span>
+                        <input
+                          type="text"
+                          value={hero?.showcaseMeta1 ?? "RESMI • LOMBA TINGKAT KAB"}
+                          onChange={(e) => updateHero("showcaseMeta1", e.target.value)}
+                          placeholder="Contoh: RESMI • LOMBA TINGKAT KAB"
+                          className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 text-[11px] font-bold"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-500 font-semibold block mb-1">
+                          Meta Tengah
+                        </span>
+                        <input
+                          type="text"
+                          value={hero?.showcaseMeta2 ?? "2026 • PURWOKERTO"}
+                          onChange={(e) => updateHero("showcaseMeta2", e.target.value)}
+                          placeholder="Contoh: 2026 • PURWOKERTO"
+                          className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 text-[11px] font-bold"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-500 font-semibold block mb-1">
+                          Meta Kanan
+                        </span>
+                        <input
+                          type="text"
+                          value={hero?.showcaseMeta3 ?? "15+ SMA / SMK / MA"}
+                          onChange={(e) => updateHero("showcaseMeta3", e.target.value)}
+                          placeholder="Contoh: 15+ SMA / SMK / MA"
+                          className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 text-[11px] font-bold"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -427,10 +427,10 @@ export default function HomePage() {
                   {/* Gradient Overlay at bottom for clear text readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 via-45% to-transparent pointer-events-none" />
 
-                  {/* Top-Right Badge (Matching Gambar 1) */}
+                  {/* Top-Right Badge */}
                   <div className="absolute top-4 right-4 z-10">
                     <span className="px-3.5 py-1.5 rounded-full bg-[#1b3d30]/90 backdrop-blur-md border border-amber-400/30 text-amber-300 text-[11px] font-black tracking-wider uppercase shadow-lg">
-                      RBC X PECETIKAH
+                      {cms.hero?.showcaseBadge || "RBC X PECETIKAH"}
                     </span>
                   </div>
 
@@ -439,26 +439,33 @@ export default function HomePage() {
                     {/* Location Badge */}
                     <div className="flex items-center gap-1.5 text-xs font-black tracking-wider text-amber-400 mb-1.5 uppercase drop-shadow">
                       <span>📍</span>
-                      <span>SMAN 4 PURWOKERTO</span>
+                      <span>{cms.hero?.showcaseLocation || "SMAN 4 PURWOKERTO"}</span>
                     </div>
 
                     {/* Title */}
                     <h3 className="text-lg sm:text-xl font-black text-white tracking-tight mb-1.5 uppercase drop-shadow-md">
-                      ROHIS AKHDIR 38
+                      {cms.hero?.showcaseTitle || "ROHIS AKHDIR 38"}
                     </h3>
 
                     {/* Description */}
                     <p className="text-xs sm:text-[13px] text-emerald-100/90 leading-relaxed font-medium line-clamp-2 drop-shadow">
-                      Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan.
+                      {cms.hero?.showcaseDescription ||
+                        "Pertemuan akbar dan kaderisasi generasi ke-38 Rohis SMA Negeri 4 Purwokerto dalam merajut ukhuwah dan agenda keumatan."}
                     </p>
                   </div>
                 </div>
 
-                {/* Bottom Meta Information (Matching Gambar 1) */}
-                <div className="mt-4 flex items-center justify-between text-[11px] sm:text-xs font-extrabold text-emerald-300/75 tracking-wider uppercase px-2 w-full">
-                  <span>RESMI • LOMBA TINGKAT KAB</span>
-                  <span>2026 • PURWOKERTO</span>
-                  <span>15+ SMA / SMK / MA</span>
+                {/* Bottom Meta Information (Responsive Spacing for All DPIs) */}
+                <div className="mt-3.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-[10.5px] sm:text-xs font-black text-emerald-300/85 tracking-wider uppercase px-2 w-full">
+                  <span className="truncate">
+                    {cms.hero?.showcaseMeta1 || "RESMI • LOMBA TINGKAT KAB"}
+                  </span>
+                  <span className="truncate">
+                    {cms.hero?.showcaseMeta2 || "2026 • PURWOKERTO"}
+                  </span>
+                  <span className="truncate">
+                    {cms.hero?.showcaseMeta3 || "15+ SMA / SMK / MA"}
+                  </span>
                 </div>
               </div>
             </motion.div>
