@@ -77,52 +77,6 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Separated Links Info Bar (Public vs Admin) */}
-        <div className="mt-6 pt-4 border-t border-emerald-800/50 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-black/25 border border-white/10">
-            <div className="min-w-0">
-              <span className="block text-[10px] font-black uppercase tracking-wider text-emerald-300">
-                🌐 Link Umum (Siswa &amp; Publik)
-              </span>
-              <a
-                href="https://rohis-sman4pwt.web.id/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono font-bold text-white hover:text-amber-300 underline underline-offset-2 truncate block"
-              >
-                https://rohis-sman4pwt.web.id/
-              </a>
-            </div>
-            <a
-              href="https://rohis-sman4pwt.web.id/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-[11px] shrink-0 transition-colors"
-            >
-              Buka Web →
-            </a>
-          </div>
-
-          <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-black/25 border border-amber-400/20">
-            <div className="min-w-0">
-              <span className="block text-[10px] font-black uppercase tracking-wider text-amber-300">
-                🔐 Link Khusus Admin (Terproteksi Password)
-              </span>
-              <a
-                href="https://rohissmapa.farisnasrul542.workers.dev/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono font-bold text-white hover:text-amber-300 underline underline-offset-2 truncate block"
-              >
-                https://rohissmapa.farisnasrul542.workers.dev/
-              </a>
-            </div>
-            <span className="px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30 font-extrabold text-[10px] shrink-0">
-              PW Aktif
-            </span>
-          </div>
-        </div>
-
         {/* Running Announcement Notice */}
         {announcement.isActive && (
           <div className="mt-6 pt-4 border-t border-emerald-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-emerald-100/90">
