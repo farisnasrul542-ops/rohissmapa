@@ -314,12 +314,6 @@ export default function HomePage() {
               style={{ y: heroTextY, opacity: heroTextOpacity }}
               className="lg:col-span-7 text-left will-change-transform"
             >
-              {/* Live Badge */}
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-900/80 border border-emerald-500/30 text-emerald-200 text-xs font-semibold mb-6 backdrop-blur-md shadow-lg shadow-emerald-950/40">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{cms.hero.tag || SITE.heroTag}</span>
-              </div>
-
               {/* Title with Sequential Line-by-Line Reveal */}
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] mb-6 text-left">
                 <CinematicTextLine delay={0.1}>

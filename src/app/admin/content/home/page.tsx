@@ -329,39 +329,25 @@ export default function HomeCmsEditorPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
             <div>
               <label className="block font-bold text-gray-700 mb-1">
-                Tagline / Kicker Badge Atas
+                Headline Baris 1
               </label>
               <input
                 type="text"
-                value={hero?.tag || ""}
-                onChange={(e) => updateHero("tag", e.target.value)}
+                value={hero?.titleLine1 || ""}
+                onChange={(e) => updateHero("titleLine1", e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-700"
               />
             </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block font-bold text-gray-700 mb-1">
-                  Headline Baris 1
-                </label>
-                <input
-                  type="text"
-                  value={hero?.titleLine1 || ""}
-                  onChange={(e) => updateHero("titleLine1", e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-700"
-                />
-              </div>
-              <div>
-                <label className="block font-bold text-gray-700 mb-1">
-                  Headline Baris 2 (Gradasi Emas)
-                </label>
-                <input
-                  type="text"
-                  value={hero?.titleLine2 || ""}
-                  onChange={(e) => updateHero("titleLine2", e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-700"
-                />
-              </div>
+            <div>
+              <label className="block font-bold text-gray-700 mb-1">
+                Headline Baris 2 (Gradasi Emas)
+              </label>
+              <input
+                type="text"
+                value={hero?.titleLine2 || ""}
+                onChange={(e) => updateHero("titleLine2", e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-700"
+              />
             </div>
 
             <div className="md:col-span-2">
