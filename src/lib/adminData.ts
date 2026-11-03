@@ -217,12 +217,12 @@ export const INITIAL_GALLERY: GalleryItem[] = [
   },
   {
     id: "GAL-002",
-    title: "Kajian Akbar Pelajar SMAPA",
+    title: "SMAN 4 MENOLONG",
     category: "Kajian",
-    date: "28 September 2026",
-    location: "Musholla Al-Ikhlas SMAPA",
-    imageUrl: "https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1000&auto=format&fit=crop",
-    caption: "Antusiasme ratusan siswa dalam menyimak sirah nabawiyah dan kiat menjaga adab di sekolah.",
+    date: "28 Mei 2026",
+    location: "BAZNAS Kabupaten Banyumas",
+    imageUrl: "/images/galeri-sman4-menolong.jpg",
+    caption: "Dengan rasa kemanusiaan SMAN 4 memberikan bantuan kepada korban bencana",
   },
   {
     id: "GAL-003",

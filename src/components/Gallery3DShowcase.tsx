@@ -82,11 +82,11 @@ export default function Gallery3DShowcase({
     },
     {
       id: "gal-2",
-      title: "Tadarus Pagi & Pembiasaan Sholat Dhuha Berjamaah",
-      category: "Ibadah Rutin",
-      date: "05 Oktober 2026",
-      image: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1000&auto=format&fit=crop",
-      description: "Pembiasaan sholat dhuha dan tadarus bersama sebelum jam belajar dimulai.",
+      title: "SMAN 4 MENOLONG",
+      category: "Kajian",
+      date: "28 Mei 2026",
+      image: "/images/galeri-sman4-menolong.jpg",
+      description: "Dengan rasa kemanusiaan SMAN 4 memberikan bantuan kepada korban bencana",
     },
     {
       id: "gal-3",

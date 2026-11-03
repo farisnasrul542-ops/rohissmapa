@@ -146,8 +146,27 @@ export default {
       return Response.redirect(`https://rohis-sman4pwt.web.id/`, 302);
     }
 
-    // 4. Layani aset statis Next.js dari ./out
-    return env.ASSETS.fetch(request);
+    // 4. Layani aset statis Next.js dari ./out dengan proteksi cache dokumen HTML untuk HP/mobile
+    const assetRes = await env.ASSETS.fetch(request);
+    const contentType = assetRes.headers.get("content-type") || "";
+    if (
+      contentType.includes("text/html") ||
+      url.pathname === "/" ||
+      url.pathname === "" ||
+      url.pathname.endsWith(".html")
+    ) {
+      const newHeaders = new Headers(assetRes.headers);
+      newHeaders.set("Cache-Control", "no-cache, no-store, must-revalidate");
+      newHeaders.set("Pragma", "no-cache");
+      newHeaders.set("Expires", "0");
+      return new Response(assetRes.body, {
+        status: assetRes.status,
+        statusText: assetRes.statusText,
+        headers: newHeaders,
+      });
+    }
+
+    return assetRes;
   },
 };
 
