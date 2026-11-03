@@ -366,26 +366,26 @@ export const EVENTS_DATA = [
   },
   {
     id: 2,
-    title: "Latihan Dasar Kepemimpinan Rohis (LDKR) SMAPA 2026",
-    date: "2026-10-18",
+    title: "Latihan Dasar Kepemimpinan SMAPA 2026",
+    date: "18 Oktober 2026",
     time: "07:00 - 16:30 WIB",
     location: "Aula Pertemuan SMA Negeri 4 Purwokerto",
     speaker: "Tim Trainer Motivasi Muslim & Alumni Rohis SMAPA",
     type: "Pelatihan",
     status: "upcoming",
-    image: "/images/dokumentasi-smapa.jpg",
+    image: "/images/dokumentasi-muskerta.jpg",
     description: "Pelatihan kepemimpinan, manajemen organisasi dakwah sekolah, public speaking, dan team building bagi calon pengurus generasi penerus Rohis SMAPA."
   },
   {
     id: 3,
     title: "Peringatan Isra Mi'raj Nabi Muhammad SAW 1447 H",
-    date: "2026-10-28",
+    date: "28 Oktober 2026",
     time: "08:00 - 11:30 WIB",
     location: "Lapangan Utama / Musholla Al-Ikhlas SMAN 4 Purwokerto",
     speaker: "Ustadz Tamu Penceramah & Dewan Guru PAI",
     type: "Kajian",
     status: "upcoming",
-    image: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=800&q=80",
+    image: "/images/dokumentasi-smapa.jpg",
     description: "Kajian akbar memperingati peristiwa agung Isra Mi'raj dengan tema 'Menegakkan Shalat Sebagai Pilar Karakter Generasi Emas Pelajar'."
   },
   {

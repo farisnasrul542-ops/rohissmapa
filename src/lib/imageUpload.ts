@@ -71,3 +71,4 @@ export async function uploadImageToWebSystem(
 
   throw new Error("Gagal mengunci gambar ke CDN web");
 }
+

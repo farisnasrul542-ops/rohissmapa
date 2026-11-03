@@ -24,8 +24,47 @@ export default {
 
     // 2. Endpoint Sinkronisasi Data Lintas Domain (Admin workers.dev <-> Publik rohis-sman4pwt.web.id)
     if (url.pathname === "/api/cms-sync") {
+      const cache = typeof caches !== "undefined" ? caches.default : null;
+      const cacheKey = new Request("https://sync-cache.rohis-sman4pwt.local/cms-sync", { method: "GET" });
+
       if (request.method === "GET") {
-        // Coba ambil dari cloud persistent storage terlebih dahulu
+        // Coba ambil dari edge cache terlebih dahulu
+        if (cache) {
+          try {
+            const cachedRes = await cache.match(cacheKey);
+            if (cachedRes) {
+              const cachedJson = await cachedRes.json();
+              if (cachedJson && typeof cachedJson === "object" && !cachedJson.empty) {
+                globalThis.__ROHIS_SHARED_STATE__ = {
+                  ...globalThis.__ROHIS_SHARED_STATE__,
+                  ...cachedJson,
+                };
+                return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE__), {
+                  status: 200,
+                  headers: {
+                    ...CORS_HEADERS,
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store, no-cache, must-revalidate",
+                  },
+                });
+              }
+            }
+          } catch {}
+        }
+
+        // Coba ambil dari in-memory state
+        if (globalThis.__ROHIS_SHARED_STATE__) {
+          return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE__), {
+            status: 200,
+            headers: {
+              ...CORS_HEADERS,
+              "Content-Type": "application/json",
+              "Cache-Control": "no-store, no-cache, must-revalidate",
+            },
+          });
+        }
+
+        // Coba ambil dari cloud persistent storage
         try {
           const res = await fetch(CLOUD_STORAGE_OBJECT_URL, {
             method: "GET",
@@ -50,17 +89,6 @@ export default {
           }
         } catch {}
 
-        if (globalThis.__ROHIS_SHARED_STATE__) {
-          return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE__), {
-            status: 200,
-            headers: {
-              ...CORS_HEADERS,
-              "Content-Type": "application/json",
-              "Cache-Control": "no-store, no-cache, must-revalidate",
-            },
-          });
-        }
-
         return new Response(JSON.stringify({ empty: true }), {
           status: 200,
           headers: {
@@ -76,16 +104,18 @@ export default {
           const incoming = await request.json();
           let existing = globalThis.__ROHIS_SHARED_STATE__ || {};
 
-          // Ambil data terbaru dari cloud storage sebelum merge
-          try {
-            const currentRes = await fetch(CLOUD_STORAGE_OBJECT_URL, { cache: "no-store" });
-            if (currentRes.ok) {
-              const currentJson = await currentRes.json();
-              if (currentJson?.data && typeof currentJson.data === "object") {
-                existing = { ...existing, ...currentJson.data };
+          // Ambil dari edge cache jika memori dingin
+          if (cache && Object.keys(existing).length === 0) {
+            try {
+              const cachedRes = await cache.match(cacheKey);
+              if (cachedRes) {
+                const cachedJson = await cachedRes.json();
+                if (cachedJson && typeof cachedJson === "object") {
+                  existing = { ...existing, ...cachedJson };
+                }
               }
-            }
-          } catch {}
+            } catch {}
+          }
 
           const merged = {
             ...existing,
@@ -95,20 +125,36 @@ export default {
 
           globalThis.__ROHIS_SHARED_STATE__ = merged;
 
-          // Simpan secara permanen ke cloud persistent store via PUT
-          const savePromise = fetch(CLOUD_STORAGE_OBJECT_URL, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name: "rohis_smapa_cms_v1",
-              data: merged,
-            }),
-          }).catch(() => {});
+          // Simpan ke edge cache
+          if (cache) {
+            try {
+              const cacheRes = new Response(JSON.stringify(merged), {
+                headers: {
+                  "Content-Type": "application/json",
+                  "Cache-Control": "public, max-age=31536000",
+                },
+              });
+              const cachePut = cache.put(cacheKey, cacheRes);
+              if (ctx && typeof ctx.waitUntil === "function") {
+                ctx.waitUntil(cachePut);
+              } else {
+                await cachePut;
+              }
+            } catch {}
+          }
 
-          if (ctx && typeof ctx.waitUntil === "function") {
-            ctx.waitUntil(savePromise);
-          } else {
-            await savePromise;
+          // Coba simpan ke cloud storage jika ukurannya wajar
+          const payloadStr = JSON.stringify({ name: "rohis_smapa_cms_v1", data: merged });
+          if (payloadStr.length < 1500) {
+            const savePromise = fetch(CLOUD_STORAGE_OBJECT_URL, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: payloadStr,
+            }).catch(() => {});
+
+            if (ctx && typeof ctx.waitUntil === "function") {
+              ctx.waitUntil(savePromise);
+            }
           }
 
           return new Response(JSON.stringify({ ok: true, updatedAt: merged.updatedAt }), {
