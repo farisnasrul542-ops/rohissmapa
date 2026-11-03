@@ -130,6 +130,64 @@ export default {
       }
     }
 
+    // 2.5. Endpoint Upload Gambar Permanen ke CDN Global (/api/upload-image)
+    if (url.pathname === "/api/upload-image") {
+      if (request.method === "OPTIONS") {
+        return new Response(null, { status: 204, headers: CORS_HEADERS });
+      }
+
+      if (request.method === "POST") {
+        try {
+          const formData = await request.formData();
+          const file = formData.get("file") || formData.get("image") || formData.get("source");
+          if (!file) {
+            return new Response(JSON.stringify({ ok: false, error: "File tidak ditemukan" }), {
+              status: 400,
+              headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+            });
+          }
+
+          const uploadForm = new FormData();
+          uploadForm.append("key", "6d207e02198a847aa98d0a2a901485a5");
+          uploadForm.append("action", "upload");
+          uploadForm.append("format", "json");
+          uploadForm.append("source", file, (file.name || "image.jpg"));
+
+          const upstream = await fetch("https://freeimage.host/api/1/upload", {
+            method: "POST",
+            body: uploadForm,
+          });
+
+          if (!upstream.ok) {
+            const errBody = await upstream.text();
+            return new Response(JSON.stringify({ ok: false, error: errBody }), {
+              status: 502,
+              headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+            });
+          }
+
+          const j = await upstream.json();
+          const imgUrl = j?.image?.url || j?.image?.display_url;
+          if (!imgUrl) {
+            return new Response(JSON.stringify({ ok: false, error: "Gagal mendapatkan URL gambar CDN" }), {
+              status: 500,
+              headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+            });
+          }
+
+          return new Response(JSON.stringify({ ok: true, url: imgUrl }), {
+            status: 200,
+            headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ ok: false, error: String(err) }), {
+            status: 500,
+            headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+          });
+        }
+      }
+    }
+
     // 3. Pemisahan Domain Otomatis:
     // - Jika membuka root https://rohissmapa.farisnasrul542.workers.dev/ -> langsung arahkan ke /admin
     if (hostname.includes("workers.dev") && (url.pathname === "/" || url.pathname === "" || url.pathname === "/index.html")) {

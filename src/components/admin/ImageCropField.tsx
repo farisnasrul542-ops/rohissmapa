@@ -26,6 +26,7 @@ import {
   bakeCroppedImageCanvas,
 } from "@/lib/imageCropUtils";
 import { formatGoogleDriveUrl, handleGoogleDriveImageError } from "@/lib/driveUtils";
+import { uploadImageToWebSystem } from "@/lib/imageUpload";
 
 export interface ImageCropFieldProps {
   label?: string;
@@ -171,12 +172,23 @@ export default function ImageCropField({
       const dataUrl = await compressUploadedImageFile(file, 1280, 0.86);
       onChange(dataUrl);
       setIsStudioOpen(true);
-      setBakeFeedback(
-        isHeic
-          ? "✓ Foto iPhone (HEIC) berhasil dikonversi & diunggah! Geser untuk mengatur crop."
-          : "✓ Foto berhasil diunggah! Geser atau zoom untuk mengatur crop."
-      );
-      setTimeout(() => setBakeFeedback(null), 4000);
+
+      setBakeFeedback("Sedang mengunci & mengunggah foto ke sistem web...");
+      let finalUrl = dataUrl;
+      try {
+        finalUrl = await uploadImageToWebSystem(dataUrl, file.name || "upload.jpg");
+        onChange(finalUrl);
+        setBakeFeedback(
+          "✓ Foto berhasil dikunci ke sistem web! Otomatis dapat dilihat di HP & semua perangkat."
+        );
+      } catch {
+        setBakeFeedback(
+          isHeic
+            ? "✓ Foto iPhone (HEIC) berhasil dimuat! Geser atau zoom untuk mengatur crop."
+            : "✓ Foto berhasil dimuat! Geser atau zoom untuk mengatur crop."
+        );
+      }
+      setTimeout(() => setBakeFeedback(null), 5000);
     } catch (err: any) {
       setBakeFeedback(err?.message || "Gagal memproses file gambar.");
     } finally {
@@ -189,7 +201,7 @@ export default function ImageCropField({
   const handleBakePermanentCrop = async () => {
     if (!src) return;
     setIsBaking(true);
-    setBakeFeedback(null);
+    setBakeFeedback("Sedang memotong gambar...");
     try {
       const bakedDataUrl = await bakeCroppedImageCanvas(
         src,
@@ -198,9 +210,16 @@ export default function ImageCropField({
         1080
       );
       onChange(bakedDataUrl);
-      setBakeFeedback(
-        "✓ Gambar berhasil dipotong permanen sesuai bingkai!"
-      );
+
+      setBakeFeedback("Sedang mengunci potongan foto ke sistem web...");
+      let finalUrl = bakedDataUrl;
+      try {
+        finalUrl = await uploadImageToWebSystem(bakedDataUrl, "crop-baked.jpg");
+        onChange(finalUrl);
+        setBakeFeedback("✓ Foto berhasil dipotong & dikunci ke sistem web!");
+      } catch {
+        setBakeFeedback("✓ Gambar berhasil dipotong permanen sesuai bingkai!");
+      }
       setTimeout(() => setBakeFeedback(null), 4000);
     } catch (err: any) {
       // Fallback: keep non-destructive crop parameters which always work on any link
