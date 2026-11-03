@@ -36,6 +36,10 @@ export default function AgendaPage() {
           setEventList(
             parsed.map((e: any) => ({
               ...e,
+              image:
+                e.image && typeof e.image === "string" && e.image.startsWith("data:image/")
+                  ? "/images/event-3.jpg"
+                  : e.image,
               type: e.category || e.type || "Kajian",
             }))
           );

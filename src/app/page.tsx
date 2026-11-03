@@ -89,7 +89,7 @@ const STAT_METADATA = [
 export default function HomePage() {
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [activePembinaIndex, setActivePembinaIndex] = useState(0);
-  const [agendaIndex, setAgendaIndex] = useState(2);
+  const [agendaIndex, setAgendaIndex] = useState(1);
   const [isAgendaPaused, setIsAgendaPaused] = useState(false);
   const [agendaDragOffset, setAgendaDragOffset] = useState(0);
   const [isAgendaDragging, setIsAgendaDragging] = useState(false);
@@ -144,7 +144,13 @@ export default function HomePage() {
         if (savedEvents) {
           const parsed = JSON.parse(savedEvents);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setEventsList(parsed);
+            const cleaned = parsed.map((e: any) => {
+              if (e.image && typeof e.image === "string" && e.image.startsWith("data:image/")) {
+                return { ...e, image: "/images/event-3.jpg" };
+              }
+              return e;
+            });
+            setEventsList(cleaned);
           }
         }
       } catch {}

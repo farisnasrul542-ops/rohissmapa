@@ -354,30 +354,18 @@ export const TEAM_MEMBERS = [
 export const EVENTS_DATA = [
   {
     id: 1,
-    title: "Kajian Jumat Berkah & Keputrian Rutin SMAPA",
-    date: "Setiap Hari Jumat",
-    time: "11:30 - 12:45 WIB",
-    location: "Musholla Al-Ikhlas & Ruang Multimedia SMAN 4",
-    speaker: "Ustadz Pembina & Tim Keputrian SMAPA",
-    type: "Kajian",
-    status: "upcoming",
-    image: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=800&q=80",
-    description: "Kegiatan rutin mingguan pembinaan rohani Islam bagi siswa putra (shalat Jumat & kultum) serta kajian fiqih dan akhlak keputrian bagi siswi muslimah."
-  },
-  {
-    id: 2,
-    title: "Latihan Dasar Kepemimpinan SMAPA 2026",
+    title: "Latihan Dasar Kepemimpinan Rohis (LDKR) SMAPA 2026",
     date: "18 Oktober 2026",
     time: "07:00 - 16:30 WIB",
     location: "Aula Pertemuan SMA Negeri 4 Purwokerto",
     speaker: "Tim Trainer Motivasi Muslim & Alumni Rohis SMAPA",
     type: "Pelatihan",
     status: "upcoming",
-    image: "/images/dokumentasi-muskerta.jpg",
+    image: "/images/dokumentasi-smapa.jpg",
     description: "Pelatihan kepemimpinan, manajemen organisasi dakwah sekolah, public speaking, dan team building bagi calon pengurus generasi penerus Rohis SMAPA."
   },
   {
-    id: 3,
+    id: 2,
     title: "Peringatan Isra Mi'raj Nabi Muhammad SAW 1447 H",
     date: "28 Oktober 2026",
     time: "08:00 - 11:30 WIB",
@@ -385,56 +373,20 @@ export const EVENTS_DATA = [
     speaker: "Ustadz Tamu Penceramah & Dewan Guru PAI",
     type: "Kajian",
     status: "upcoming",
-    image: "/images/dokumentasi-smapa.jpg",
+    image: "https://iili.io/nP1Ssvp.jpg",
     description: "Kajian akbar memperingati peristiwa agung Isra Mi'raj dengan tema 'Menegakkan Shalat Sebagai Pilar Karakter Generasi Emas Pelajar'."
   },
   {
-    id: 4,
-    title: "Bakti Sosial & Santunan Berbagi Rohis SMAPA Peduli",
+    id: 3,
+    title: "MUSTAH",
     date: "2026-11-08",
     time: "08:30 - 12:00 WIB",
-    location: "Lingkungan Sekitar SMAN 4 Purwokerto Lor",
+    location: "RUPATAMA",
     speaker: null,
-    type: "Sosial",
+    type: "Kajian",
     status: "upcoming",
-    image: "https://lh3.googleusercontent.com/d/1k7_grStMevTwva3_h2sLQhGyaPl1Gb0M",
-    description: "Penyaluran paket sembako dan bantuan perlengkapan sekolah dari hasil himpunan infak siswa-siswi SMAN 4 Purwokerto untuk warga dhuafa."
-  },
-  {
-    id: 5,
-    title: "Workshop Desain Dakwah Digital & Pembuatan Mading",
-    date: "2026-11-15",
-    time: "13:30 - 15:30 WIB",
-    location: "Laboratorium Komputer SMAN 4 Purwokerto",
-    speaker: "Kak Rafif Nur Hafizudin (Tim Media Rohis)",
-    type: "Workshop",
-    status: "upcoming",
-    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
-    description: "Pelatihan pembuatan poster islami modern, tips copywriting dakwah Instagram, dan tata letak artistik majalah dinding musholla sekolah."
-  },
-  {
-    id: 6,
-    title: "Pesantren Kilat Ramadhan & Buka Bersama Akbar SMAPA",
-    date: "Ramadhan 1447 H",
-    time: "14:00 - 19:30 WIB",
-    location: "Musholla Al-Ikhlas SMAN 4 Purwokerto",
-    speaker: "Dewan Guru PAI & Asatidz Tamu",
-    type: "Organisasi",
-    status: "upcoming",
-    image: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&fit=crop&w=800&q=80",
-    description: "Rangkaian tadarus Al-Qur'an, pembinaan tahsin, santunan yatim piatu, tausiyah menjelang berbuka, dan shalat tarawih berjamaah keluarga besar SMAN 4."
-  },
-  {
-    id: 7,
-    title: "Musyawarah Akhir Tahun & Suksesi Kepengurusan Rohis",
-    date: "Akhir Semester Genap",
-    time: "08:00 - 14:00 WIB",
-    location: "Ruang Rapat SMA Negeri 4 Purwokerto",
-    speaker: null,
-    type: "Organisasi",
-    status: "upcoming",
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80",
-    description: "Laporan pertanggungjawaban program kerja tahunan dan serah terima amanah kepengurusan Rohis SMAPA periode berikutnya."
+    image: "https://lh3.googleusercontent.com/d/1k7_grStMevTwva3_h2sLQhGyaPl1Gb0M=w1600#crop=51,41,1,cover",
+    description: "Musyawarah kerja tahunan"
   }
 ];
 

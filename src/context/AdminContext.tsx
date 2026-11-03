@@ -113,7 +113,21 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const savedEvents = localStorage.getItem("rohis_admin_events");
-      if (savedEvents) setEvents(JSON.parse(savedEvents));
+      if (savedEvents) {
+        try {
+          const parsed = JSON.parse(savedEvents);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const cleaned = parsed.map((e: any) => {
+              if (e.image && typeof e.image === "string" && e.image.startsWith("data:image/")) {
+                return { ...e, image: "/images/event-3.jpg" };
+              }
+              return e;
+            });
+            setEvents(cleaned);
+            localStorage.setItem("rohis_admin_events", JSON.stringify(cleaned));
+          }
+        } catch {}
+      }
 
       const savedApplicants = localStorage.getItem("rohis_admin_applicants");
       if (savedApplicants) setApplicants(JSON.parse(savedApplicants));
