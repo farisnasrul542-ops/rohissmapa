@@ -252,7 +252,7 @@ export const DEFAULT_HOME_CMS: HomeCmsData = {
   },
   sections: {
     showHero: true,
-    showStats: true,
+    showStats: false,
     showAbout: true,
     showSambutan: true,
     showAgenda: true,
@@ -454,7 +454,7 @@ export function normalizeHomeCms(raw: any): HomeCmsData {
     },
     sections: {
       showHero: raw.sections?.showHero !== false,
-      showStats: raw.sections?.showStats !== false,
+      showStats: false,
       showAbout: raw.sections?.showAbout !== false,
       showSambutan: raw.sections?.showSambutan !== false,
       showAgenda: raw.sections?.showAgenda !== false,
