@@ -520,151 +520,58 @@ export const ARTICLES_DATA = [
 export const GALLERY_DATA = [
   {
     id: 1,
-    title: "Shalat Dzuhur Berjamaah & Kultum di Musholla Al-Ikhlas",
-    category: "Ibadah",
-    date: "September 2026",
-    description: "Kegiatan shalat berjamaah rutin para siswa dan guru SMA Negeri 4 Purwokerto dilanjutkan dengan kultum singkat ba'da shalat.",
-    emoji: "🕌",
-    coverImage: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=1200&q=80",
-    image: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=1200&q=80",
+    title: "Musyawarah Kerja Anggota (MUSKERTA) 2026",
+    category: "Muskerta & Raker",
+    date: "12 Oktober 2026",
+    description: "Dokumentasi Musyawarah Kerja Anggota (MUSKERTA) Rohis SMA Negeri 4 Purwokerto bersama pembina untuk merumuskan program kerja dakwah sekolah.",
+    emoji: "📸",
+    coverImage: "/images/dokumentasi-muskerta.jpg",
+    image: "/images/dokumentasi-muskerta.jpg",
+    imageUrl: "/images/dokumentasi-muskerta.jpg",
     media: [
       {
         id: "1-1",
         type: "image",
-        url: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=1200&q=80",
-        caption: "Suasana jamaah shalat Dzuhur di Musholla Al-Ikhlas SMAN 4 Purwokerto"
-      },
-      {
-        id: "1-2",
-        type: "image",
-        url: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1200&q=80",
-        caption: "Tadarus bersama siswa sebelum masuk waktu shalat"
+        url: "/images/dokumentasi-muskerta.jpg",
+        caption: "Dokumentasi Musyawarah Kerja Anggota (MUSKERTA) Rohis SMA Negeri 4 Purwokerto"
       }
     ]
   },
   {
     id: 2,
-    title: "Latihan Dasar Kepemimpinan Rohis (LDKR) SMAPA 2026",
-    category: "Pelatihan",
-    date: "September 2026",
-    description: "Pembekalan kepemimpinan, pembinaan mental ukhuwah, dan simulasi pemecahan masalah dakwah bagi calon pengurus baru.",
-    emoji: "🎓",
-    coverImage: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
-    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
+    title: "SMAN 4 MENOLONG",
+    category: "Kajian",
+    date: "28 Mei 2026",
+    description: "Dengan rasa kemanusiaan SMAN 4 memberikan bantuan kepada korban bencana",
+    emoji: "🤝",
+    coverImage: "https://iili.io/nPaqCWg.jpg",
+    image: "https://iili.io/nPaqCWg.jpg",
+    imageUrl: "https://iili.io/nPaqCWg.jpg",
     media: [
       {
         id: "2-1",
         type: "image",
-        url: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
-        caption: "Sesi materi kepemimpinan dan manajemen organisasi di Aula SMAN 4"
-      },
-      {
-        id: "2-2",
-        type: "image",
-        url: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80",
-        caption: "Diskusi kelompok penyusunan program kerja unggulan per divisi"
+        url: "https://iili.io/nPaqCWg.jpg",
+        caption: "Penyerahan bantuan kemanusiaan SMAN 4 Purwokerto melalui BAZNAS Kabupaten Banyumas"
       }
     ]
   },
   {
     id: 3,
-    title: "Kajian Keputrian Jumat di Ruang Multimedia SMAN 4",
-    category: "Keputrian",
-    date: "Agustus 2026",
-    description: "Sesi kajian fiqih praktis dan motivasi akhlak muslimah yang diikuti ratusan siswi muslimah saat pelaksanaan shalat Jumat.",
-    emoji: "🌸",
-    coverImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1200&q=80",
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1200&q=80",
+    title: "Tadarus & Sholat Dhuha Berjamaah",
+    category: "Ibadah",
+    date: "05 Oktober 2026",
+    description: "Pembiasaan ibadah pagi dan tilawah Al-Qur'an bersama sebelum kegiatan belajar mengajar dimulai.",
+    emoji: "🕌",
+    coverImage: "https://iili.io/nP8LnYF.jpg#crop=53,50,0.75,cover",
+    image: "https://iili.io/nP8LnYF.jpg#crop=53,50,0.75,cover",
+    imageUrl: "https://iili.io/nP8LnYF.jpg#crop=53,50,0.75,cover",
     media: [
       {
         id: "3-1",
         type: "image",
-        url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1200&q=80",
-        caption: "Pemaparan materi kajian keputrian oleh pembina putri"
-      },
-      {
-        id: "3-2",
-        type: "image",
-        url: "https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1200&q=80",
-        caption: "Tanya jawab seputar problematika remaja putri muslimah"
-      }
-    ]
-  },
-  {
-    id: 4,
-    title: "Bakti Sosial & Santunan Siswa Dhuafa SMAPA Peduli",
-    category: "Sosial",
-    date: "Agustus 2026",
-    description: "Penyaluran hasil himpunan infak Jum'at berkah berupa bingkisan sembako dan santunan sekolah bagi siswa-siswi yang membutuhkan.",
-    emoji: "🤝",
-    coverImage: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=80",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=80",
-    media: [
-      {
-        id: "4-1",
-        type: "image",
-        url: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=80",
-        caption: "Penyerahan santunan bakti sosial di serambi musholla sekolah"
-      },
-      {
-        id: "4-2",
-        type: "image",
-        url: "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1200&q=80",
-        caption: "Kader rohis gotong royong mengemas paket bantuan"
-      }
-    ]
-  },
-  {
-    id: 5,
-    title: "Lingkaran Halaqah Mentoring Mingguan Siswa SMAPA",
-    category: "Kaderisasi",
-    date: "Juli 2026",
-    description: "Kegiatan kelompok belajar keislaman kecil dipandu oleh kakak mentor kelas XI dan alumni untuk mempererat ukhuwah.",
-    emoji: "📖",
-    coverImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
-    media: [
-      {
-        id: "5-1",
-        type: "image",
-        url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
-        caption: "Sesi sharing mentoring santai di area taman sekolah SMAPA"
-      }
-    ]
-  },
-  {
-    id: 6,
-    title: "Kreativitas Pembuatan Majalah Dinding Islami & Media",
-    category: "Workshop",
-    date: "Juli 2026",
-    description: "Proses kurasi tulisan, poster dakwah, dan mading bertema motivasi hijrah di laboratorium komputer sekolah.",
-    emoji: "🎨",
-    coverImage: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80",
-    image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80",
-    media: [
-      {
-        id: "6-1",
-        type: "image",
-        url: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80",
-        caption: "Tim medinfo mendesain buletin mingguan musholla"
-      }
-    ]
-  },
-  {
-    id: 7,
-    title: "Semarak Buka Puasa Bersama & Pesantren Ramadhan di Sekolah",
-    category: "Ibadah",
-    date: "Ramadhan 1446 H",
-    description: "Keluarga besar muslim SMA Negeri 4 Purwokerto berkumpul dalam kebersamaan buka puasa dan doa bersama di selasar sekolah.",
-    emoji: "🌙",
-    coverImage: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
-    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
-    media: [
-      {
-        id: "7-1",
-        type: "image",
-        url: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
-        caption: "Buka puasa bersama di halaman Musholla Al-Ikhlas SMAN 4"
+        url: "https://iili.io/nP8LnYF.jpg#crop=53,50,0.75,cover",
+        caption: "Tadarus & Sholat Dhuha Berjamaah siswa SMAN 4 Purwokerto"
       }
     ]
   }

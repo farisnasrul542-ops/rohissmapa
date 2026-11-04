@@ -170,7 +170,6 @@ export default function ImageCropField({
 
     try {
       const dataUrl = await compressUploadedImageFile(file, 1280, 0.86);
-      onChange(dataUrl);
       setIsStudioOpen(true);
 
       setBakeFeedback("Sedang mengunci & mengunggah foto ke sistem web...");
@@ -182,6 +181,7 @@ export default function ImageCropField({
           "✓ Foto berhasil dikunci ke sistem web! Otomatis dapat dilihat di HP & semua perangkat."
         );
       } catch {
+        onChange(dataUrl);
         setBakeFeedback(
           isHeic
             ? "✓ Foto iPhone (HEIC) berhasil dimuat! Geser atau zoom untuk mengatur crop."
@@ -209,7 +209,6 @@ export default function ImageCropField({
         numericAspect,
         1080
       );
-      onChange(bakedDataUrl);
 
       setBakeFeedback("Sedang mengunci potongan foto ke sistem web...");
       let finalUrl = bakedDataUrl;
@@ -218,6 +217,7 @@ export default function ImageCropField({
         onChange(finalUrl);
         setBakeFeedback("✓ Foto berhasil dipotong & dikunci ke sistem web!");
       } catch {
+        onChange(bakedDataUrl);
         setBakeFeedback("✓ Gambar berhasil dipotong permanen sesuai bingkai!");
       }
       setTimeout(() => setBakeFeedback(null), 4000);

@@ -230,16 +230,7 @@ export const INITIAL_GALLERY: GalleryItem[] = [
     category: "Peribadahan",
     date: "05 Oktober 2026",
     location: "Musholla Al-Ikhlas SMAPA",
-    imageUrl: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1000&auto=format&fit=crop",
+    imageUrl: "https://iili.io/nP8LnYF.jpg#crop=53,50,0.75,cover",
     caption: "Pembiasaan sholat sunnah dhuha dan tadarus juz 30 sebelum memulai kegiatan belajar mengajar.",
-  },
-  {
-    id: "GAL-004",
-    title: "Mentoring & Halaqah Pelajar Muslim",
-    category: "Kaderisasi",
-    date: "15 Oktober 2026",
-    location: "Gazebo Taman SMAPA",
-    imageUrl: "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=1000&auto=format&fit=crop",
-    caption: "Lingkaran mentoring pekanan yang interaktif membimbing karakter dan kepemimpinan akhlak siswa.",
   },
 ];

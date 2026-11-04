@@ -73,28 +73,28 @@ export default function Gallery3DShowcase({
 
   const safeItems = items.length > 0 ? items : [
     {
-      id: "gal-1",
-      title: "Kajian Akbar & Peringatan Isra Mi'raj Pelajar",
-      category: "Kajian Akbar",
-      date: "28 September 2026",
+      id: "GAL-001",
+      title: "Musyawarah Kerja Anggota (MUSKERTA) 2026",
+      category: "Muskerta & Raker",
+      date: "12 Oktober 2026",
       image: "/images/dokumentasi-muskerta.jpg",
-      description: "Peringatan hari besar Islam bersama seluruh pelajar muslim SMA Negeri 4 Purwokerto.",
+      description: "Dokumentasi Musyawarah Kerja Anggota (MUSKERTA) Rohis SMA Negeri 4 Purwokerto bersama pembina untuk merumuskan program kerja dakwah sekolah.",
     },
     {
-      id: "gal-2",
+      id: "GAL-002",
       title: "SMAN 4 MENOLONG",
       category: "Kajian",
       date: "28 Mei 2026",
-      image: "/images/galeri-sman4-menolong.jpg",
+      image: "https://iili.io/nPaqCWg.jpg",
       description: "Dengan rasa kemanusiaan SMAN 4 memberikan bantuan kepada korban bencana",
     },
     {
-      id: "gal-3",
-      title: "Mentoring Pekanan & Lingkaran Ukhuwah Sahabat Taat",
-      category: "Mentoring Pelajar",
-      date: "15 Oktober 2026",
-      image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=1000&auto=format&fit=crop",
-      description: "Forum pembinaan karakter dan tadabbur dalam kelompok kecil sahabat taat.",
+      id: "GAL-003",
+      title: "Tadarus & Sholat Dhuha Berjamaah",
+      category: "Ibadah",
+      date: "05 Oktober 2026",
+      image: "https://iili.io/nP8LnYF.jpg#crop=53,50,0.75,cover",
+      description: "Pembiasaan ibadah pagi dan tilawah Al-Qur'an bersama sebelum kegiatan belajar mengajar dimulai.",
     },
   ];
 

@@ -29,7 +29,7 @@ import {
 import { DEFAULT_HOME_CMS, HomeCmsData, normalizeHomeCms } from "@/lib/homeCmsData";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
 import { handleGoogleDriveImageError } from "@/lib/driveUtils";
-import { pullCloudSync } from "@/lib/cloudSync";
+import { pullCloudSync, ensureCleanStorageVersion } from "@/lib/cloudSync";
 import { EventItem } from "@/lib/types";
 import {
   ArrowRight,
@@ -129,6 +129,8 @@ export default function HomePage() {
     }
 
     setMounted(true);
+    ensureCleanStorageVersion();
+
     const loadCms = () => {
       try {
         const saved = localStorage.getItem("rohis_home_cms");
@@ -146,7 +148,7 @@ export default function HomePage() {
           if (Array.isArray(parsed) && parsed.length > 0) {
             const cleaned = parsed.map((e: any) => {
               if (e.image && typeof e.image === "string" && e.image.startsWith("data:image/")) {
-                return { ...e, image: "/images/event-3.jpg" };
+                return { ...e, image: "https://iili.io/nP1Ssvp.jpg" };
               }
               return e;
             });
@@ -1242,18 +1244,13 @@ export default function HomePage() {
         <CinematicReveal direction="up" delay={0.15}>
           <Gallery3DShowcase
             items={(() => {
-              const isCmsDefault =
-                JSON.stringify(cms.gallery?.items) ===
-                JSON.stringify(DEFAULT_HOME_CMS.gallery.items);
-              if (!isCmsDefault && cms.gallery?.items && cms.gallery.items.length > 0) {
-                return cms.gallery.items;
-              }
               if (galleryList.length > 0) {
                 return galleryList;
               }
-              return cms.gallery?.items && cms.gallery.items.length > 0
-                ? cms.gallery.items
-                : GALLERY_DATA;
+              if (cms.gallery?.items && cms.gallery.items.length > 0) {
+                return cms.gallery.items;
+              }
+              return GALLERY_DATA;
             })()}
             tag={cms.gallery?.tag || "Dokumentasi Kegiatan"}
             title={cms.gallery?.title || "Galeri Syiar & Ukhuwah SMAPA"}

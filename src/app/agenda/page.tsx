@@ -9,7 +9,7 @@ import { EVENTS_DATA } from "@/lib/constants";
 import { EventItem } from "@/lib/types";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
 import { handleGoogleDriveImageError } from "@/lib/driveUtils";
-import { pullCloudSync } from "@/lib/cloudSync";
+import { pullCloudSync, ensureCleanStorageVersion } from "@/lib/cloudSync";
 import {
   Calendar,
   MapPin,
@@ -29,6 +29,7 @@ export default function AgendaPage() {
 
   useEffect(() => {
     try {
+      ensureCleanStorageVersion();
       const saved = localStorage.getItem("rohis_admin_events");
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -38,7 +39,7 @@ export default function AgendaPage() {
               ...e,
               image:
                 e.image && typeof e.image === "string" && e.image.startsWith("data:image/")
-                  ? "/images/event-3.jpg"
+                  ? "https://iili.io/nP1Ssvp.jpg"
                   : e.image,
               type: e.category || e.type || "Kajian",
             }))

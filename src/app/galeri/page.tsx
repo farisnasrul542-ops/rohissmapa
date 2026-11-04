@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { GALLERY_DATA } from "@/lib/constants";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
 import { handleGoogleDriveImageError } from "@/lib/driveUtils";
-import { pullCloudSync } from "@/lib/cloudSync";
+import { pullCloudSync, ensureCleanStorageVersion } from "@/lib/cloudSync";
 import { ScrollProgressBar, CinematicReveal } from "@/components/ScrollAnimations";
 import { Calendar, Tag } from "lucide-react";
 
@@ -15,6 +15,7 @@ export default function GaleriPage() {
 
   useEffect(() => {
     try {
+      ensureCleanStorageVersion();
       const saved = localStorage.getItem("rohis_admin_gallery");
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -57,7 +58,7 @@ export default function GaleriPage() {
       <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 -mt-8 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {galleryList.map((item: any, idx: number) => {
-            const rawImg = item.coverImage || item.image || "/images/dokumentasi-muskerta.jpg";
+            const rawImg = item.imageUrl || item.coverImage || item.image || "/images/dokumentasi-muskerta.jpg";
             return (
               <CinematicReveal
                 key={item.id || idx}

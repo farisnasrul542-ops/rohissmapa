@@ -14,7 +14,7 @@ import {
   INITIAL_ANNOUNCEMENT,
 } from "@/lib/adminData";
 import { HomeCmsData, DEFAULT_HOME_CMS, normalizeHomeCms } from "@/lib/homeCmsData";
-import { pullCloudSync, pushCloudSync } from "@/lib/cloudSync";
+import { pullCloudSync, pushCloudSync, ensureCleanStorageVersion } from "@/lib/cloudSync";
 
 interface ToastNotification {
   id: number;
@@ -112,6 +112,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   // Load from localStorage only after initial client mount to guarantee 100% SSR hydration match
   useEffect(() => {
     try {
+      ensureCleanStorageVersion();
+
       const savedEvents = localStorage.getItem("rohis_admin_events");
       if (savedEvents) {
         try {
@@ -119,7 +121,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           if (Array.isArray(parsed) && parsed.length > 0) {
             const cleaned = parsed.map((e: any) => {
               if (e.image && typeof e.image === "string" && e.image.startsWith("data:image/")) {
-                return { ...e, image: "/images/event-3.jpg" };
+                return { ...e, image: "https://iili.io/nP1Ssvp.jpg" };
               }
               return e;
             });
@@ -143,19 +145,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
       const savedCms = localStorage.getItem("rohis_home_cms");
       if (savedCms) setHomeCms(normalizeHomeCms(JSON.parse(savedCms)));
-
-      // Otomatis sinkronkan data yang tersimpan di panel admin ke cloud store agar perubahan langsung aktif
-      if (typeof window !== "undefined") {
-        const payloadToSync: any = {};
-        if (savedCms) payloadToSync.rohis_home_cms = JSON.parse(savedCms);
-        if (savedEvents) payloadToSync.rohis_admin_events = JSON.parse(savedEvents);
-        if (savedGallery) payloadToSync.rohis_admin_gallery = JSON.parse(savedGallery);
-        if (savedAspirasi) payloadToSync.rohis_admin_aspirasi = JSON.parse(savedAspirasi);
-        if (savedAnnouncement) payloadToSync.rohis_admin_announcement = JSON.parse(savedAnnouncement);
-        if (Object.keys(payloadToSync).length > 0) {
-          pushCloudSync(payloadToSync);
-        }
-      }
     } catch {}
     setIsInitialized(true);
 
@@ -270,6 +259,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const resetHomeCms = () => {
     hasUserModifiedCmsRef.current = true;
     setHomeCms(DEFAULT_HOME_CMS);
+    pushCloudSync({ rohis_home_cms: DEFAULT_HOME_CMS });
     try {
       localStorage.removeItem("rohis_home_cms");
       if (typeof window !== "undefined") {
@@ -306,29 +296,41 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)+/g, "");
     const newEvent: EventItem = { ...item, id, slug };
-    setEvents((prev) => [newEvent, ...prev]);
+    setEvents((prev) => {
+      const updated = [newEvent, ...prev];
+      pushCloudSync({ rohis_admin_events: updated });
+      return updated;
+    });
     showToast(`Agenda "${item.title}" berhasil ditambahkan!`, "success");
   };
 
   const updateEvent = (id: string, updated: Partial<EventItem>) => {
     hasUserModifiedEventsRef.current = true;
-    setEvents((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...updated } : e))
-    );
+    setEvents((prev) => {
+      const updatedList = prev.map((e) => (e.id === id ? { ...e, ...updated } : e));
+      pushCloudSync({ rohis_admin_events: updatedList });
+      return updatedList;
+    });
     showToast("Data agenda berhasil diperbarui.", "success");
   };
 
   const deleteEvent = (id: string) => {
     hasUserModifiedEventsRef.current = true;
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+    setEvents((prev) => {
+      const updatedList = prev.filter((e) => e.id !== id);
+      pushCloudSync({ rohis_admin_events: updatedList });
+      return updatedList;
+    });
     showToast("Agenda telah dihapus dari sistem.", "warning");
   };
 
   const toggleEventStatus = (id: string, status: EventItem["status"]) => {
     hasUserModifiedEventsRef.current = true;
-    setEvents((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, status } : e))
-    );
+    setEvents((prev) => {
+      const updatedList = prev.map((e) => (e.id === id ? { ...e, status } : e));
+      pushCloudSync({ rohis_admin_events: updatedList });
+      return updatedList;
+    });
     showToast(`Status agenda diubah menjadi ${status}.`, "info");
   };
 

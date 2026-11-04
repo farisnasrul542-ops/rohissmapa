@@ -1,16 +1,16 @@
 /**
  * Cloudflare Worker untuk ROHIS SMAN 4 Purwokerto
  * - Memisahkan domain Publik (https://rohis-sman4pwt.web.id/) dan domain Admin (https://rohissmapa.farisnasrul542.workers.dev/)
- * - Menyediakan endpoint sinkronisasi data lintas domain (/api/cms-sync) menggunakan Cloudflare Edge Cache API
+ * - Menyediakan endpoint sinkronisasi data lintas domain (/api/cms-sync) menggunakan Cloudflare Edge Cache API (Schema v3)
  */
-
-const CLOUD_STORAGE_OBJECT_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a19cc57a9b1075";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
+
+const REQUIRED_SCHEMA_VERSION = 3;
 
 export default {
   async fetch(request, env, ctx) {
@@ -25,21 +25,28 @@ export default {
     // 2. Endpoint Sinkronisasi Data Lintas Domain (Admin workers.dev <-> Publik rohis-sman4pwt.web.id)
     if (url.pathname === "/api/cms-sync") {
       const cache = typeof caches !== "undefined" ? caches.default : null;
-      const cacheKey = new Request("https://sync-cache.rohis-sman4pwt.local/cms-sync", { method: "GET" });
+      const cacheKey = new Request("https://sync-cache.rohis-sman4pwt.local/cms-sync-v3", {
+        method: "GET",
+      });
 
       if (request.method === "GET") {
-        // Coba ambil dari edge cache terlebih dahulu
+        // Coba ambil dari edge cache v3 terlebih dahulu
         if (cache) {
           try {
             const cachedRes = await cache.match(cacheKey);
             if (cachedRes) {
               const cachedJson = await cachedRes.json();
-              if (cachedJson && typeof cachedJson === "object" && !cachedJson.empty) {
-                globalThis.__ROHIS_SHARED_STATE__ = {
-                  ...globalThis.__ROHIS_SHARED_STATE__,
+              if (
+                cachedJson &&
+                typeof cachedJson === "object" &&
+                !cachedJson.empty &&
+                Number(cachedJson.schemaVersion) >= REQUIRED_SCHEMA_VERSION
+              ) {
+                globalThis.__ROHIS_SHARED_STATE_V3__ = {
+                  ...globalThis.__ROHIS_SHARED_STATE_V3__,
                   ...cachedJson,
                 };
-                return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE__), {
+                return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE_V3__), {
                   status: 200,
                   headers: {
                     ...CORS_HEADERS,
@@ -52,9 +59,12 @@ export default {
           } catch {}
         }
 
-        // Coba ambil dari in-memory state
-        if (globalThis.__ROHIS_SHARED_STATE__) {
-          return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE__), {
+        // Coba ambil dari in-memory state v3
+        if (
+          globalThis.__ROHIS_SHARED_STATE_V3__ &&
+          Number(globalThis.__ROHIS_SHARED_STATE_V3__.schemaVersion) >= REQUIRED_SCHEMA_VERSION
+        ) {
+          return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE_V3__), {
             status: 200,
             headers: {
               ...CORS_HEADERS,
@@ -64,32 +74,7 @@ export default {
           });
         }
 
-        // Coba ambil dari cloud persistent storage
-        try {
-          const res = await fetch(CLOUD_STORAGE_OBJECT_URL, {
-            method: "GET",
-            headers: { "Cache-Control": "no-cache" },
-          });
-          if (res.ok) {
-            const json = await res.json();
-            if (json?.data && typeof json.data === "object") {
-              globalThis.__ROHIS_SHARED_STATE__ = {
-                ...globalThis.__ROHIS_SHARED_STATE__,
-                ...json.data,
-              };
-              return new Response(JSON.stringify(globalThis.__ROHIS_SHARED_STATE__), {
-                status: 200,
-                headers: {
-                  ...CORS_HEADERS,
-                  "Content-Type": "application/json",
-                  "Cache-Control": "no-store, no-cache, must-revalidate",
-                },
-              });
-            }
-          }
-        } catch {}
-
-        return new Response(JSON.stringify({ empty: true }), {
+        return new Response(JSON.stringify({ empty: true, schemaVersion: REQUIRED_SCHEMA_VERSION }), {
           status: 200,
           headers: {
             ...CORS_HEADERS,
@@ -102,15 +87,34 @@ export default {
       if (request.method === "POST") {
         try {
           const incoming = await request.json();
-          let existing = globalThis.__ROHIS_SHARED_STATE__ || {};
 
-          // Ambil dari edge cache jika memori dingin
+          // Tolak payload dari tab browser versi lama yang belum memiliki schemaVersion >= 3
+          if (!incoming || Number(incoming.schemaVersion) < REQUIRED_SCHEMA_VERSION) {
+            return new Response(
+              JSON.stringify({ ok: false, ignored: true, reason: "Outdated schema version" }),
+              {
+                status: 200,
+                headers: {
+                  ...CORS_HEADERS,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+          }
+
+          let existing = globalThis.__ROHIS_SHARED_STATE_V3__ || {};
+
+          // Ambil dari edge cache v3 jika memori dingin
           if (cache && Object.keys(existing).length === 0) {
             try {
               const cachedRes = await cache.match(cacheKey);
               if (cachedRes) {
                 const cachedJson = await cachedRes.json();
-                if (cachedJson && typeof cachedJson === "object") {
+                if (
+                  cachedJson &&
+                  typeof cachedJson === "object" &&
+                  Number(cachedJson.schemaVersion) >= REQUIRED_SCHEMA_VERSION
+                ) {
                   existing = { ...existing, ...cachedJson };
                 }
               }
@@ -120,12 +124,13 @@ export default {
           const merged = {
             ...existing,
             ...incoming,
+            schemaVersion: REQUIRED_SCHEMA_VERSION,
             updatedAt: Date.now(),
           };
 
-          globalThis.__ROHIS_SHARED_STATE__ = merged;
+          globalThis.__ROHIS_SHARED_STATE_V3__ = merged;
 
-          // Simpan ke edge cache
+          // Simpan ke edge cache v3
           if (cache) {
             try {
               const cacheRes = new Response(JSON.stringify(merged), {
@@ -141,20 +146,6 @@ export default {
                 await cachePut;
               }
             } catch {}
-          }
-
-          // Coba simpan ke cloud storage jika ukurannya wajar
-          const payloadStr = JSON.stringify({ name: "rohis_smapa_cms_v1", data: merged });
-          if (payloadStr.length < 1500) {
-            const savePromise = fetch(CLOUD_STORAGE_OBJECT_URL, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: payloadStr,
-            }).catch(() => {});
-
-            if (ctx && typeof ctx.waitUntil === "function") {
-              ctx.waitUntil(savePromise);
-            }
           }
 
           return new Response(JSON.stringify({ ok: true, updatedAt: merged.updatedAt }), {
@@ -197,7 +188,7 @@ export default {
           uploadForm.append("key", "6d207e02198a847aa98d0a2a901485a5");
           uploadForm.append("action", "upload");
           uploadForm.append("format", "json");
-          uploadForm.append("source", file, (file.name || "image.jpg"));
+          uploadForm.append("source", file, file.name || "image.jpg");
 
           const upstream = await fetch("https://freeimage.host/api/1/upload", {
             method: "POST",
@@ -215,10 +206,13 @@ export default {
           const j = await upstream.json();
           const imgUrl = j?.image?.url || j?.image?.display_url;
           if (!imgUrl) {
-            return new Response(JSON.stringify({ ok: false, error: "Gagal mendapatkan URL gambar CDN" }), {
-              status: 500,
-              headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-            });
+            return new Response(
+              JSON.stringify({ ok: false, error: "Gagal mendapatkan URL gambar CDN" }),
+              {
+                status: 500,
+                headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+              }
+            );
           }
 
           return new Response(JSON.stringify({ ok: true, url: imgUrl }), {
@@ -236,7 +230,10 @@ export default {
 
     // 3. Pemisahan Domain Otomatis:
     // - Jika membuka root https://rohissmapa.farisnasrul542.workers.dev/ -> langsung arahkan ke /admin
-    if (hostname.includes("workers.dev") && (url.pathname === "/" || url.pathname === "" || url.pathname === "/index.html")) {
+    if (
+      hostname.includes("workers.dev") &&
+      (url.pathname === "/" || url.pathname === "" || url.pathname === "/index.html")
+    ) {
       return Response.redirect(`${url.origin}/admin`, 302);
     }
 
@@ -273,4 +270,3 @@ export default {
     return assetRes;
   },
 };
-
