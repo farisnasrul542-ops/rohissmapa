@@ -98,11 +98,6 @@ export default function Footer() {
                   Jadwal Kegiatan & Kajian
                 </Link>
               </li>
-              <li>
-                <Link href="/kontak" className="hover:text-amber-300 transition-colors">
-                  Kontak & Sekretariat Musholla
-                </Link>
-              </li>
             </ul>
           </div>
 

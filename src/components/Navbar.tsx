@@ -63,7 +63,6 @@ export default function Navbar() {
     { name: "Divisi & Proker", href: "/program", icon: Layers, desc: "6 divisi dakwah sekolah" },
     { name: "Agenda & Kegiatan", href: "/agenda", icon: Calendar, desc: "Jadwal kajian & LDKR" },
     { name: "Galeri Foto", href: "/galeri", icon: Camera, desc: "Dokumentasi syiar SMAPA" },
-    { name: "Kontak & Medsos", href: "/kontak", icon: Phone, desc: "Instagram & Musholla" },
   ];
 
   return (
@@ -94,14 +93,9 @@ export default function Navbar() {
                 />
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-sm sm:text-base tracking-tight text-emerald-950 group-hover:text-emerald-700 transition-colors">
-                    ROHIS SMAN 4
-                  </span>
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded">
-                    SMAPA
-                  </span>
-                </div>
+                <span className="font-extrabold text-sm sm:text-base tracking-tight text-emerald-950 group-hover:text-emerald-700 transition-colors">
+                  ROHIS SMAN 4
+                </span>
                 <p className="text-[11px] font-medium text-emerald-800/70 leading-none">
                   SMA Negeri 4 Purwokerto
                 </p>

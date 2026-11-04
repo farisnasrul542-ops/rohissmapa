@@ -8,7 +8,6 @@ import {
   Layers,
   Calendar,
   Camera,
-  MessageSquareHeart,
   Send,
   Building,
   ShieldCheck,
@@ -114,22 +113,6 @@ const DIRECTORY_ITEMS: DirectoryItem[] = [
     description:
       "Arsip dokumentasi visual potret kebersamaan ibadah di Musholla Al-Ikhlas, bakti sosial, dan momen ukhuwah santri pelajar.",
     link: "/galeri",
-  },
-  {
-    id: "aspirasi",
-    tag: "SUARA SISWA",
-    tagColor: {
-      bg: "bg-rose-50",
-      text: "text-rose-700",
-      border: "border-rose-200",
-    },
-    iconBg: "bg-rose-100/80",
-    iconColor: "text-rose-700",
-    icon: MessageSquareHeart,
-    title: "Kotak Aspirasi Siswa",
-    description:
-      "Sampaikan saran, masukan perbaikan musholla, usulan program dakwah, atau pertanyaan keagamaan secara terbuka maupun rahasia.",
-    link: "/aspirasi",
   },
   {
     id: "kontak",
