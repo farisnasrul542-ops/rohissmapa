@@ -6,7 +6,6 @@ import Image from "next/image";
 import {
   Users,
   CalendarDays,
-  MessageSquareHeart,
   TrendingUp,
   ArrowRight,
   Clock,
@@ -25,13 +24,11 @@ import { DIVISIONS } from "@/lib/constants";
 export default function AdminDashboardPage() {
   const {
     events,
-    aspirasiList,
     gallery,
     announcement,
     toggleEventStatus,
   } = useAdmin();
 
-  const pendingAspirasi = aspirasiList.filter((a) => a.status === "pending");
   const activeEvents = events.filter((e) => e.status !== "completed");
   const totalMembers = DIVISIONS.reduce(
     (sum, div) => sum + (div.members?.length || 0),
@@ -55,7 +52,7 @@ export default function AdminDashboardPage() {
               Ahlan wa Sahlan, Pengurus BPH SMAPA
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100/80 mt-1.5 max-w-2xl leading-relaxed">
-              Pusat kendali kegiatan dakwah, pengelolaan kajian Musholla Al-Ikhlas, dokumentasi publikasi, dan monitoring aspirasi pelajar SMA Negeri 4 Purwokerto.
+              Pusat kendali kegiatan dakwah, pengelolaan kajian Musholla Al-Ikhlas, dan dokumentasi publikasi pelajar SMA Negeri 4 Purwokerto.
             </p>
           </div>
 
@@ -66,13 +63,6 @@ export default function AdminDashboardPage() {
             >
               <PlusCircle size={15} />
               <span>Agenda Baru</span>
-            </Link>
-            <Link
-              href="/admin/aspirasi"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/20 border-b-[3px] border-b-black/40 transition-all backdrop-blur-xs"
-            >
-              <MessageSquareHeart size={15} className="text-amber-300" />
-              <span>Aspirasi Masuk ({pendingAspirasi.length})</span>
             </Link>
           </div>
         </div>
@@ -98,7 +88,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* ── 3D TACTILE KPI STATS GRID (UNIFIED MONOCHROME EMERALD & SLATE) ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
         {/* Stat 1: Total Pengurus & Kader */}
         <div className="p-5 rounded-3xl bg-white border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_8px_20px_-6px_rgba(6,32,23,0.06)] hover:-translate-y-0.5 transition-all">
           <div className="flex items-center justify-between mb-3">
@@ -160,27 +150,6 @@ export default function AdminDashboardPage() {
           <div className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-emerald-800">
             <CheckCircle2 size={13} />
             <span>Tersinkron ke Galeri Publik</span>
-          </div>
-        </div>
-
-        {/* Stat 4: Kotak Aspirasi */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_8px_20px_-6px_rgba(6,32,23,0.06)] hover:-translate-y-0.5 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
-              Aspirasi Siswa
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-amber-300 flex items-center justify-center border border-emerald-700/40 border-b-2 border-b-black shadow-xs">
-              <MessageSquareHeart size={18} />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">
-              {pendingAspirasi.length}
-            </span>
-            <span className="text-xs font-bold text-slate-400">Menunggu</span>
-          </div>
-          <div className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
-            <span>Total {aspirasiList.length} suara siswa masuk</span>
           </div>
         </div>
       </div>
@@ -355,77 +324,8 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Right Column: Aspirasi & Piket Musholla (4 Cols) */}
+        {/* Right Column: Piket Musholla & Info (4 Cols) */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Card: Aspirasi Masuk */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_10px_28px_-8px_rgba(6,32,23,0.06)]">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-              <div>
-                <h2 className="text-base font-black text-slate-900">
-                  Aspirasi Siswa Terbaru
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Suara & usulan pelajar SMAPA
-                </p>
-              </div>
-              <Link
-                href="/admin/aspirasi"
-                className="text-xs font-extrabold text-emerald-900 hover:underline"
-              >
-                Semua ({aspirasiList.length})
-              </Link>
-            </div>
-
-            <div className="space-y-3">
-              {aspirasiList.slice(0, 3).map((item) => (
-                <div
-                  key={item.id}
-                  className="p-3.5 rounded-2xl border border-slate-200/80 border-b-2 border-b-slate-300/80 bg-slate-50/60 hover:bg-white transition-all text-xs"
-                >
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <span
-                      className={`text-[9.5px] font-black uppercase px-2 py-0.5 rounded-md ${
-                        item.status === "resolved"
-                          ? "bg-emerald-950/[0.08] text-emerald-950"
-                          : item.status === "in_review"
-                          ? "bg-slate-200 text-slate-800"
-                          : "bg-amber-100 text-amber-950"
-                      }`}
-                    >
-                      {item.status === "resolved"
-                        ? "✓ Selesai"
-                        : item.status === "in_review"
-                        ? "◷ Ditinjau"
-                        : "● Menunggu"}
-                    </span>
-                    <span className="text-[10px] font-semibold text-slate-400">
-                      {item.createdAt}
-                    </span>
-                  </div>
-
-                  <h4 className="font-extrabold text-slate-900 mb-1">
-                    {item.title}
-                  </h4>
-                  <p className="text-slate-600 line-clamp-2 leading-relaxed">
-                    {item.message}
-                  </p>
-
-                  <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
-                    <span className="font-semibold truncate">
-                      Oleh: {item.senderName}
-                    </span>
-                    <Link
-                      href="/admin/aspirasi"
-                      className="font-extrabold text-emerald-900 hover:underline shrink-0"
-                    >
-                      Tanggapi →
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Card: Jadwal Petugas Musholla Al-Ikhlas Hari Ini */}
           <div className="bg-gradient-to-br from-[#062017] via-[#092b1f] to-[#041610] text-white rounded-3xl p-6 border border-emerald-800/40 border-b-[5px] border-b-[#020d09] shadow-lg">
             <div className="flex items-center gap-2 text-amber-300 text-[11px] font-black uppercase tracking-wider mb-1.5">

@@ -247,8 +247,8 @@ export const DEFAULT_HOME_CMS: HomeCmsData = {
       "Tingkatkan wawasan keislaman, temukan sahabat taat di sekolah, asah keterampilan kepemimpinan, dan dapatkan pengalaman berharga di SMA Negeri 4 Purwokerto.",
     btnPrimaryText: "Lihat Agenda & Kajian",
     btnPrimaryLink: "/agenda",
-    btnSecondaryText: "Kotak Aspirasi Siswa",
-    btnSecondaryLink: "/aspirasi",
+    btnSecondaryText: "Tentang Kami",
+    btnSecondaryLink: "/tentang",
   },
   sections: {
     showHero: true,

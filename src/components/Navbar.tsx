@@ -15,7 +15,6 @@ import {
   Camera,
   Phone,
   ArrowRight,
-  MessageSquareHeart,
   ShieldCheck,
   ChevronRight,
 } from "lucide-react";
@@ -128,17 +127,6 @@ export default function Navbar() {
                 );
               })}
             </nav>
-
-            {/* Action CTAs */}
-            <div className="hidden sm:flex items-center gap-2">
-              <Link
-                href="/aspirasi"
-                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all border border-emerald-900/10 shadow-2xs hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <MessageSquareHeart size={14} className="text-emerald-700" />
-                <span>Kotak Aspirasi</span>
-              </Link>
-            </div>
 
             {/* Mobile Menu Button */}
             <div className="flex items-center gap-2 lg:hidden">
@@ -260,21 +248,6 @@ export default function Navbar() {
                     </Link>
                   );
                 })}
-
-                {/* Bottom Quick Action CTA */}
-                <div className="pt-3 border-t border-gray-100">
-                  <Link
-                    href="/aspirasi"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-3 p-3.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-900/10 text-emerald-900 transition-all text-center group"
-                  >
-                    <MessageSquareHeart size={20} className="text-emerald-700 group-hover:scale-110 transition-transform" />
-                    <div className="text-left">
-                      <span className="text-xs font-bold block">Kotak Aspirasi Siswa</span>
-                      <span className="text-[10px] text-emerald-700/70 block">Sampaikan suara & saran ke Rohis SMAPA</span>
-                    </div>
-                  </Link>
-                </div>
               </div>
             </motion.div>
           </div>

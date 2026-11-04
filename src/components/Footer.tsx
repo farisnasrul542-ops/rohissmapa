@@ -94,11 +94,6 @@ export default function Footer() {
             </h4>
             <ul className="flex flex-col gap-2.5 text-xs text-emerald-100/70">
               <li>
-                <Link href="/aspirasi" className="hover:text-amber-300 transition-colors">
-                  Kotak Aspirasi & Suara Siswa
-                </Link>
-              </li>
-              <li>
                 <Link href="/agenda" className="hover:text-amber-300 transition-colors">
                   Jadwal Kegiatan & Kajian
                 </Link>

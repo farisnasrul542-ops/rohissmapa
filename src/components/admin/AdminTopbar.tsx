@@ -11,7 +11,6 @@ import {
   ExternalLink,
   Calendar,
   CheckCircle2,
-  MessageSquare,
   X,
   KeyRound,
   Lock,
@@ -36,7 +35,7 @@ export default function AdminTopbar({
   onMenuToggle,
 }: AdminTopbarProps) {
   const pathname = usePathname();
-  const { aspirasiList, searchQuery, setSearchQuery } = useAdmin();
+  const { searchQuery, setSearchQuery } = useAdmin();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -110,8 +109,7 @@ export default function AdminTopbar({
   };
 
   const breadcrumb = getBreadcrumb();
-  const pendingAspirasi = aspirasiList.filter((a) => a.status === "pending");
-  const totalNotifications = pendingAspirasi.length;
+  const totalNotifications = 0;
 
   const formattedDate = mounted
     ? new Intl.DateTimeFormat("id-ID", {
@@ -155,7 +153,7 @@ export default function AdminTopbar({
             />
             <input
               type="text"
-              placeholder="Cari cepat agenda, foto dokumentasi, atau aspirasi..."
+              placeholder="Cari cepat agenda atau foto dokumentasi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200/90 bg-slate-50/80 text-xs text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 focus:bg-white transition-all"
@@ -232,35 +230,13 @@ export default function AdminTopbar({
                   </div>
 
                   <div className="p-3 space-y-2 max-h-72 overflow-y-auto custom-scrollbar">
-                    {pendingAspirasi.length > 0 && (
-                      <Link
-                        href="/admin/aspirasi"
-                        onClick={() => setNotificationOpen(false)}
-                        className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 hover:bg-emerald-50/60 border border-slate-200/80 hover:border-emerald-300 transition-colors"
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-[#062017] text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
-                          <MessageSquare size={15} />
-                        </div>
-                        <div className="text-xs">
-                          <p className="font-extrabold text-slate-900">
-                            {pendingAspirasi.length} Aspirasi Siswa Menunggu Balasan
-                          </p>
-                          <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                            Tinjau dan berikan tanggapan resmi BPH Rohis SMAPA.
-                          </p>
-                        </div>
-                      </Link>
-                    )}
-
-                    {totalNotifications === 0 && (
-                      <div className="text-center py-6 text-slate-400 text-xs">
-                        <CheckCircle2
-                          size={28}
-                          className="mx-auto mb-2 text-emerald-700"
-                        />
-                        Semua aspirasi siswa telah ditindaklanjuti!
-                      </div>
-                    )}
+                    <div className="text-center py-6 text-slate-400 text-xs">
+                      <CheckCircle2
+                        size={28}
+                        className="mx-auto mb-2 text-emerald-700"
+                      />
+                      Semua sistem dan pembaruan berjalan optimal!
+                    </div>
                   </div>
 
                   <div className="px-4 py-2.5 bg-slate-50/80 border-t border-slate-200/80 text-center">

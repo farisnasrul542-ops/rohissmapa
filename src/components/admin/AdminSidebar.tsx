@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   CalendarDays,
-  MessageSquareHeart,
   ImageIcon,
   Megaphone,
   Globe,
@@ -52,11 +51,6 @@ export default function AdminSidebar({
       label: "Dokumentasi & Galeri",
       href: "/admin/galeri",
       icon: ImageIcon,
-    },
-    {
-      label: "Kotak Aspirasi Siswa",
-      href: "/admin/aspirasi",
-      icon: MessageSquareHeart,
     },
     {
       label: "Pengumuman & Pembina",
