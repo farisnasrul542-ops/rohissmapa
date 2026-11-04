@@ -18,7 +18,6 @@ import {
   ExternalLink,
   Layers,
 } from "lucide-react";
-import { useAdmin } from "@/context/AdminContext";
 import { logoutAdmin } from "@/lib/adminAuth";
 
 interface AdminSidebarProps {
@@ -31,63 +30,38 @@ export default function AdminSidebar({
   setMobileOpen,
 }: AdminSidebarProps) {
   const pathname = usePathname();
-  const { aspirasiList, events, gallery } = useAdmin();
-  const [mounted, setMounted] = useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const pendingAspirasiCount = aspirasiList.filter(
-    (a) => a.status === "pending"
-  ).length;
-
-  const activeEventsCount = events.filter(
-    (e) => e.status === "open" || e.status === "closing_soon"
-  ).length;
 
   const navItems = [
     {
       label: "Dashboard Eksekutif",
       href: "/admin",
       icon: LayoutDashboard,
-      badge: null,
       exact: true,
     },
     {
       label: "Editor Konten Beranda",
       href: "/admin/content/home",
       icon: Sparkles,
-      badge: "Live CMS",
-      badgeColor: "bg-amber-400/20 text-amber-300 border-amber-400/35",
     },
     {
       label: "Manajemen Agenda",
       href: "/admin/agenda",
       icon: CalendarDays,
-      badge: mounted && activeEventsCount > 0 ? `${activeEventsCount} Aktif` : null,
-      badgeColor: "bg-emerald-500/20 text-emerald-200 border-emerald-500/35",
     },
     {
       label: "Dokumentasi & Galeri",
       href: "/admin/galeri",
       icon: ImageIcon,
-      badge: mounted && gallery.length > 0 ? `${gallery.length} Foto` : null,
-      badgeColor: "bg-white/10 text-emerald-100 border-white/15",
     },
     {
       label: "Kotak Aspirasi Siswa",
       href: "/admin/aspirasi",
       icon: MessageSquareHeart,
-      badge:
-        mounted && pendingAspirasiCount > 0 ? `${pendingAspirasiCount} Baru` : null,
-      badgeColor: "bg-amber-500/25 text-amber-200 border-amber-400/40",
     },
     {
       label: "Pengumuman & Pembina",
       href: "/admin/pengumuman",
       icon: Megaphone,
-      badge: null,
     },
   ];
 
@@ -188,15 +162,9 @@ export default function AdminSidebar({
                 <span className="truncate">{item.label}</span>
               </div>
 
-              {item.badge ? (
-                <span
-                  className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded-full border shrink-0 ${item.badgeColor}`}
-                >
-                  {item.badge}
-                </span>
-              ) : active ? (
+              {active && (
                 <ChevronRight size={14} className="text-emerald-200/70 shrink-0" />
-              ) : null}
+              )}
             </Link>
           );
         })}
