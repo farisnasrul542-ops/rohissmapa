@@ -122,9 +122,6 @@ export default function AdminSidebar({
                 <span className="font-black text-sm tracking-tight text-white group-hover:text-emerald-200 transition-colors">
                   ROHIS SMAPA
                 </span>
-                <span className="text-[9px] font-black tracking-widest px-1.5 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                  CMS
-                </span>
               </div>
               <p className="text-[11px] font-medium text-emerald-300/70">
                 Panel Eksekutif BPH
