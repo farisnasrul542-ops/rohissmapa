@@ -78,20 +78,13 @@ export default function GaleriPage() {
                         style={getImageCropStyle(rawImg)}
                         className="w-full h-full transition-transform duration-500"
                       />
-                      <div className="absolute top-3.5 left-3.5 flex items-center gap-2">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-800 text-white shadow">
-                          {item.category}
-                        </span>
-                        {item.emoji && (
-                          <span className="w-6 h-6 rounded-full bg-white/90 text-xs flex items-center justify-center shadow">
-                            {item.emoji}
-                          </span>
-                        )}
-                      </div>
                     </div>
 
                     <div className="p-6">
                       <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                          {item.category}
+                        </span>
                         <Calendar size={13} className="text-emerald-700" />
                         <span>{item.date}</span>
                       </div>

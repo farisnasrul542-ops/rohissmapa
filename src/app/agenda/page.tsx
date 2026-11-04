@@ -154,7 +154,6 @@ export default function AgendaPage() {
                       style={getImageCropStyle(event.image)}
                       className="w-full h-full transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                   </div>
                 )}
                 <div className="p-6 pb-0">

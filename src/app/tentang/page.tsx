@@ -285,10 +285,6 @@ export default function TentangPage() {
                     sizes="(max-width: 640px) 176px, 192px"
                     className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                  <span className="absolute bottom-2.5 left-2 right-2 text-center text-[10px] font-black uppercase tracking-wider text-amber-300 bg-black/60 backdrop-blur-md py-1 px-2 rounded-lg border border-white/10 shadow-sm">
-                    {m.classGrade}
-                  </span>
                 </div>
 
                 {/* Penjelasan & Keterangan di Samping Foto */}

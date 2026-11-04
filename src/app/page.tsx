@@ -45,8 +45,6 @@ import {
   GraduationCap,
   ChevronLeft,
   ChevronRight,
-  Pause,
-  Play,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -966,42 +964,6 @@ export default function HomePage() {
                       style={getImageCropStyle(event.image)}
                       className="w-full h-full object-cover select-none"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
-
-                    {/* Category Pill Tag (Exact Reference Shape & Color) */}
-                    <div className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 px-3.5 py-1 rounded-full bg-emerald-800/95 backdrop-blur-md border border-white/25 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md">
-                      {event.type || "KAJIAN"}
-                    </div>
-
-                    {/* Interactive Autoplay & Slide Counter Pill (Clear across Mobile & PC) */}
-                    {isCenter && (
-                      <div className="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 z-30 flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsAgendaPaused((prev) => !prev);
-                          }}
-                          title={isAgendaPaused ? "Lanjutkan putar otomatis" : "Jeda putar otomatis"}
-                          className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold tracking-wide bg-black/75 hover:bg-black/90 text-emerald-300 border border-white/20 transition-colors shadow-md cursor-pointer"
-                        >
-                          {isAgendaPaused ? (
-                            <>
-                              <Pause size={10} className="text-amber-400" />
-                              <span className="text-amber-300">Dijeda</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                              <span>Otomatis (6s)</span>
-                            </>
-                          )}
-                        </button>
-                        <div className="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold text-white/90 bg-black/75 border border-white/20 shadow-md">
-                          {idx + 1} / {total}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Lightweight Directional Shading on angled side cards */}
@@ -1015,8 +977,11 @@ export default function HomePage() {
                   {/* Card Content (Clean & Smooth Layout matching Reference) */}
                   <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between text-left">
                     <div>
-                      {/* Date with Calendar Icon (Clean Line below Image, Exactly like Reference) */}
+                      {/* Category & Date below Image */}
                       <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 font-semibold mb-2">
+                        <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0">
+                          {event.type || "KAJIAN"}
+                        </span>
                         <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
                         <span className="truncate">
                           {event.date && event.date.includes("-") && event.date.length === 10
