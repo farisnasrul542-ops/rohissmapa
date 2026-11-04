@@ -36,18 +36,54 @@ export function ensureCleanStorageVersion(): void {
       localStorage.removeItem("rohis_admin_events");
       localStorage.removeItem("rohis_admin_gallery");
       localStorage.removeItem("rohis_home_cms");
+      localStorage.removeItem("rohis_sync_updated_at");
       localStorage.setItem("rohis_schema_version", String(ROHIS_SCHEMA_VERSION));
     }
   } catch {}
 }
 
+export function markLocalSyncTimestamp(ts: number = Date.now()): number {
+  if (typeof window === "undefined") return ts;
+  try {
+    localStorage.setItem("rohis_sync_updated_at", String(ts));
+  } catch {}
+  return ts;
+}
+
+export function getLocalSyncTimestamp(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    return Number(localStorage.getItem("rohis_sync_updated_at") || "0") || 0;
+  } catch {
+    return 0;
+  }
+}
+
 export async function pushCloudSync(partial: CloudSyncPayload): Promise<void> {
   if (typeof window === "undefined") return;
 
+  const now = markLocalSyncTimestamp(Date.now());
+
+  // Sertakan snapshot lengkap dari localStorage agar semua endpoint memiliki state terbaru yang utuh
+  let fullSnapshot: CloudSyncPayload = {};
+  try {
+    const savedCms = localStorage.getItem("rohis_home_cms");
+    if (savedCms) fullSnapshot.rohis_home_cms = JSON.parse(savedCms);
+    const savedEvents = localStorage.getItem("rohis_admin_events");
+    if (savedEvents) fullSnapshot.rohis_admin_events = JSON.parse(savedEvents);
+    const savedGallery = localStorage.getItem("rohis_admin_gallery");
+    if (savedGallery) fullSnapshot.rohis_admin_gallery = JSON.parse(savedGallery);
+    const savedAspirasi = localStorage.getItem("rohis_admin_aspirasi");
+    if (savedAspirasi) fullSnapshot.rohis_admin_aspirasi = JSON.parse(savedAspirasi);
+    const savedAnnouncement = localStorage.getItem("rohis_admin_announcement");
+    if (savedAnnouncement) fullSnapshot.rohis_admin_announcement = JSON.parse(savedAnnouncement);
+  } catch {}
+
   const payloadWithTime: CloudSyncPayload = {
+    ...fullSnapshot,
     ...partial,
     schemaVersion: ROHIS_SCHEMA_VERSION,
-    updatedAt: Date.now(),
+    updatedAt: now,
   };
 
   const body = JSON.stringify(payloadWithTime);
@@ -68,17 +104,23 @@ export async function pullCloudSync(): Promise<CloudSyncPayload | null> {
 
   ensureCleanStorageVersion();
 
+  const localUpdatedAt = getLocalSyncTimestamp();
+
   const applyData = (data: any): CloudSyncPayload => {
+    const incomingTs = Number(data.updatedAt || 0);
+    if (incomingTs > 0) {
+      markLocalSyncTimestamp(incomingTs);
+    }
     if (data.rohis_home_cms) {
       localStorage.setItem("rohis_home_cms", JSON.stringify(data.rohis_home_cms));
     }
-    if (data.rohis_admin_events && Array.isArray(data.rohis_admin_events)) {
+    if (Array.isArray(data.rohis_admin_events)) {
       localStorage.setItem("rohis_admin_events", JSON.stringify(data.rohis_admin_events));
     }
-    if (data.rohis_admin_gallery && Array.isArray(data.rohis_admin_gallery)) {
+    if (Array.isArray(data.rohis_admin_gallery)) {
       localStorage.setItem("rohis_admin_gallery", JSON.stringify(data.rohis_admin_gallery));
     }
-    if (data.rohis_admin_aspirasi && Array.isArray(data.rohis_admin_aspirasi)) {
+    if (Array.isArray(data.rohis_admin_aspirasi)) {
       localStorage.setItem("rohis_admin_aspirasi", JSON.stringify(data.rohis_admin_aspirasi));
     }
     if (data.rohis_admin_announcement) {
@@ -90,14 +132,14 @@ export async function pullCloudSync(): Promise<CloudSyncPayload | null> {
     return data as CloudSyncPayload;
   };
 
-  for (const endpoint of SYNC_ENDPOINTS) {
-    try {
-      const res = await fetch(endpoint, { cache: "no-store" });
-      if (!res.ok) continue;
+  // Tarik dari semua endpoint secara paralel lalu pilih yang memiliki updatedAt paling baru
+  const results = await Promise.allSettled(
+    SYNC_ENDPOINTS.map(async (endpoint) => {
+      const res = await fetch(`${endpoint}?t=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) return null;
       const data = await res.json();
       if (data && !data.empty && typeof data === "object") {
         const payload = data.data || data;
-        // Hanya terima data sinkronisasi dengan schemaVersion >= 3 agar cache lama tidak pernah menimpa
         if (Number(payload.schemaVersion) >= ROHIS_SCHEMA_VERSION) {
           if (
             payload.rohis_home_cms ||
@@ -105,12 +147,33 @@ export async function pullCloudSync(): Promise<CloudSyncPayload | null> {
             payload.rohis_admin_gallery ||
             payload.rohis_admin_aspirasi
           ) {
-            return applyData(payload);
+            return payload as CloudSyncPayload;
           }
         }
       }
-    } catch {}
+      return null;
+    })
+  );
+
+  let newestPayload: CloudSyncPayload | null = null;
+  let newestTs = -1;
+
+  for (const r of results) {
+    if (r.status === "fulfilled" && r.value) {
+      const ts = Number(r.value.updatedAt || 0);
+      if (ts > newestTs) {
+        newestTs = ts;
+        newestPayload = r.value;
+      }
+    }
   }
 
-  return null;
+  if (!newestPayload) return null;
+
+  // Jangan timpa data lokal jika localStorage di browser ini memiliki perubahan yang lebih baru
+  if (localUpdatedAt > 0 && newestTs > 0 && newestTs < localUpdatedAt) {
+    return null;
+  }
+
+  return applyData(newestPayload);
 }

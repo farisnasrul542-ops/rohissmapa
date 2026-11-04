@@ -150,19 +150,19 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
     pullCloudSync().then((synced) => {
       if (!synced) return;
-      if (Array.isArray(synced.rohis_admin_events) && synced.rohis_admin_events.length > 0) {
+      if (!hasUserModifiedEventsRef.current && Array.isArray(synced.rohis_admin_events) && synced.rohis_admin_events.length > 0) {
         setEvents(synced.rohis_admin_events);
       }
-      if (Array.isArray(synced.rohis_admin_gallery) && synced.rohis_admin_gallery.length > 0) {
+      if (!hasUserModifiedGalleryRef.current && Array.isArray(synced.rohis_admin_gallery) && synced.rohis_admin_gallery.length > 0) {
         setGallery(synced.rohis_admin_gallery);
       }
-      if (Array.isArray(synced.rohis_admin_aspirasi) && synced.rohis_admin_aspirasi.length > 0) {
+      if (!hasUserModifiedAspirasiRef.current && Array.isArray(synced.rohis_admin_aspirasi) && synced.rohis_admin_aspirasi.length > 0) {
         setAspirasiList(synced.rohis_admin_aspirasi);
       }
-      if (synced.rohis_admin_announcement) {
+      if (!hasUserModifiedAnnouncementRef.current && synced.rohis_admin_announcement) {
         setAnnouncement(synced.rohis_admin_announcement);
       }
-      if (synced.rohis_home_cms) {
+      if (!hasUserModifiedCmsRef.current && synced.rohis_home_cms) {
         setHomeCms(normalizeHomeCms(synced.rohis_home_cms));
       }
     });

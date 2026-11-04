@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
 import { handleGoogleDriveImageError, formatGoogleDriveUrl } from "@/lib/driveUtils";
 import {
@@ -53,6 +54,7 @@ export default function Gallery3DShowcase({
   title = "Galeri Syiar & Ukhuwah SMAPA",
   lead = "Potret nyata aktivitas pembiasaan ibadah di Musholla Al-Ikhlas, kajian keputrian, dan kegiatan kepemimpinan SMA Negeri 4 Purwokerto.",
 }: Gallery3DShowcaseProps) {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -378,11 +380,13 @@ export default function Gallery3DShowcase({
                   onClick={() => {
                     if (hasMovedRef.current) return;
                     if (isLeft) prevSlide();
-                    if (isRight) nextSlide();
+                    else if (isRight) nextSlide();
+                    else if (isCenter) router.push("/galeri");
                   }}
                   onMouseMove={isCenter && !isDragging ? handleMouseMove : undefined}
                   onMouseEnter={isCenter ? handleMouseEnter : undefined}
                   onMouseLeave={isCenter ? handleMouseLeave : undefined}
+                  title={isCenter ? "Klik untuk melihat galeri dokumentasi lengkap" : undefined}
                   style={{
                     transform,
                     zIndex,
@@ -397,13 +401,13 @@ export default function Gallery3DShowcase({
                       ? "transform 160ms ease-out, opacity 420ms cubic-bezier(0.22, 1, 0.36, 1)"
                       : "transform 440ms cubic-bezier(0.22, 1, 0.36, 1), opacity 440ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
-                  className={`absolute w-[82vw] min-w-[260px] max-w-[345px] sm:w-[490px] sm:max-w-none lg:w-[620px] h-[350px] sm:h-[460px] lg:h-[500px] rounded-[26px] sm:rounded-[32px] overflow-hidden bg-emerald-950 will-change-transform border border-white/30 select-none ${
+                  className={`absolute w-[82vw] min-w-[260px] max-w-[345px] sm:w-[490px] sm:max-w-none lg:w-[620px] h-[350px] sm:h-[460px] lg:h-[500px] rounded-[26px] sm:rounded-[32px] overflow-hidden bg-emerald-950 will-change-transform border border-white/30 select-none cursor-pointer ${
                     isCenter
-                      ? "shadow-2xl ring-1 ring-white/25"
-                      : "shadow-xl cursor-pointer hover:opacity-80"
+                      ? "shadow-2xl ring-1 ring-white/35"
+                      : "shadow-xl hover:opacity-85"
                   }`}
                 >
-                  {/* Layer 0: Background Photo */}
+                  {/* Layer 0: Background Photo - Pristine, Crisp & Natural */}
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <img
                       draggable={false}
@@ -413,12 +417,8 @@ export default function Gallery3DShowcase({
                       referrerPolicy="no-referrer"
                       onError={(e) => handleGoogleDriveImageError(e, itemImage)}
                       style={getImageCropStyle(itemImage)}
-                      className="w-full h-full select-none"
+                      className="w-full h-full select-none object-cover"
                     />
-
-                    {/* Multi-Stop Cinematic Overlay Gradients */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#041a13] via-[#041a13]/65 to-transparent opacity-95 pointer-events-none" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
                   </div>
 
                   {/* Lightweight Directional Shading for angled side cards */}
@@ -439,112 +439,9 @@ export default function Gallery3DShowcase({
                     />
                   )}
 
-                  {/* Layer 2: Top Floating Info Badges */}
-                  <div className="absolute top-5 sm:top-6 left-5 sm:left-7 right-5 sm:right-7 flex items-center justify-between gap-3 pointer-events-none z-20">
-                    {/* Category Pill Tag */}
-                    <div className="flex items-center gap-2">
-                      <span className="px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-600 text-white border border-white/25 shadow-md">
-                        {item.category}
-                      </span>
-                      {item.emoji && (
-                        <span className="w-7 h-7 rounded-full bg-white text-xs flex items-center justify-center shadow-md">
-                          {item.emoji}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Auto-Slide Status & Counter */}
-                    {isCenter && (
-                      <div className="flex items-center gap-2 pointer-events-auto">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsPaused(!isPaused);
-                          }}
-                          title={
-                            isPaused
-                              ? "Lanjutkan putar otomatis"
-                              : "Jeda putar otomatis"
-                          }
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide bg-black/75 hover:bg-black/90 text-emerald-300 border border-white/15 transition-colors shadow-md cursor-pointer"
-                        >
-                          {isPaused || isHovered || isDragging ? (
-                            <>
-                              <Pause size={11} className="text-amber-400" />
-                              <span className="text-amber-300">
-                                {isDragging
-                                  ? "Digeser"
-                                  : isHovered
-                                  ? "Dijeda (Hover)"
-                                  : "Dijeda"}
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                              <span>Otomatis (4s)</span>
-                            </>
-                          )}
-                        </button>
-
-                        <div className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white/90 bg-black/75 border border-white/15 shadow-md">
-                          {currentIndex + 1} / {total}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Layer 3: Main Foreground Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10 z-20 pointer-events-auto">
-                    <div>
-                      {/* Date Badge */}
-                      <div className="inline-flex items-center gap-2 text-xs font-semibold text-amber-300 bg-amber-400/15 border border-amber-400/30 px-3 py-1 rounded-full mb-2.5 shadow">
-                        <Calendar size={13} className="text-amber-300" />
-                        <span>{item.date}</span>
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-lg sm:text-2xl lg:text-3xl font-black text-white leading-snug tracking-tight mb-2">
-                        {item.title}
-                      </h3>
-
-                      {/* Description (visible on center) */}
-                      {isCenter && (
-                        <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed max-w-xl line-clamp-2 sm:line-clamp-3 mb-4">
-                          {itemDesc}
-                        </p>
-                      )}
-
-                      {/* Action Links */}
-                      {isCenter && (
-                        <div className="flex flex-wrap items-center gap-3 pt-1">
-                          <Link
-                            href="/galeri"
-                            onClick={(e) => {
-                              if (hasMovedRef.current) e.preventDefault();
-                            }}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-emerald-950 text-xs sm:text-sm font-black tracking-wide shadow-lg transition-transform duration-200 group"
-                          >
-                            <span>Lihat Dokumentasi Lengkap</span>
-                            <ArrowRight
-                              size={15}
-                              className="group-hover:translate-x-1 transition-transform"
-                            />
-                          </Link>
-
-                          <span className="text-xs text-emerald-200/80 hidden sm:inline-flex items-center gap-1.5">
-                            <Sparkles size={13} className="text-amber-300" />
-                            <span>Geser kartu ke kanan/kiri untuk melihat</span>
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Layer 4: 4-Second Animated Progress Bar on Center Card */}
+                  {/* Layer 2: 4-Second Animated Progress Bar on Center Card */}
                   {isCenter && (
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-20 overflow-hidden">
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20 z-20 overflow-hidden">
                       <div
                         key={progressKey}
                         style={{
@@ -572,8 +469,20 @@ export default function Gallery3DShowcase({
             }`}
           />
 
+          {/* Active Slide Caption - Cleanly Outside the Photo for Maximum Clarity */}
+          <div className="text-center mt-3 mb-1 px-4 transition-all duration-300">
+            <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-800 bg-white/90 border border-emerald-900/10 px-3.5 py-1 rounded-full shadow-xs">
+              <span className="uppercase tracking-wider">{safeItems[currentIndex]?.category}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="text-gray-500 font-medium">{safeItems[currentIndex]?.date}</span>
+            </div>
+            <h3 className="text-lg sm:text-2xl font-black text-emerald-950 mt-2 tracking-tight">
+              {safeItems[currentIndex]?.title}
+            </h3>
+          </div>
+
           {/* Bottom Thumbnail Selector & Indicator Strip */}
-          <div className="mt-8 flex flex-col items-center gap-4">
+          <div className="mt-6 flex flex-col items-center gap-4">
             {/* Interactive Thumbnail Previews */}
             <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 max-w-full px-2">
               {safeItems.map((item, idx) => {
@@ -627,21 +536,46 @@ export default function Gallery3DShowcase({
               })}
             </div>
 
-            {/* Dot Indicators */}
-            <div className="flex items-center gap-2 mt-1">
-              {safeItems.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => goToSlide(idx)}
-                  aria-label={`Ke slide ${idx + 1}`}
-                  className={`transition-all duration-500 rounded-full cursor-pointer ${
-                    idx === currentIndex
-                      ? "w-8 h-2.5 bg-emerald-600 shadow-sm"
-                      : "w-2.5 h-2.5 bg-gray-300 hover:bg-emerald-400"
-                  }`}
-                />
-              ))}
+            {/* Playback Controls & Dot Indicators */}
+            <div className="flex items-center gap-3 mt-1">
+              <button
+                type="button"
+                onClick={() => setIsPaused(!isPaused)}
+                title={isPaused ? "Lanjutkan putar otomatis" : "Jeda putar otomatis"}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-emerald-900 bg-white hover:bg-emerald-50 border border-emerald-900/10 shadow-xs transition-colors cursor-pointer"
+              >
+                {isPaused ? (
+                  <>
+                    <Play size={11} className="text-emerald-700" />
+                    <span>Putar</span>
+                  </>
+                ) : (
+                  <>
+                    <Pause size={11} className="text-amber-600" />
+                    <span>Jeda</span>
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center gap-2">
+                {safeItems.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => goToSlide(idx)}
+                    aria-label={`Ke slide ${idx + 1}`}
+                    className={`transition-all duration-500 rounded-full cursor-pointer ${
+                      idx === currentIndex
+                        ? "w-8 h-2.5 bg-emerald-600 shadow-sm"
+                        : "w-2.5 h-2.5 bg-gray-300 hover:bg-emerald-400"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <div className="px-2.5 py-0.5 rounded-full text-xs font-bold text-gray-600 bg-gray-100 border border-gray-200">
+                {currentIndex + 1} / {total}
+              </div>
             </div>
           </div>
         </div>
