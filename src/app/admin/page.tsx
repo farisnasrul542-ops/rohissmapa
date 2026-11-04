@@ -12,10 +12,8 @@ import {
   Sparkles,
   MapPin,
   PlusCircle,
-  Building,
   ImageIcon,
   Megaphone,
-  Layers,
   CheckCircle2,
 } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
@@ -154,10 +152,8 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── MAIN 2-COLUMN WORKSPACE ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Agenda & Pintasan CMS (8 Cols) */}
-        <div className="lg:col-span-8 space-y-6">
+      {/* ── MAIN WORKSPACE ── */}
+      <div className="space-y-6">
           {/* Card: Manajemen Agenda Cepat */}
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_10px_28px_-8px_rgba(6,32,23,0.06)]">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
@@ -323,71 +319,6 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         </div>
-
-        {/* Right Column: Piket Musholla & Info (4 Cols) */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* Card: Jadwal Petugas Musholla Al-Ikhlas Hari Ini */}
-          <div className="bg-gradient-to-br from-[#062017] via-[#092b1f] to-[#041610] text-white rounded-3xl p-6 border border-emerald-800/40 border-b-[5px] border-b-[#020d09] shadow-lg">
-            <div className="flex items-center gap-2 text-amber-300 text-[11px] font-black uppercase tracking-wider mb-1.5">
-              <Building size={14} />
-              <span>Jadwal Musholla Al-Ikhlas</span>
-            </div>
-            <h3 className="text-base font-black text-white mb-4">
-              Petugas Sholat & Syiar Harian
-            </h3>
-
-            <div className="space-y-2.5 text-xs">
-              <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-between gap-2">
-                <div>
-                  <p className="font-extrabold text-white">Sholat Dzuhur Berjamaah</p>
-                  <p className="text-[11px] text-emerald-200/75">
-                    Imam: Ustadz Toyyib Yuliadi, Sh. M.Pd
-                  </p>
-                </div>
-                <span className="text-[10px] font-black text-amber-300 bg-amber-400/15 border border-amber-400/25 px-2.5 py-1 rounded-lg shrink-0">
-                  11:45 WIB
-                </span>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-between gap-2">
-                <div>
-                  <p className="font-extrabold text-white">Koordinasi Piket Ikhwan</p>
-                  <p className="text-[11px] text-emerald-200/75">
-                    Koordinator: Lutfi Triansyah (Ketua Ikhwan)
-                  </p>
-                </div>
-                <span className="text-[10px] font-black text-emerald-200 bg-white/10 border border-white/15 px-2.5 py-1 rounded-lg shrink-0">
-                  Piket
-                </span>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-between gap-2">
-                <div>
-                  <p className="font-extrabold text-white">Kultum & Evaluasi BPH</p>
-                  <p className="text-[11px] text-emerald-200/75">
-                    Pimpinan: Tifatul Reyhan Zahran (Ketua Umum)
-                  </p>
-                </div>
-                <span className="text-[10px] font-black text-amber-300 bg-amber-400/15 border border-amber-400/25 px-2.5 py-1 rounded-lg shrink-0">
-                  15:15 WIB
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-emerald-800/50 flex items-center justify-between text-[11px] text-emerald-200/70">
-              <span>6 Divisi Terintegrasi</span>
-              <Link
-                href="/program"
-                target="_blank"
-                className="font-bold text-amber-300 hover:underline inline-flex items-center gap-1"
-              >
-                <span>Lihat Struktur</span>
-                <Layers size={11} />
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
-    </div>
   );
 }
