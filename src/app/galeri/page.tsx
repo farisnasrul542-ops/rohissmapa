@@ -82,9 +82,6 @@ export default function GaleriPage() {
 
                     <div className="p-6">
                       <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800">
-                          {item.category}
-                        </span>
                         <Calendar size={13} className="text-emerald-700" />
                         <span>{item.date}</span>
                       </div>

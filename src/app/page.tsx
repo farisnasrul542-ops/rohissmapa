@@ -977,11 +977,8 @@ export default function HomePage() {
                   {/* Card Content (Clean & Smooth Layout matching Reference) */}
                   <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between text-left">
                     <div>
-                      {/* Category & Date below Image */}
+                      {/* Date with Calendar Icon */}
                       <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 font-semibold mb-2">
-                        <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0">
-                          {event.type || "KAJIAN"}
-                        </span>
                         <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
                         <span className="truncate">
                           {event.date && event.date.includes("-") && event.date.length === 10
@@ -1040,9 +1037,6 @@ export default function HomePage() {
                         <span>Lihat Rincian Acara</span>
                         <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 group-hover/btn:translate-x-1 transition-transform shrink-0" />
                       </button>
-                      <span className="text-[9px] sm:text-[10px] uppercase font-extrabold tracking-wider px-2.5 py-1 rounded-full bg-emerald-100/90 text-emerald-900 border border-emerald-200/80 whitespace-nowrap shrink-0">
-                        AGENDA SMAPA
-                      </span>
                     </div>
                   </div>
                 </div>
