@@ -92,14 +92,9 @@ export default function AdminSidebar({
               />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-sm tracking-tight text-white group-hover:text-emerald-200 transition-colors">
-                  ROHIS SMAPA
-                </span>
-              </div>
-              <p className="text-[11px] font-medium text-emerald-300/70">
-                Panel Eksekutif BPH
-              </p>
+              <span className="font-black text-sm tracking-tight text-white group-hover:text-emerald-200 transition-colors">
+                ROHIS SMAPA
+              </span>
             </div>
           </Link>
 
@@ -111,17 +106,6 @@ export default function AdminSidebar({
           >
             <X size={20} />
           </button>
-        </div>
-
-        {/* Status Pill */}
-        <div className="mt-4 flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-950/80 border border-emerald-800/40 shadow-inner text-[11px] text-emerald-200">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-            <span className="font-semibold">Periode Aktif</span>
-          </div>
-          <span className="font-mono font-bold text-[10px] text-amber-300/90">
-            2026/2027
-          </span>
         </div>
       </div>
 
