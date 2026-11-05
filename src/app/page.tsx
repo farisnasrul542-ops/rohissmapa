@@ -497,12 +497,6 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left Column: Editorial & Values */}
             <CinematicReveal direction="up" delay={0.1} className="lg:col-span-7">
-              {/* Section Tag Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 border border-emerald-200/80 text-emerald-800 text-xs font-bold tracking-wide mb-4">
-                <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
-                <span>{cms.about?.tag || ABOUT_CONTENT.tag}</span>
-              </div>
-
               {/* Main Headline */}
               <CinematicTextLine delay={0.1}>
                 <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-emerald-950 tracking-tight leading-[1.18] mb-5">
@@ -621,12 +615,6 @@ export default function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
               {/* Left Column: Greeting Message with Interactive Switching */}
               <CinematicReveal direction="up" delay={0.1} className="lg:col-span-7">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 border border-emerald-200/80 text-emerald-800 text-xs font-bold tracking-wide mb-4">
-                  <Quote className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>{cms.sambutan?.tag || PEMBINA_WELCOME.tag}</span>
-                </div>
-
                 {/* Title */}
                 <h2 className="text-2xl min-[380px]:text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-950 tracking-tight leading-[1.2] mb-5">
                   Sambutan{" "}
@@ -797,11 +785,6 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
             {/* Header with Smooth Viewport Deceleration */}
             <CinematicReveal direction="up" delay={0.1} className="max-w-3xl mx-auto mb-5 sm:mb-8">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-bold tracking-wide mb-3.5 backdrop-blur-md">
-                <Calendar className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{cms.agenda?.tag || "AGENDA KEGIATAN"}</span>
-              </div>
-
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
                 {cms.agenda?.title || "Agenda & Kajian Rohis SMAPA"}
               </h2>

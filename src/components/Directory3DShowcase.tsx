@@ -243,12 +243,6 @@ export default function Directory3DShowcase() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-emerald-500/8 blur-[140px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        {/* Top Tag */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-gray-200 text-gray-700 text-xs font-semibold mb-3 shadow-xs">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-          <span>JELAJAHI FITUR</span>
-        </div>
-
         {/* Section Heading */}
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-950 tracking-tight mb-3">
           Layanan & Direktori Dakwah

@@ -132,10 +132,6 @@ export default function TentangPage() {
         <CinematicReveal direction="up" delay={0.15}>
           <div id="tentang-kami" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-16 scroll-mt-24">
             <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-emerald-950/5 border border-emerald-900/10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100/90 border border-emerald-200/80 text-emerald-800 text-xs font-bold tracking-wide mb-4">
-                <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
-                <span>{ABOUT_CONTENT.tag}</span>
-              </div>
               <h2 className="text-2xl sm:text-3xl font-black text-emerald-950 tracking-tight mb-4">
                 {ABOUT_CONTENT.title}
               </h2>
@@ -228,10 +224,6 @@ export default function TentangPage() {
               </div>
             </div>
             <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/80 border border-emerald-500/30 text-amber-300 text-xs font-bold tracking-wide mb-4">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Identitas & Filosofi Lambang</span>
-              </div>
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-4">
                 Logo Resmi ROHIS SMA Negeri 4 Purwokerto
               </h2>
@@ -257,9 +249,6 @@ export default function TentangPage() {
       <section id="pembina" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-slate-200/60 scroll-mt-24">
         <CinematicReveal direction="up" delay={0.1}>
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-800 bg-emerald-100 px-3.5 py-1.5 rounded-full inline-block mb-3">
-              Bimbingan Guru PAI
-            </span>
             <h2 className="text-2xl sm:text-3xl font-black text-emerald-950">
               Dewan Pembina Rohis SMAPA
             </h2>

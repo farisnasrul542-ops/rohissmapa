@@ -90,20 +90,8 @@ export default function KepengurusanSection() {
           </div>
         </div>
 
-        {/* ── 2. HEADER INFO & BADGE ── */}
+        {/* ── 2. HEADER INFO ── */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-          {/* Active Period Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-black tracking-wider uppercase mb-3 border transition-colors bg-emerald-50 text-emerald-700 border-emerald-200">
-            <span
-              className={`w-2 h-2 rounded-full ${
-                isActivePeriod ? "bg-emerald-500 animate-pulse" : "bg-slate-400"
-              }`}
-            />
-            <span>
-              {isActivePeriod ? "Periode Aktif" : "Arsip Demisioner"}
-            </span>
-          </div>
-
           {/* Heading */}
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-2">
             Kepengurusan {selectedPeriod}

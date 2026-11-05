@@ -404,11 +404,6 @@ export default function ProgramPage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <CinematicReveal direction="up" delay={0.1}>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-900/60 border border-emerald-700/40 text-xs font-bold text-amber-300 mb-4">
-              <Sparkles size={14} className="text-amber-400" />
-              <span>STRUKTUR ORGANISASI & PROGRAM KERJA 2026/2027</span>
-            </div>
-
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 text-white">
               6 Pilar Divisi & Program Kerja Rohis SMAPA
             </h1>

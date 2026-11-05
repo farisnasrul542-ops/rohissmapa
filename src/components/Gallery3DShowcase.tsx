@@ -218,10 +218,6 @@ export default function Gallery3DShowcase({
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 lg:mb-14 gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-800 bg-emerald-100/90 border border-emerald-300/40 px-3.5 py-1.5 rounded-full mb-3 shadow-sm">
-              <Sparkles size={14} className="text-emerald-700 animate-pulse" />
-              <span>{tag}</span>
-            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-950 tracking-tight">
               {title}
             </h2>

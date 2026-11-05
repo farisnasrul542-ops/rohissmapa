@@ -41,9 +41,6 @@ export default function GaleriPage() {
       <section className="pt-32 pb-16 lg:pt-40 lg:pb-20 bg-gradient-to-br from-[#062017] via-[#0b3324] to-[#041610] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <CinematicReveal direction="up" delay={0.1}>
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-300 bg-amber-400/10 border border-amber-400/20 px-3.5 py-1.5 rounded-full inline-block mb-3">
-              Dokumentasi Kegiatan
-            </span>
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4">
               Galeri Dokumentasi Rohis SMAPA
             </h1>

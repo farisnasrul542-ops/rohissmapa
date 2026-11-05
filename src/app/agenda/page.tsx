@@ -84,9 +84,6 @@ export default function AgendaPage() {
       <section className="pt-32 pb-16 lg:pt-40 lg:pb-20 bg-gradient-to-br from-[#062017] via-[#0b3324] to-[#041610] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <CinematicReveal direction="up" delay={0.1}>
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-300 bg-amber-400/10 border border-amber-400/20 px-3.5 py-1.5 rounded-full inline-block mb-3">
-              Kalender Dakwah Pelajar
-            </span>
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4">
               Agenda & Kegiatan Rohis SMAPA
             </h1>
@@ -157,14 +154,9 @@ export default function AgendaPage() {
                   </div>
                 )}
                 <div className="p-6 pb-0">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800">
-                    {event.type}
-                  </span>
-                  <span className="text-xs font-semibold text-gray-500 flex items-center gap-1">
-                    <Calendar size={13} className="text-emerald-700" />
-                    {event.date}
-                  </span>
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 mb-4">
+                  <Calendar size={13} className="text-emerald-700" />
+                  <span>{event.date}</span>
                 </div>
 
                 <h3 className="text-base font-extrabold text-emerald-950 mb-2 group-hover:text-emerald-700 transition-colors leading-snug">
