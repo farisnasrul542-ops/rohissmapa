@@ -1,344 +1,390 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import KepengurusanSection from "@/components/KepengurusanSection";
-import { ScrollProgressBar, CinematicReveal } from "@/components/ScrollAnimations";
-import { ABOUT_CONTENT, TEAM_MEMBERS, SITE } from "@/lib/constants";
 import {
-  Compass,
-  Target,
-  Award,
-  Users,
-  Calendar,
-  Sparkles,
-  ShieldCheck,
-  GraduationCap,
-  ArrowRight,
+  ScrollProgressBar,
+  CinematicReveal,
+  CinematicStagger,
+  CinematicStaggerItem,
+} from "@/components/ScrollAnimations";
+import { ABOUT_CONTENT, PEMBINA_WELCOME, SITE } from "@/lib/constants";
+import {
   BookOpen,
-  Quote,
-  Building,
-  CheckCircle2,
+  Users,
+  HeartHandshake,
+  ArrowRight,
+  MapPin,
+  Sparkles,
 } from "lucide-react";
-import Link from "next/link";
+
+const SUB_NAV_ITEMS = [
+  { id: "tentang-kami", label: "Tentang Kami", href: "#tentang-kami" },
+  { id: "visi-misi", label: "Visi & Misi", href: "#visi-misi" },
+  { id: "pembina", label: "Pembina", href: "#pembina" },
+  { id: "kepengurusan", label: "Kepengurusan", href: "#kepengurusan" },
+];
+
+const MISI_ITEMS = [
+  {
+    icon: BookOpen,
+    text: "Membiasakan ibadah dan tadarus Al-Qur'an di lingkungan sekolah.",
+  },
+  {
+    icon: Sparkles,
+    text: "Menyelenggarakan kajian, mentoring, dan pembinaan akhlak secara rutin.",
+  },
+  {
+    icon: Users,
+    text: "Mengembangkan kepemimpinan dan kerja sama lewat kepengurusan divisi.",
+  },
+  {
+    icon: HeartHandshake,
+    text: "Menumbuhkan kepedulian sosial dan ukhuwah di kalangan siswa.",
+  },
+];
 
 export default function TentangPage() {
+  const prefersReducedMotion = useReducedMotion();
+  const [activeSubNav, setActiveSubNav] = useState("tentang-kami");
+  const [activePembinaIdx, setActivePembinaIdx] = useState(0);
+
+  const pembinaList = PEMBINA_WELCOME.pembinaList;
+  const activePembina = pembinaList[activePembinaIdx] || pembinaList[0];
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafaf7]">
+    <div className="min-h-screen flex flex-col clay-canvas text-[#153E32]">
       <ScrollProgressBar />
       <Navbar />
 
-      {/* Page Header */}
-      <section className="pt-32 pb-14 lg:pt-40 lg:pb-16 bg-gradient-to-br from-[#062017] via-[#0b3324] to-[#041610] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-amber-300 bg-amber-400/10 border border-amber-400/20 px-3.5 py-1.5 rounded-full inline-block mb-3">
-            Profil & Kepengurusan Organisasi
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4">
-            Profil & Kepengurusan Rohis SMAPA
-          </h1>
-          <p className="text-emerald-100/80 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Mengenal lebih dekat visi, misi, filosofi gerakan, dewan pembina guru PAI, serta struktur dewan kepengurusan Badan Pengurus Harian (BPH) SMA Negeri 4 Purwokerto.
-          </p>
+      {/* ── 1. PAGE HEADER & 4-TAB CLAY JUMP BAR (Matches 03_profil_visi_misi.png) ── */}
+      <section className="pt-24 pb-6 sm:pt-28 sm:pb-8 lg:pt-32 lg:pb-10">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <CinematicReveal direction="up" delay={0.04}>
+            {/* Breadcrumb Pill */}
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full clay-pill-mint text-xs font-bold mb-4">
+              <Link href="/" className="hover:underline text-[#4A6B5F]">
+                Beranda
+              </Link>
+              <span className="text-[#4A6B5F]">/</span>
+              <span className="text-[#087A53]">Profil Rohis</span>
+            </div>
 
-          {/* Quick Sub-Navigation Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-8 max-w-3xl mx-auto">
-            <a
-              href="#visi-misi"
-              className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-emerald-100 border border-white/15 backdrop-blur-sm transition-all"
-            >
-              Visi & Misi
-            </a>
-            <a
-              href="#tentang-kami"
-              className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-emerald-100 border border-white/15 backdrop-blur-sm transition-all"
-            >
-              Latar Belakang
-            </a>
-            <a
-              href="#pembina"
-              className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-emerald-100 border border-white/15 backdrop-blur-sm transition-all"
-            >
-              Dewan Pembina
-            </a>
-            <a
-              href="#kepengurusan"
-              className="px-4 py-1.5 rounded-full text-xs font-extrabold bg-amber-400 hover:bg-amber-300 text-emerald-950 shadow-md shadow-amber-400/20 transition-all flex items-center gap-1.5"
-            >
-              <Users size={13} />
-              <span>Struktur Kepengurusan</span>
-            </a>
-          </div>
+            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#153E32] tracking-tight mb-3">
+              Profil & Kepengurusan Rohis SMAPA
+            </h1>
+
+            <p className="text-sm sm:text-base text-[#3B5E52] max-w-2xl mx-auto leading-relaxed">
+              Mengenal visi, misi, pembina, dan pengurus Rohis SMA Negeri 4
+              Purwokerto.
+            </p>
+
+            {/* 4-Tab Clay Sub-Navigation Bar */}
+            <div className="mt-6 sm:mt-8 inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 rounded-full clay-card max-w-full">
+              {SUB_NAV_ITEMS.map((tab) => {
+                const isActive = activeSubNav === tab.id;
+                return (
+                  <a
+                    key={tab.id}
+                    href={tab.href}
+                    onClick={() => setActiveSubNav(tab.id)}
+                    className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-[13.5px] font-bold transition-all duration-200 whitespace-nowrap min-h-[38px] flex items-center ${
+                      isActive
+                        ? "clay-btn-emerald text-white"
+                        : "text-[#153E32] hover:bg-[#E5F8EF]"
+                    }`}
+                  >
+                    {tab.label}
+                  </a>
+                );
+              })}
+            </div>
+          </CinematicReveal>
         </div>
       </section>
 
-      {/* Visi & Misi */}
-      <section id="visi-misi" className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 scroll-mt-24">
-        <CinematicReveal direction="up" delay={0.1}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {/* Visi */}
-            <div className="bg-white rounded-3xl p-8 shadow-xl shadow-emerald-950/5 border border-emerald-900/10 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
-                    <Compass size={20} />
-                  </div>
-                  <h2 className="text-xl font-black text-emerald-950">Visi Organisasi</h2>
-                </div>
-                <p className="text-sm sm:text-base font-bold text-emerald-900 leading-relaxed mb-4">
-                  “Terwujudnya Generasi Muda Muslim SMA Negeri 4 Purwokerto yang Bertaqwa, Berilmu, Berakhlakul Karimah, Cerdas, dan Berprestasi.”
-                </p>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Menjadi pilar pembinaan keagamaan di sekolah yang menumbuhkan kecintaan terhadap Al-Qur'an dan Sunnah, serta berintegritas tinggi dalam kehidupan bermasyarakat.
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-gray-100 text-xs font-semibold text-emerald-800">
-                Prinsip: Berilmu, Beramal, Berakhlak
-              </div>
-            </div>
-
-            {/* Misi */}
-            <div className="bg-white rounded-3xl p-8 shadow-xl shadow-emerald-950/5 border border-emerald-900/10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center">
-                  <Target size={20} />
-                </div>
-                <h2 className="text-xl font-black text-emerald-950">Misi Utama</h2>
-              </div>
-              <ul className="space-y-3 text-xs sm:text-sm text-gray-700">
-                <li className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
-                  <span>Membiasakan shalat berjamaah, dhuha, dan tadarus Al-Qur'an secara rutin di sekolah.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
-                  <span>Mengembangkan wawasan Islam rahmatan lil 'alamin melalui halaqah mentoring siswa.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
-                  <span>Membina kepribadian muslimah melalui kajian keputrian Jumat dan fiqih wanita.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
-                  <span>Melatih kepemimpinan amanah dan kepedulian sosial melalui bakti sosial sekolah.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </CinematicReveal>
-
-        {/* Narrative & Quote (Image 2 Style) */}
-        <CinematicReveal direction="up" delay={0.15}>
-          <div id="tentang-kami" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-16 scroll-mt-24">
-            <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-emerald-950/5 border border-emerald-900/10">
-              <h2 className="text-2xl sm:text-3xl font-black text-emerald-950 tracking-tight mb-4">
-                {ABOUT_CONTENT.title}
+      {/* ── 2. VISI, PHOTO & MISI UTAMA + TENTANG ROHIS SMAPA (Matches 03_profil_visi_misi.png) ── */}
+      <section
+        id="visi-misi"
+        className="py-4 sm:py-6 max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 w-full scroll-mt-24"
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-7 items-stretch mb-6 sm:mb-7">
+          {/* Left Column: Visi Organisasi Card + Documentary Photo Card */}
+          <CinematicReveal
+            direction="up"
+            delay={0.06}
+            className="lg:col-span-5 flex flex-col gap-6 sm:gap-7"
+          >
+            {/* Visi Organisasi */}
+            <div className="clay-card p-6 sm:p-7">
+              <h2 className="font-heading text-xl sm:text-2xl font-extrabold text-[#153E32] mb-3">
+                Visi Organisasi
               </h2>
-              <p className="text-sm sm:text-base font-bold text-emerald-900/90 leading-relaxed mb-4">
-                {ABOUT_CONTENT.lead}
+              <p className="text-sm sm:text-[15.5px] font-medium text-[#2A4E42] leading-relaxed">
+                Mewujudkan generasi muslim SMA Negeri 4 Purwokerto yang beriman,
+                berilmu, berakhlak mulia, dan bermanfaat bagi lingkungan
+                sekolah.
               </p>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                {ABOUT_CONTENT.paragraph1}
-              </p>
-              <p className="text-sm text-gray-600 leading-relaxed mb-6">
-                {ABOUT_CONTENT.paragraph2}
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-200/80 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-extrabold text-emerald-950 mb-1">
-                      {ABOUT_CONTENT.highlights[0].title}
-                    </h4>
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      {ABOUT_CONTENT.highlights[0].desc}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-100 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-amber-200/80 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
-                    <Award className="w-4 h-4 text-amber-700" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-extrabold text-emerald-950 mb-1">
-                      {ABOUT_CONTENT.highlights[1].title}
-                    </h4>
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      {ABOUT_CONTENT.highlights[1].desc}
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            <div className="lg:col-span-5 flex flex-col gap-6">
-              {/* Photo Card */}
-              <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-emerald-950/10 border border-emerald-900/10 group bg-emerald-950/5">
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
-                  <Image
-                    src="/images/dokumentasi-smapa.jpg"
-                    alt="Dokumentasi Pertemuan Kader Rohis SMA Negeri 4 Purwokerto"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 42vw"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                </div>
-              </div>
-
-              {/* Warm Quote Card */}
-              <div className="rounded-3xl p-6 bg-[#FAF7F2] border border-amber-900/10 shadow-sm relative overflow-hidden">
-                <div className="relative z-10">
-                  <Quote className="w-7 h-7 text-amber-500 fill-amber-500/20 mb-3" />
-                  <p className="text-sm italic text-emerald-950/90 font-medium leading-relaxed mb-4">
-                    &ldquo;{ABOUT_CONTENT.quote}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-emerald-900/75 pt-3 border-t border-amber-900/10">
-                    <span className="text-amber-600 font-bold">—</span>
-                    <span>{ABOUT_CONTENT.quoteAuthor}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CinematicReveal>
-      </section>
-
-      {/* Identitas & Makna Lambang */}
-      <section className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-        <CinematicReveal direction="up" delay={0.15}>
-          <div className="bg-gradient-to-br from-[#062017] via-[#0b3324] to-[#041610] text-white rounded-3xl p-8 sm:p-12 shadow-xl shadow-emerald-950/20 border border-emerald-500/20 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full max-w-sm bg-white p-7 sm:p-8 rounded-3xl shadow-2xl border border-white/30 flex items-center justify-center">
+            {/* Group Photo Clay Frame */}
+            <div className="clay-photo-frame p-2.5 flex-1 flex flex-col">
+              <div className="relative aspect-[16/10] w-full flex-1 rounded-[18px] overflow-hidden bg-[#E5F2EC] min-h-[210px]">
                 <Image
-                  src="/images/logo-transparent.png"
-                  alt="Logo Resmi Rohis SMA Negeri 4 Purwokerto"
-                  width={360}
-                  height={220}
-                  className="w-full h-auto object-contain"
+                  src="/images/dokumentasi-smapa.jpg"
+                  alt="Keluarga Besar Rohis SMA Negeri 4 Purwokerto"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  className="object-cover object-center"
                 />
               </div>
             </div>
-            <div className="lg:col-span-7">
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-4">
-                Logo Resmi ROHIS SMA Negeri 4 Purwokerto
+          </CinematicReveal>
+
+          {/* Right Column: Misi Utama Card with 4 Inner Clay Rows */}
+          <CinematicReveal
+            direction="up"
+            delay={0.1}
+            className="lg:col-span-7 flex"
+          >
+            <div className="clay-card p-6 sm:p-8 w-full flex flex-col justify-between">
+              <div>
+                <h2 className="font-heading text-xl sm:text-2xl font-extrabold text-[#153E32] mb-4 sm:mb-5">
+                  Misi Utama
+                </h2>
+
+                <CinematicStagger className="space-y-3 sm:space-y-3.5">
+                  {MISI_ITEMS.map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <CinematicStaggerItem key={idx}>
+                        <div className="clay-inner p-3.5 sm:p-4 flex items-center gap-3.5">
+                          <div className="w-10 h-10 rounded-xl clay-icon-sq flex items-center justify-center shrink-0">
+                            <Icon size={18} className="text-[#087A53]" />
+                          </div>
+                          <p className="text-xs sm:text-[14.5px] font-medium text-[#153E32] leading-relaxed">
+                            {item.text}
+                          </p>
+                        </div>
+                      </CinematicStaggerItem>
+                    );
+                  })}
+                </CinematicStagger>
+              </div>
+            </div>
+          </CinematicReveal>
+        </div>
+
+        {/* Full-Width "Tentang Rohis SMAPA" Card (Matches bottom of 03_profil_visi_misi.png) */}
+        <CinematicReveal direction="up" delay={0.12}>
+          <div
+            id="tentang-kami"
+            className="clay-card p-6 sm:p-8 scroll-mt-24"
+          >
+            <h2 className="font-heading text-xl sm:text-2xl font-extrabold text-[#153E32] mb-2.5">
+              Tentang Rohis SMAPA
+            </h2>
+            <p className="text-sm sm:text-[15.5px] text-[#3B5E52] leading-relaxed mb-3">
+              Rohis SMA Negeri 4 Purwokerto adalah wadah pembinaan keislaman
+              siswa yang berpusat di Musholla Al-Ikhlas. Kegiatan dirancang agar
+              siswa dapat belajar agama dengan nyaman, bertumbuh dalam
+              kebersamaan, dan memberi manfaat nyata.
+            </p>
+            <p className="text-xs sm:text-sm text-[#4A6B5F] leading-relaxed mb-5">
+              {ABOUT_CONTENT.paragraph1}
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#DCEAE3]">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full clay-pill-mint text-xs sm:text-[13px] font-bold self-start sm:self-auto">
+                <MapPin size={15} className="text-[#087A53] shrink-0" />
+                <span>Berpusat di Musholla Al-Ikhlas</span>
+              </div>
+
+              <a
+                href="#kepengurusan"
+                onClick={() => setActiveSubNav("kepengurusan")}
+                className="clay-btn-emerald px-5 py-2.5 rounded-full text-xs sm:text-[13.5px] font-bold inline-flex items-center justify-center gap-2 self-start sm:self-auto min-h-[42px]"
+              >
+                <span>Lihat kepengurusan</span>
+                <ArrowRight size={15} />
+              </a>
+            </div>
+          </div>
+        </CinematicReveal>
+      </section>
+
+      {/* ── 3. DEWAN PEMBINA SECTION (Matches 04_profil_pengurus.png + Retains Both Pembina) ── */}
+      <section
+        id="pembina"
+        aria-label="Dewan Pembina Rohis"
+        className="py-8 sm:py-10 max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 w-full scroll-mt-24"
+      >
+        <CinematicReveal direction="up" delay={0.08}>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
+            <div>
+              <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#153E32] tracking-tight">
+                Dewan Pembina
               </h2>
-              <p className="text-sm text-emerald-100/85 leading-relaxed mb-6">
-                Lambang resmi ROHIS SMAPA memadukan siluet kubah masjid dan menara agung sebagai simbol keimanan, ketakwaan, serta keluhuran budi pekerti Islam. Tipografi blok <strong>ROHIS</strong> dengan ornamen menara di bagian bawah melambangkan pondasi dakwah yang kokoh di kalangan pelajar, berpayung pada nama kebanggaan <strong>SMA Negeri 4 Purwokerto</strong>.
+              <p className="text-xs sm:text-sm text-[#4A6B5F] mt-1">
+                Guru Pembina Kerohanian Islam (ROHIS) SMA Negeri 4 Purwokerto
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="p-3.5 rounded-2xl bg-white/10 border border-white/10">
-                  <span className="font-extrabold text-amber-300 block mb-1">Kubah & Menara Masjid</span>
-                  <span className="text-emerald-100/70">Pusat ibadah pembinaan spiritual dan syiar kebaikan yang senantiasa meninggi menuju ridha Allah SWT.</span>
-                </div>
-                <div className="p-3.5 rounded-2xl bg-white/10 border border-white/10">
-                  <span className="font-extrabold text-amber-300 block mb-1">Pita Kehormatan SMAPA</span>
-                  <span className="text-emerald-100/70">Komitmen persatuan, ukhuwah islamiyah, dan dedikasi nyata kader muslim bagi kemajuan almamater tercinta.</span>
-                </div>
-              </div>
+            </div>
+
+            {/* Interactive Switcher for Pembina 1 & Pembina 2 */}
+            <div
+              role="tablist"
+              aria-label="Pilih Pembina"
+              className="inline-flex items-center gap-1.5 p-1.5 rounded-full clay-card self-start sm:self-auto"
+            >
+              {pembinaList.map((p, idx) => {
+                const isActive = activePembinaIdx === idx;
+                return (
+                  <button
+                    key={p.id}
+                    role="tab"
+                    aria-selected={isActive}
+                    type="button"
+                    onClick={() => setActivePembinaIdx(idx)}
+                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer whitespace-nowrap min-h-[38px] ${
+                      isActive
+                        ? "clay-btn-emerald text-white"
+                        : "text-[#3B5E52] hover:text-[#153E32]"
+                    }`}
+                  >
+                    {p.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </CinematicReveal>
-      </section>
 
-      {/* Dewan Pembina Guru PAI */}
-      <section id="pembina" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-slate-200/60 scroll-mt-24">
-        <CinematicReveal direction="up" delay={0.1}>
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-emerald-950">
-              Dewan Pembina Rohis SMAPA
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-2">
-              Membimbing, mengarahkan, dan mengawal kegiatan dakwah dan pembinaan karakter islami siswa.
-            </p>
-          </div>
-        </CinematicReveal>
-
-        <CinematicReveal direction="up" delay={0.2} distance={20}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {TEAM_MEMBERS[0]?.members.map((m, mIdx) => (
-              <div
-                key={mIdx}
-                className="bg-white rounded-3xl p-6 sm:p-7 border border-emerald-900/10 shadow-sm hover:shadow-xl hover:border-emerald-300 transition-all duration-300 flex flex-col sm:flex-row items-center sm:items-start gap-6 group"
+          {/* Main Pembina Clay Card (Exact Composition of 04_profil_pengurus.png) */}
+          <div className="clay-card p-5 sm:p-7 lg:p-8">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activePembina.id}
+                initial={
+                  prefersReducedMotion
+                    ? { opacity: 0 }
+                    : { opacity: 0, y: 6 }
+                }
+                animate={
+                  prefersReducedMotion
+                    ? { opacity: 1 }
+                    : { opacity: 1, y: 0 }
+                }
+                exit={
+                  prefersReducedMotion
+                    ? { opacity: 0 }
+                    : { opacity: 0, y: -4 }
+                }
+                transition={{
+                  duration: prefersReducedMotion ? 0.08 : 0.2,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center"
               >
-                {/* Foto Pembina */}
-                <div className="relative w-44 sm:w-48 aspect-square rounded-2xl overflow-hidden shrink-0 shadow-md border border-emerald-900/15 bg-emerald-950/5">
-                  <Image
-                    src={m.image}
-                    alt={`Foto ${m.name} - ${m.role}`}
-                    fill
-                    sizes="(max-width: 640px) 176px, 192px"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                </div>
-
-                {/* Penjelasan & Keterangan di Samping Foto */}
-                <div className="flex flex-col justify-between flex-1 h-full text-center sm:text-left">
-                  <div>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-[11px] font-bold border border-emerald-200/60 mb-2.5">
-                      <GraduationCap size={13} className="text-emerald-700" />
-                      <span>{m.role}</span>
+                {/* Left: Portrait Photo + Name & Role Pill */}
+                <div className="lg:col-span-5 flex flex-col sm:flex-row items-center gap-5">
+                  <div className="relative w-36 h-40 sm:w-40 sm:h-44 rounded-[20px] overflow-hidden clay-photo-frame p-1.5 shrink-0">
+                    <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-[#E5F2EC]">
+                      <Image
+                        src={activePembina.image}
+                        alt={activePembina.name}
+                        fill
+                        sizes="160px"
+                        className="object-cover object-top"
+                      />
                     </div>
-
-                    <h3 className="text-lg sm:text-xl font-black text-emerald-950 tracking-tight leading-snug mb-1">
-                      {m.name}
-                    </h3>
-
-                    <p className="text-xs font-semibold text-emerald-700 mb-3.5">
-                      {m.classGrade} • SMA Negeri 4 Purwokerto
-                    </p>
-
-                    <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed mb-5">
-                      {m.bio}
-                    </p>
                   </div>
 
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-center sm:justify-start gap-2 text-[11px] text-emerald-800/90 font-medium">
-                    <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-                    <span>Membina Periode {SITE.period}</span>
+                  <div className="text-center sm:text-left">
+                    <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[#153E32] leading-snug mb-2">
+                      {activePembina.name}
+                    </h3>
+                    <span className="inline-block px-3.5 py-1.5 rounded-full text-xs font-bold clay-pill-mint mb-2">
+                      Pembina ROHIS SMAN 4 Purwokerto
+                    </span>
+                    <p className="text-xs font-medium text-[#4A6B5F]">
+                      {activePembina.role} • Masa Bakti {SITE.period}
+                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CinematicReveal>
-      </section>
 
-      {/* Kepengurusan Interaktif (Sesuai Referensi) */}
-      <KepengurusanSection />
+                {/* Right: Sambutan Pembina Inner Clay Card */}
+                <div className="lg:col-span-7">
+                  <div className="clay-inner p-5 sm:p-6">
+                    <h4 className="font-heading text-base sm:text-lg font-extrabold text-[#153E32] mb-2">
+                      Sambutan Pembina
+                    </h4>
+                    <p className="text-xs sm:text-sm font-semibold text-[#087A53] mb-2">
+                      {activePembina.salamPembuka}
+                    </p>
+                    <div className="space-y-2.5 text-xs sm:text-[14px] text-[#3B5E52] leading-relaxed">
+                      {activePembina.paragraphs.map((para, i) => (
+                        <p key={i}>{para}</p>
+                      ))}
+                    </div>
+                    <p className="text-xs sm:text-sm font-semibold text-[#153E32] mt-3">
+                      {activePembina.salamPenutup}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-      {/* CTA Aspirasi Pelajar */}
-      <section className="py-16 bg-gradient-to-br from-[#062017] via-[#092b1e] to-[#041610] text-white border-t border-emerald-800/40">
-        <CinematicReveal direction="up" delay={0.1}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <Sparkles size={32} className="mx-auto text-amber-400 mb-4 animate-bounce" />
-            <h2 className="text-2xl sm:text-3xl font-black mb-3">
-              Sampaikan Ide, Masukan, atau Pertanyaanmu
-            </h2>
-            <p className="text-xs sm:text-sm text-emerald-200/80 max-w-xl mx-auto mb-8 leading-relaxed">
-              Kotak Aspirasi Pelajar SMAPA siap menampung suara, saran kebaikan, usulan kegiatan musholla, dan konsultasi keagamaan secara aman.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href="/aspirasi"
-                className="px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black text-sm shadow-xl shadow-amber-500/20 transition-all hover:scale-105 active:scale-95"
-              >
-                Kirim Aspirasi Siswa
-              </Link>
-              <Link
-                href="/program"
-                className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/20 transition-all hover:scale-105 active:scale-95"
-              >
-                Lihat 6 Divisi & Proker
-              </Link>
+            {/* Quick Dual Pembina Cards Strip Below so both Pembina are always visible at a glance */}
+            <div className="mt-6 pt-5 border-t border-[#DCEAE3] grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {pembinaList.map((pembina, idx) => {
+                const isSelected = activePembinaIdx === idx;
+                return (
+                  <button
+                    key={pembina.id}
+                    type="button"
+                    onClick={() => setActivePembinaIdx(idx)}
+                    className={`p-3.5 rounded-2xl flex items-center justify-between gap-3 text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "clay-card-mint ring-2 ring-[#087A53]/30"
+                        : "clay-inner hover:bg-[#EAF8F1]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-[#E5F2EC] shrink-0">
+                        <Image
+                          src={pembina.image}
+                          alt={pembina.name}
+                          fill
+                          sizes="48px"
+                          className="object-cover object-top"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-heading text-xs sm:text-sm font-extrabold text-[#153E32] truncate">
+                          {pembina.name}
+                        </p>
+                        <p className="text-[11px] font-semibold text-[#087A53]">
+                          {pembina.role} ROHIS SMAN 4 Purwokerto
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold text-[#087A53] shrink-0">
+                      {isSelected ? "Aktif" : "Baca sambutan →"}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </CinematicReveal>
       </section>
+
+      {/* ── 4. KENALI PENGURUS KAMI (Matches 04_profil_pengurus.png) ── */}
+      <KepengurusanSection />
 
       <Footer />
     </div>

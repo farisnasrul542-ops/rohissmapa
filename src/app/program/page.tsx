@@ -1,25 +1,29 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ScrollProgressBar, CinematicReveal } from "@/components/ScrollAnimations";
-import { DIVISIONS } from "@/lib/constants";
+import {
+  ScrollProgressBar,
+  CinematicReveal,
+} from "@/components/ScrollAnimations";
+import { DIVISIONS, SITE } from "@/lib/constants";
 import {
   CheckCircle2,
   Users,
   ArrowRight,
   ShieldCheck,
   HeartHandshake,
-  Sparkles,
   BookOpen,
   Newspaper,
   Building,
-  Award,
-  ArrowUpRight,
   Layers,
+  MapPin,
+  ArrowUpRight,
 } from "lucide-react";
-import Link from "next/link";
 
 const DIVISION_ICONS: Record<string, React.ElementType> = {
   ShieldCheck,
@@ -33,35 +37,65 @@ const DIVISION_ICONS: Record<string, React.ElementType> = {
 const DIVISION_META: Record<
   string,
   {
-    pilar: string;
-    subtitle: string;
+    shortSubtitle: string;
+    coverImage: string;
+    featuredTitle: string;
+    featuredDesc: string;
   }
 > = {
   bph: {
-    pilar: "PILAR 01 • EKSEKUTIF & MANAJEMEN",
-    subtitle: "Pimpinan Pusat, Administrasi Kesekretariatan & Kebendaharaan",
+    shortSubtitle: "Badan Pengurus Harian",
+    coverImage: "/images/dokumentasi-muskerta.jpg",
+    featuredTitle: "Musyawarah Kerja Anggota (MUSKERTA) & Pleno Evaluasi",
+    featuredDesc:
+      "Perumusan grand design dakwah sekolah, koordinasi lintas divisi, tata kelola kesekretariatan, dan transparansi kas organisasi.",
   },
   pendidikan: {
-    pilar: "PILAR 02 • SYIAR & KEILMUAN",
-    subtitle: "Kajian Rutin, Tahsin Al-Qur'an & Pembinaan Ibadah Pelajar",
+    shortSubtitle: "Pendidikan & Syiar",
+    coverImage: "/images/dokumentasi-smapa.jpg",
+    featuredTitle: "Kajian Rutin Jumat & Bimbingan Tahsin Al-Qur'an",
+    featuredDesc:
+      "Kajian keislaman mingguan, gerakan shalat dhuha dan tadarus pagi, serta pembinaan pemahaman ibadah pelajar SMAPA.",
   },
   kaderisasi: {
-    pilar: "PILAR 03 • REGENERASI & SDM",
-    subtitle: "LDKR, Masa Ta'aruf Siswa Baru & Halaqah Mentoring",
+    shortSubtitle: "Kaderisasi & SDM",
+    coverImage: "/images/rohis-akhdir-38.jpg",
+    featuredTitle: "Latihan Dasar Kepemimpinan Rohis (LDKR) & Mentoring",
+    featuredDesc:
+      "Regenerasi kepemimpinan kader, Masa Ta'aruf Anggota Baru (MTA), dan lingkaran halaqah mentoring pekanan.",
   },
   humas: {
-    pilar: "PILAR 04 • KEMITRAAN & SOSIAL",
-    subtitle: "Jejaring Eksternal, Sinergi Sekolah & Aksi Bakti Sosial",
+    shortSubtitle: "Hubungan Masyarakat",
+    coverImage: "/images/galeri-sman4-menolong.jpg",
+    featuredTitle: "SMAN 4 Menolong & Jejaring Ukhuwah Antarsekolah",
+    featuredDesc:
+      "Sinergi kegiatan bersama OSIS-MPK, silaturahmi FKMI se-Banyumas, serta aksi bakti sosial dan santunan kemanusiaan.",
   },
   perpusmed: {
-    pilar: "PILAR 05 • LITERASI & MEDIA KREATIF",
-    subtitle: "Publikasi Digital, Dokumentasi Visual & Pojok Literasi Islam",
+    shortSubtitle: "Perpustakaan & Media",
+    coverImage: "/images/galeri-item-3.jpg",
+    featuredTitle: "Publikasi Syiar Digital & Pojok Literasi Musholla",
+    featuredDesc:
+      "Pengelolaan perpustakaan islami Musholla Al-Ikhlas, penerbitan mading dakwah, serta dokumentasi kreatif seluruh kegiatan.",
   },
   sarpras: {
-    pilar: "PILAR 06 • KEMAKMURAN MUSHOLLA",
-    subtitle: "Pemeliharaan Musholla Al-Ikhlas, Inventaris & Logistik Acara",
+    shortSubtitle: "Sarana & Prasarana",
+    coverImage: "/images/event-3.jpg",
+    featuredTitle: "Kemakmuran & Inventaris Musholla Al-Ikhlas",
+    featuredDesc:
+      "Pemeliharaan kebersihan ruang ibadah, peremajaan mushaf Al-Qur'an dan perlengkapan shalat, serta kesiapan logistik acara.",
   },
 };
+
+const FILTER_OPTIONS = [
+  "Semua",
+  "BPH",
+  "Pendidikan",
+  "Kaderisasi",
+  "Humas",
+  "Perpusmed",
+  "Sarpras",
+] as const;
 
 function getInitials(name: string) {
   return name
@@ -72,397 +106,173 @@ function getInitials(name: string) {
     .join("");
 }
 
-const TAB_OPTIONS = [
-  "Semua",
-  "BPH",
-  "Pendidikan",
-  "Kaderisasi",
-  "Humas",
-  "Perpusmed",
-  "Sarpras",
-] as const;
-
-function Division3DCard({ prog }: { prog: (typeof DIVISIONS)[number] }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 30, isHovered: false });
-
-  const IconComponent = DIVISION_ICONS[prog.icon] || Layers;
-  const meta = DIVISION_META[prog.id] || DIVISION_META.bph;
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-
-    const rotateY = Number(((x - 0.5) * 4.5).toFixed(2));
-    const rotateX = Number(((0.5 - y) * 3.5).toFixed(2));
-
-    setTilt({
-      rotateX,
-      rotateY,
-      glareX: Math.round(x * 100),
-      glareY: Math.round(y * 100),
-      isHovered: true,
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 30, isHovered: false });
-  };
-
-  return (
-    <div
-      id={prog.id}
-      style={{ perspective: "1600px" }}
-      className="w-full"
-    >
-      <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{
-          transform: tilt.isHovered
-            ? `rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) translateZ(4px)`
-            : "rotateX(0deg) rotateY(0deg) translateZ(0px)",
-          transformStyle: "preserve-3d",
-          transition: tilt.isHovered
-            ? "transform 160ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease"
-            : "transform 550ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 500ms ease",
-        }}
-        className="relative bg-white rounded-[32px] border border-slate-200/90 border-b-[5px] border-b-emerald-950/20 shadow-[0_22px_50px_-14px_rgba(6,32,23,0.12),0_4px_14px_-2px_rgba(6,32,23,0.05),inset_0_1px_0_rgba(255,255,255,0.9)] hover:shadow-[0_32px_65px_-16px_rgba(6,32,23,0.18),0_8px_20px_-4px_rgba(6,32,23,0.08)] overflow-hidden group will-change-transform"
-      >
-        {/* Dynamic 3D Specular Light Sheen */}
-        <div
-          className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-300"
-          style={{
-            opacity: tilt.isHovered ? 1 : 0,
-            background: `radial-gradient(650px circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(16, 185, 129, 0.055), transparent 60%)`,
-          }}
-        />
-
-        {/* Subtle Architectural Top Trim (Single Monochrome Deep Emerald) */}
-        <div className="h-1 w-full bg-gradient-to-r from-[#062017] via-emerald-800 to-[#062017]" />
-
-        {/* ── CARD HEADER ── */}
-        <div
-          style={{ transform: "translateZ(18px)" }}
-          className="p-6 sm:p-8 lg:px-10 lg:pt-8 lg:pb-7 bg-gradient-to-b from-slate-50/90 to-white border-b border-slate-200/70"
-        >
-          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-            {/* Left: 3D Pedestal Icon + Pilar Tag + Title */}
-            <div className="flex items-start sm:items-center gap-4 sm:gap-5">
-              {/* 3D Extruded Icon Cube */}
-              <div className="relative shrink-0">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-white flex items-center justify-center border border-emerald-700/40 border-b-[3.5px] border-b-[#020d09] shadow-[0_12px_24px_-6px_rgba(6,32,23,0.45),inset_0_1.5px_1px_rgba(255,255,255,0.22)] transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5">
-                  <IconComponent size={27} strokeWidth={2} className="text-emerald-100 drop-shadow-xs" />
-                </div>
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-[#062017] text-emerald-100 text-[9.5px] font-black tracking-widest uppercase shadow-md border border-emerald-700/50 whitespace-nowrap">
-                  {prog.shortName}
-                </span>
-              </div>
-
-              <div className="pt-0.5">
-                <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/[0.06] border border-emerald-900/15 text-emerald-950 text-[10px] font-black tracking-wider uppercase">
-                    {meta.pilar}
-                  </span>
-                  <span className="text-[11px] font-bold text-slate-400">
-                    • Periode 2026/2027
-                  </span>
-                </div>
-                <h2 className="text-xl sm:text-2xl lg:text-[26px] font-black text-slate-900 tracking-tight leading-tight">
-                  {prog.name}
-                </h2>
-                <p className="text-xs sm:text-[13px] text-slate-500 font-medium mt-1">
-                  {meta.subtitle}
-                </p>
-              </div>
-            </div>
-
-            {/* Right: 3D Raised Metadata Modules (Coordinator & Strength) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex items-stretch gap-3 shrink-0">
-              {/* Coordinator 3D Box */}
-              <div className="flex items-center gap-3 bg-white px-4 py-3 rounded-2xl border border-slate-200/90 border-b-[3px] border-b-slate-300/90 shadow-[0_4px_12px_rgba(15,23,42,0.04)]">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200/80 text-emerald-900 flex items-center justify-center shrink-0 shadow-inner">
-                  <Award size={17} />
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px] font-extrabold uppercase tracking-wider leading-none mb-1">
-                    Koordinator / Pimpinan
-                  </span>
-                  <span className="font-extrabold text-slate-900 text-xs sm:text-[13px] leading-snug block">
-                    {prog.coordinator}
-                  </span>
-                </div>
-              </div>
-
-              {/* Member Strength 3D Box */}
-              <div className="flex items-center gap-3 bg-gradient-to-b from-[#0b3324] to-[#051a12] text-white px-4 py-3 rounded-2xl border border-emerald-800/60 border-b-[3px] border-b-[#020d09] shadow-[0_8px_18px_-4px_rgba(6,32,23,0.35),inset_0_1px_0_rgba(255,255,255,0.14)]">
-                <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 text-emerald-200 flex items-center justify-center shrink-0">
-                  <Users size={16} />
-                </div>
-                <div>
-                  <span className="text-emerald-200/75 block text-[10px] font-extrabold uppercase tracking-wider leading-none mb-1">
-                    Kekuatan Divisi
-                  </span>
-                  <span className="font-black text-white text-xs sm:text-sm leading-none block">
-                    {prog.members?.length || 0} Kader Terdaftar
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── CARD BODY ── */}
-        <div className="p-6 sm:p-8 lg:px-10 lg:py-8 space-y-8 bg-white">
-          {/* 3D Recessed Description Callout */}
-          <div
-            style={{ transform: "translateZ(10px)" }}
-            className="p-4 sm:p-5 rounded-2xl bg-slate-50/90 border border-slate-200/80 border-l-[4px] border-l-[#062017] shadow-[inset_0_2px_4px_rgba(15,23,42,0.03)]"
-          >
-            <p className="text-xs sm:text-[14px] text-slate-700 leading-relaxed font-medium">
-              {prog.description}
-            </p>
-          </div>
-
-          {/* 3D Raised Program Kerja Grid */}
-          <div style={{ transform: "translateZ(20px)" }}>
-            <div className="flex items-center justify-between gap-2 mb-4">
-              <h3 className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#062017] inline-block ring-4 ring-emerald-900/10" />
-                <span>Program Kerja & Agenda Prioritas 2026/2027</span>
-              </h3>
-              <span className="text-[11px] font-extrabold text-emerald-950 bg-slate-100 border border-slate-200/90 px-3 py-0.5 rounded-full">
-                {prog.programs?.length || 0} Fokus Utama
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-              {prog.programs?.map((detail: string, i: number) => (
-                <div
-                  key={i}
-                  className="p-4 sm:p-4.5 rounded-2xl bg-gradient-to-b from-white to-slate-50/70 border border-slate-200/90 border-b-[3.5px] border-b-slate-300/90 hover:border-emerald-800/40 hover:border-b-[#062017] shadow-[0_4px_12px_-2px_rgba(15,23,42,0.05),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_14px_26px_-6px_rgba(6,32,23,0.12)] flex items-start gap-3.5 transition-all duration-200 hover:-translate-y-0.5 group/prog"
-                >
-                  {/* 3D Number Keycap */}
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] border border-emerald-700/40 border-b-2 border-b-black text-white text-xs font-black flex items-center justify-center shrink-0 shadow-[0_4px_8px_rgba(6,32,23,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] mt-0.5 group-hover/prog:scale-105 transition-transform">
-                    {String(i + 1).padStart(2, "0")}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 group-hover/prog:text-emerald-800 transition-colors mb-0.5">
-                      <CheckCircle2 size={12} className="text-emerald-800 shrink-0" />
-                      <span>Agenda Prioritas #{i + 1}</span>
-                    </div>
-                    <p className="text-xs sm:text-[13.5px] font-bold text-slate-900 leading-snug">
-                      {detail}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 3D Tactile Member Roster Grid */}
-          <div
-            style={{ transform: "translateZ(14px)" }}
-            className="pt-6 border-t border-slate-200/80"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-2.5">
-                <h3 className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-slate-800">
-                  Susunan Pengurus & Kader Divisi
-                </h3>
-                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-extrabold">
-                  {prog.members?.length || 0} Siswa
-                </span>
-              </div>
-
-              <Link
-                href="/tentang#kepengurusan"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-[#062017] text-slate-800 hover:text-white text-xs font-extrabold border border-slate-200/90 border-b-[2.5px] border-b-slate-300 hover:border-[#062017] shadow-2xs transition-all duration-200 self-start sm:self-auto active:translate-y-0.5"
-              >
-                <span>Lihat Profil di Struktur</span>
-                <ArrowRight size={14} />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-              {prog.members?.map((m: any, mIdx: number) => {
-                const isLeader =
-                  m.role?.toLowerCase().includes("ketua") ||
-                  m.role?.toLowerCase().includes("koordinator") ||
-                  m.role?.toLowerCase().includes("sekretaris") ||
-                  m.role?.toLowerCase().includes("bendahara") ||
-                  mIdx === 0;
-                const igClean = m.instagram ? m.instagram.replace(/^@/, "") : "";
-
-                return (
-                  <div
-                    key={m.id}
-                    className={`p-3 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-2.5 hover:-translate-y-0.5 ${
-                      isLeader
-                        ? "bg-gradient-to-b from-white to-slate-50/90 border-slate-300/90 border-b-[3px] border-b-emerald-900/35 shadow-[0_4px_10px_rgba(6,32,23,0.05)] hover:shadow-[0_8px_18px_rgba(6,32,23,0.1)]"
-                        : "bg-white hover:bg-slate-50/60 border-slate-200/85 border-b-[2.5px] border-b-slate-300/80 shadow-[0_2px_6px_rgba(15,23,42,0.03)] hover:border-slate-300 hover:shadow-[0_6px_14px_rgba(15,23,42,0.06)]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      {/* 3D Initials Avatar */}
-                      <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shrink-0 border ${
-                          isLeader
-                            ? "bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-white border-emerald-700/40 border-b-2 border-b-black shadow-xs"
-                            : "bg-slate-100 text-slate-700 border-slate-200/90 border-b-2 border-b-slate-300"
-                        }`}
-                      >
-                        {getInitials(m.name)}
-                      </div>
-
-                      <div className="min-w-0">
-                        <div className="text-xs font-extrabold text-slate-900 truncate">
-                          {m.name}
-                        </div>
-                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-                          <span
-                            className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
-                              isLeader
-                                ? "bg-emerald-950/[0.08] text-emerald-950"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                          >
-                            {m.role}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-semibold">
-                            • {m.classGrade}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {igClean && (
-                      <a
-                        href={`https://instagram.com/${igClean}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-[#062017] text-slate-600 hover:text-white border border-slate-200/90 border-b-2 border-b-slate-300/80 hover:border-[#062017] text-[10px] font-bold flex items-center gap-1 shrink-0 transition-all"
-                        title={`Instagram @${igClean}`}
-                      >
-                        <svg
-                          width="11"
-                          height="11"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="shrink-0"
-                        >
-                          <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                          <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-                        </svg>
-                        <span className="hidden xl:inline max-w-[68px] truncate">
-                          @{igClean}
-                        </span>
-                        <ArrowUpRight size={10} />
-                      </a>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function ProgramPage() {
-  const [selectedTab, setSelectedTab] = useState<string>("Semua");
+  const prefersReducedMotion = useReducedMotion();
+  const [selectedFilter, setSelectedFilter] = useState<string>("Semua");
+  const [activeDetailId, setActiveDetailId] = useState<string>("pendidikan");
 
   const filteredDivisions = useMemo(() => {
-    if (selectedTab === "Semua") return DIVISIONS;
+    if (selectedFilter === "Semua") return DIVISIONS;
     return DIVISIONS.filter(
       (prog) =>
-        prog.shortName.toLowerCase() === selectedTab.toLowerCase() ||
-        prog.id.toLowerCase() === selectedTab.toLowerCase()
+        prog.shortName.toLowerCase() === selectedFilter.toLowerCase() ||
+        prog.id.toLowerCase() === selectedFilter.toLowerCase()
     );
-  }, [selectedTab]);
+  }, [selectedFilter]);
+
+  const activeDetailDivision = useMemo(() => {
+    if (selectedFilter !== "Semua") {
+      const matched = DIVISIONS.find(
+        (d) =>
+          d.shortName.toLowerCase() === selectedFilter.toLowerCase() ||
+          d.id.toLowerCase() === selectedFilter.toLowerCase()
+      );
+      if (matched) return matched;
+    }
+    return (
+      DIVISIONS.find((d) => d.id === activeDetailId) ||
+      DIVISIONS[1] ||
+      DIVISIONS[0]
+    );
+  }, [selectedFilter, activeDetailId]);
+
+  const activeMeta =
+    DIVISION_META[activeDetailDivision.id] || DIVISION_META.pendidikan;
+
+  const handleSelectDivisionDetail = (divId: string) => {
+    setActiveDetailId(divId);
+    const el = document.getElementById("rincian-program");
+    if (el) {
+      el.scrollIntoView({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        block: "start",
+      });
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafaf7]">
+    <div className="min-h-screen flex flex-col clay-canvas text-[#153E32]">
       <ScrollProgressBar />
       <Navbar />
 
-      {/* ── HEADER HERO PROGRAM ── */}
-      <section className="pt-32 pb-20 lg:pt-40 lg:pb-24 bg-gradient-to-br from-[#062017] via-[#0b3324] to-[#041610] text-white relative overflow-hidden">
-        {/* Subtle decorative glow */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 left-10 w-72 h-72 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+      {/* ── 1. HEADER HERO & STATS PILLS (Matches 05_divisi_ringkasan.png) ── */}
+      <section className="pt-24 pb-6 sm:pt-28 sm:pb-8 lg:pt-32 lg:pb-10">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            {/* Left Column: Title, Subtitle, Description & 3 Clay Stat Pills */}
+            <CinematicReveal
+              direction="up"
+              delay={0.04}
+              className="lg:col-span-7"
+            >
+              <h1 className="font-heading text-3xl sm:text-4xl lg:text-[46px] font-extrabold text-[#153E32] tracking-tight leading-[1.1] mb-2">
+                6 Pilar Divisi & Program Kerja
+              </h1>
+              <p className="text-xs sm:text-sm font-bold text-[#087A53] mb-3">
+                Rohis SMAPA • Masa Bakti {SITE.period}
+              </p>
+              <p className="text-sm sm:text-base text-[#3B5E52] leading-relaxed max-w-2xl mb-6">
+                Rancangan kegiatan dan pembagian peran pengurus untuk mendukung
+                syiar, pembinaan, dan pelayanan di sekolah.
+              </p>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <CinematicReveal direction="up" delay={0.1}>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 text-white">
-              6 Pilar Divisi & Program Kerja Rohis SMAPA
-            </h1>
-            <p className="text-emerald-100/80 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-              Rancangan program kerja BPH, Pendidikan, Kaderisasi, Humas, Perpusmed, dan Sarpras Rohis SMA Negeri 4 Purwokerto masa bakti 2026/2027 di bawah pimpinan Tifatul Reyhan Zahran & Fanny Sri Masruroh.
-            </p>
+              {/* 3 Clay Stat Pills */}
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5">
+                <div className="clay-card px-3.5 py-2.5 sm:px-4 sm:py-3 inline-flex items-center gap-2.5">
+                  <span className="w-8 h-8 rounded-xl clay-icon-sq flex items-center justify-center shrink-0">
+                    <Layers size={16} className="text-[#087A53]" />
+                  </span>
+                  <span className="font-heading text-xs sm:text-sm font-extrabold text-[#153E32]">
+                    6 Divisi
+                  </span>
+                </div>
 
-            {/* Quick Stats Pill */}
-            <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-3 bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10 text-xs text-emerald-100">
-              <span className="flex items-center gap-1.5 font-semibold">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                6 Divisi Resmi
-              </span>
-              <span className="text-white/30">•</span>
-              <span className="font-semibold">44 Pengurus Terdaftar</span>
-              <span className="text-white/30">•</span>
-              <span className="font-semibold">Musholla Al-Ikhlas SMAPA</span>
-            </div>
-          </CinematicReveal>
+                <div className="clay-card px-3.5 py-2.5 sm:px-4 sm:py-3 inline-flex items-center gap-2.5">
+                  <span className="w-8 h-8 rounded-xl clay-icon-sq flex items-center justify-center shrink-0">
+                    <Users size={16} className="text-[#087A53]" />
+                  </span>
+                  <span className="font-heading text-xs sm:text-sm font-extrabold text-[#153E32]">
+                    44 Pengurus
+                  </span>
+                </div>
+
+                <div className="clay-card px-3.5 py-2.5 sm:px-4 sm:py-3 inline-flex items-center gap-2.5">
+                  <span className="w-8 h-8 rounded-xl clay-icon-sq flex items-center justify-center shrink-0">
+                    <MapPin size={16} className="text-[#087A53]" />
+                  </span>
+                  <span className="font-heading text-xs sm:text-sm font-extrabold text-[#153E32]">
+                    Musholla Al-Ikhlas
+                  </span>
+                </div>
+              </div>
+            </CinematicReveal>
+
+            {/* Right Column: Documentary Photo Frame */}
+            <CinematicReveal
+              direction="up"
+              delay={0.1}
+              className="lg:col-span-5"
+            >
+              <div className="clay-photo-frame p-2.5">
+                <div className="relative aspect-[16/10] w-full rounded-[18px] overflow-hidden bg-[#E5F2EC]">
+                  <Image
+                    src="/images/dokumentasi-smapa.jpg"
+                    alt="Pengurus Divisi Rohis SMA Negeri 4 Purwokerto"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 42vw"
+                    className="object-cover object-center"
+                    priority
+                  />
+                </div>
+              </div>
+            </CinematicReveal>
+          </div>
         </div>
       </section>
 
-      {/* ── MAIN CONTENT ── */}
-      <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 -mt-10 relative z-20">
-        {/* ── FILTER TAB DIVISI INTERAKTIF ── */}
-        <CinematicReveal direction="up" delay={0.15}>
-          <div className="bg-white p-2.5 rounded-3xl border border-slate-200/90 border-b-[4px] border-b-slate-300/80 shadow-[0_12px_30px_-8px_rgba(6,32,23,0.08)] mb-10">
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1">
-              {TAB_OPTIONS.map((tab) => {
-                const isActive = selectedTab === tab;
-                const memberCount =
-                  tab === "Semua"
-                    ? DIVISIONS.reduce((acc, d) => acc + (d.members?.length || 0), 0)
-                    : DIVISIONS.find(
-                        (d) =>
-                          d.shortName.toLowerCase() === tab.toLowerCase() ||
-                          d.id.toLowerCase() === tab.toLowerCase()
-                      )?.members?.length || 0;
-
+      {/* ── 2. FILTER DIVISI BAR & 6 DIVISION OVERVIEW CARDS (Matches 05_divisi_ringkasan.png) ── */}
+      <section
+        aria-label="Daftar Divisi Rohis SMAPA"
+        className="py-4 sm:py-6 max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 w-full"
+      >
+        {/* Filter Divisi Clay Bar */}
+        <CinematicReveal direction="up" delay={0.08}>
+          <div className="clay-card p-3 sm:p-4 mb-7 flex flex-col sm:flex-row sm:items-center gap-3">
+            <span className="text-xs sm:text-sm font-extrabold text-[#153E32] px-2 shrink-0">
+              Filter Divisi:
+            </span>
+            <div
+              data-lenis-prevent="true"
+              onWheel={(e) => {
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                  e.currentTarget.scrollLeft += e.deltaY;
+                }
+              }}
+              className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 overscroll-contain"
+            >
+              {FILTER_OPTIONS.map((tab) => {
+                const isActive = selectedFilter === tab;
                 return (
                   <button
                     key={tab}
-                    onClick={() => setSelectedTab(tab)}
-                    className={`px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap flex items-center gap-2 cursor-pointer shrink-0 ${
+                    type="button"
+                    onClick={() => {
+                      setSelectedFilter(tab);
+                      if (tab !== "Semua") {
+                        const found = DIVISIONS.find(
+                          (d) =>
+                            d.shortName.toLowerCase() === tab.toLowerCase()
+                        );
+                        if (found) setActiveDetailId(found.id);
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold transition-all duration-200 whitespace-nowrap cursor-pointer min-h-[38px] ${
                       isActive
-                        ? "bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-white border border-emerald-700/40 border-b-[3px] border-b-black shadow-md shadow-emerald-950/20 -translate-y-0.5"
-                        : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 border border-slate-200/60 border-b-[2px] border-b-slate-300/80"
+                        ? "clay-btn-emerald text-white"
+                        : "clay-btn-mint text-[#153E32]"
                     }`}
                   >
-                    <span>{tab}</span>
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                        isActive
-                          ? "bg-white/15 text-emerald-100"
-                          : "bg-slate-200/90 text-slate-600"
-                      }`}
-                    >
-                      {memberCount} Kader
-                    </span>
+                    {tab}
                   </button>
                 );
               })}
@@ -470,39 +280,361 @@ export default function ProgramPage() {
           </div>
         </CinematicReveal>
 
-        {/* ── PROGRAM CARDS GRID ── */}
-        <div className="space-y-10">
-          {filteredDivisions.map((prog, idx) => (
-            <CinematicReveal
-              key={prog.id}
-              direction="up"
-              delay={Math.min(idx * 0.08, 0.25)}
-            >
-              <Division3DCard prog={prog} />
-            </CinematicReveal>
-          ))}
-        </div>
+        {/* 6 Division Summary Cards Grid (3-col Desktop, 2-col Mobile/Tablet) */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedFilter}
+            initial={
+              prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6 }
+            }
+            animate={{ opacity: 1, y: 0 }}
+            exit={
+              prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: -4 }
+            }
+            transition={{
+              duration: prefersReducedMotion ? 0.05 : 0.18,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          >
+            {filteredDivisions.map((prog) => {
+              const IconComponent = DIVISION_ICONS[prog.icon] || Layers;
+              const meta = DIVISION_META[prog.id] || DIVISION_META.bph;
 
-        {/* ── CTA ASPIRASI & REKOMENDASI PROKER ── */}
-        <CinematicReveal direction="up" delay={0.15}>
-          <div className="mt-14 bg-gradient-to-r from-[#062017] via-[#0b3324] to-[#041610] text-white rounded-3xl p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-emerald-800/30 border-b-[5px] border-b-[#020d09]">
-            <div className="max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 text-[11px] font-bold text-amber-300 mb-2.5">
-                <span>SUARA PELAJAR SMAPA</span>
+              return (
+                <article
+                  key={prog.id}
+                  className="clay-card clay-card-hover p-3.5 sm:p-4 flex flex-col justify-between group"
+                >
+                  <div>
+                    {/* Top Cover Image */}
+                    <div className="relative h-40 sm:h-44 w-full rounded-[16px] overflow-hidden bg-[#E5F2EC] mb-3.5">
+                      <Image
+                        src={meta.coverImage}
+                        alt={prog.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover object-center transition-transform duration-300 group-hover:scale-103"
+                      />
+                    </div>
+
+                    {/* Icon Squircle + Division Name + Subtitle */}
+                    <div className="flex items-center gap-3 px-1 mb-2.5">
+                      <div className="w-11 h-11 rounded-2xl clay-icon-sq flex items-center justify-center shrink-0">
+                        <IconComponent size={20} className="text-[#087A53]" />
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="font-heading text-lg sm:text-xl font-extrabold text-[#153E32] leading-tight truncate">
+                          {prog.shortName}
+                        </h2>
+                        <p className="text-xs font-semibold text-[#4A6B5F] truncate">
+                          {meta.shortSubtitle}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="px-1 text-xs sm:text-[13.5px] text-[#3B5E52] leading-relaxed line-clamp-3 mb-4">
+                      {prog.description}
+                    </p>
+                  </div>
+
+                  {/* Bottom Action Row */}
+                  <div className="px-1 pt-3 border-t border-[#DCEAE3] flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold text-[#4A6B5F]">
+                      {prog.members.length} Pengurus
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectDivisionDetail(prog.id)}
+                      className="clay-btn-emerald px-4 py-2 rounded-full text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer min-h-[38px]"
+                    >
+                      <span>Lihat program</span>
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
+      </section>
+
+      {/* ── 3. RINCIAN PROGRAM DIVISI & TIM PELAKSANA (Matches 06_divisi_program.png) ── */}
+      <section
+        id="rincian-program"
+        aria-label="Rincian Program Divisi"
+        className="py-10 sm:py-14 max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 w-full scroll-mt-24"
+      >
+        <CinematicReveal direction="up" delay={0.08}>
+          {/* Division Detail Selector Bar */}
+          <div className="clay-card p-3 sm:p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span className="text-xs sm:text-sm font-extrabold text-[#153E32] px-2 shrink-0">
+              Pilih Rincian Divisi:
+            </span>
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+              {DIVISIONS.map((div) => {
+                const isSelected = activeDetailDivision.id === div.id;
+                return (
+                  <button
+                    key={div.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveDetailId(div.id);
+                      if (selectedFilter !== "Semua") {
+                        setSelectedFilter(div.shortName);
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold transition-all duration-200 whitespace-nowrap cursor-pointer min-h-[38px] ${
+                      isSelected
+                        ? "clay-btn-emerald text-white"
+                        : "clay-btn-mint text-[#153E32]"
+                    }`}
+                  >
+                    {div.shortName}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Main Active Division Detail Card (Exact Composition of 06_divisi_program.png) */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeDetailDivision.id}
+              initial={
+                prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6 }
+              }
+              animate={{ opacity: 1, y: 0 }}
+              exit={
+                prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: -4 }
+              }
+              transition={{
+                duration: prefersReducedMotion ? 0.05 : 0.2,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="space-y-6"
+            >
+              <div className="clay-card p-5 sm:p-7 lg:p-8">
+                <div className="mb-5 pb-4 border-b border-[#DCEAE3] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#153E32] tracking-tight">
+                      Program Divisi {activeDetailDivision.shortName}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-[#3B5E52] mt-1">
+                      {activeDetailDivision.name} • Koordinator:{" "}
+                      <strong className="text-[#153E32]">
+                        {activeDetailDivision.coordinator}
+                      </strong>
+                    </p>
+                  </div>
+                  <span className="clay-pill-mint px-3.5 py-1.5 rounded-full text-xs font-bold self-start sm:self-auto">
+                    Masa Bakti {SITE.period}
+                  </span>
+                </div>
+
+                {/* 3-Col Layout: Photo Left | Program Unggulan Middle | Tim Pelaksana Right */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  {/* Left: Photo */}
+                  <div className="lg:col-span-4 flex flex-col">
+                    <div className="clay-photo-frame p-2 flex-1 flex flex-col">
+                      <div className="relative aspect-[4/3] lg:aspect-auto lg:flex-1 w-full rounded-[16px] overflow-hidden bg-[#E5F2EC] min-h-[200px]">
+                        <Image
+                          src={activeMeta.coverImage}
+                          alt={activeDetailDivision.name}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 33vw"
+                          className="object-cover object-center"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Middle: Program Unggulan Checklist */}
+                  <div className="lg:col-span-5 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-heading text-base sm:text-lg font-extrabold text-[#153E32] mb-3">
+                        Program Unggulan
+                      </h3>
+                      <div className="space-y-2.5">
+                        {activeDetailDivision.programs.map((progText, idx) => (
+                          <div
+                            key={idx}
+                            className="clay-inner p-3.5 flex items-start gap-3"
+                          >
+                            <span className="w-7 h-7 rounded-full clay-icon-sq flex items-center justify-center shrink-0 mt-0.5">
+                              <CheckCircle2
+                                size={15}
+                                className="text-[#087A53]"
+                              />
+                            </span>
+                            <span className="text-xs sm:text-[13.5px] font-semibold text-[#153E32] leading-snug">
+                              {progText}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Tim Pelaksana Card */}
+                  <div className="lg:col-span-3 flex">
+                    <div className="clay-inner p-5 w-full flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-3">
+                          <h3 className="font-heading text-base font-extrabold text-[#153E32]">
+                            Tim Pelaksana
+                          </h3>
+                          <span className="clay-pill-mint px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+                            {activeDetailDivision.members.length} Pengurus
+                          </span>
+                        </div>
+
+                        {/* Avatar Stack */}
+                        <div className="flex items-center -space-x-2 overflow-hidden py-2 mb-2">
+                          {activeDetailDivision.members
+                            .slice(0, 5)
+                            .map((member) => (
+                              <div
+                                key={member.id}
+                                title={`${member.name} (${member.role})`}
+                                className="w-9 h-9 rounded-full clay-pill-white border-2 border-white flex items-center justify-center text-[11px] font-extrabold text-[#087A53] shrink-0"
+                              >
+                                {getInitials(member.name)}
+                              </div>
+                            ))}
+                          {activeDetailDivision.members.length > 5 && (
+                            <div className="w-9 h-9 rounded-full clay-btn-emerald border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+                              +{activeDetailDivision.members.length - 5}
+                            </div>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-[#3B5E52] leading-relaxed mb-4">
+                          Tim yang mengoordinasikan dan menjalankan program
+                          kerja {activeDetailDivision.shortName} di lingkungan
+                          SMAN 4 Purwokerto.
+                        </p>
+                      </div>
+
+                      <Link
+                        href="/tentang#kepengurusan"
+                        className="clay-btn-emerald w-full py-2.5 px-4 rounded-full text-xs font-bold inline-flex items-center justify-center gap-1.5 min-h-[40px]"
+                      >
+                        <span>Lihat pengurus</span>
+                        <ArrowRight size={14} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Member Roster Pills for the Selected Division */}
+                <div className="mt-6 pt-5 border-t border-[#DCEAE3]">
+                  <h4 className="font-heading text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#3B5E52] mb-3">
+                    Daftar Anggota Divisi {activeDetailDivision.shortName} (
+                    {activeDetailDivision.members.length} Pengurus)
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    {activeDetailDivision.members.map((m) => {
+                      const igClean = m.instagram
+                        ? m.instagram.replace(/^@/, "")
+                        : "";
+                      return (
+                        <div
+                          key={m.id}
+                          className="clay-inner p-3 flex items-center justify-between gap-2.5"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 rounded-xl clay-icon-sq flex items-center justify-center text-xs font-extrabold shrink-0">
+                              {getInitials(m.name)}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-[#153E32] truncate">
+                                {m.name}
+                              </p>
+                              <p className="text-[11px] text-[#4A6B5F] truncate">
+                                {m.role} • {m.classGrade}
+                              </p>
+                            </div>
+                          </div>
+
+                          {igClean && (
+                            <a
+                              href={`https://instagram.com/${igClean}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={`Instagram @${igClean}`}
+                              className="px-2.5 py-1 rounded-full clay-pill-mint text-[10px] font-bold inline-flex items-center gap-1 shrink-0 hover:opacity-85"
+                            >
+                              <span>@{igClean}</span>
+                              <ArrowUpRight size={10} />
+                            </a>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-white mb-1.5">
-                Punya Usulan Kegiatan untuk Divisi Rohis?
+
+              {/* Featured Program Card Below (Matches 06_divisi_program.png) */}
+              <div className="clay-card p-4 sm:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                  <div className="md:col-span-4">
+                    <div className="relative h-44 w-full rounded-[16px] overflow-hidden bg-[#E5F2EC]">
+                      <Image
+                        src={activeMeta.coverImage}
+                        alt={activeMeta.featuredTitle}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover object-center"
+                      />
+                    </div>
+                  </div>
+                  <div className="md:col-span-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold clay-pill-mint mb-2">
+                        Fokus Kegiatan {activeDetailDivision.shortName}
+                      </span>
+                      <h3 className="font-heading text-lg sm:text-xl font-extrabold text-[#153E32] mb-1.5">
+                        {activeMeta.featuredTitle}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-[#3B5E52] leading-relaxed max-w-xl">
+                        {activeMeta.featuredDesc}
+                      </p>
+                    </div>
+                    <Link
+                      href="/agenda"
+                      className="clay-btn-emerald px-5 py-2.5 rounded-full text-xs sm:text-[13px] font-bold inline-flex items-center gap-1.5 shrink-0 self-start sm:self-center min-h-[40px]"
+                    >
+                      <span>Lihat jadwal</span>
+                      <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Bottom Suggestion CTA Clay Bar (Matches bottom of 06_divisi_program.png) */}
+          <div className="mt-6 clay-card p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="font-heading text-base sm:text-lg font-extrabold text-[#153E32]">
+                Punya usulan kegiatan?
               </h3>
-              <p className="text-xs sm:text-sm text-emerald-200/80 leading-relaxed">
-                Sampaikan saran, aspirasi kajian, atau ide inovasi program kerja secara langsung melalui Kotak Aspirasi Resmi Rohis SMAPA.
+              <p className="text-xs sm:text-sm text-[#3B5E52] mt-0.5">
+                Sampaikan saran untuk kegiatan Rohis SMAN 4 Purwokerto ke depan.
               </p>
             </div>
-            <Link
-              href="/aspirasi"
-              className="px-6 py-3.5 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs sm:text-sm shrink-0 border-b-[3px] border-b-amber-700 shadow-lg shadow-amber-950/20 hover:-translate-y-0.5 active:translate-y-0 transition-all"
+            <a
+              href={SITE.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="clay-btn-emerald px-5 py-2.5 rounded-full text-xs sm:text-[13px] font-bold inline-flex items-center gap-2 shrink-0 min-h-[42px]"
             >
-              Sampaikan Ide Program
-            </Link>
+              <span>Hubungi Pengurus Rohis</span>
+              <ArrowRight size={14} />
+            </a>
           </div>
         </CinematicReveal>
       </section>

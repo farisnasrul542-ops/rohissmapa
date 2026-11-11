@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   KEPENGURUSAN_PERIODS,
   ACTIVE_PERIOD,
@@ -8,27 +9,25 @@ import {
 } from "@/lib/pengurusData";
 import { PengurusMember } from "@/lib/types";
 import {
-  CheckCircle2,
-  Sparkles,
   Quote,
   X,
   Search,
   Users,
-  Award,
-  BookOpen,
   GraduationCap,
+  ArrowUpRight,
 } from "lucide-react";
-import { SITE } from "@/lib/constants";
 
 export default function KepengurusanSection() {
+  const prefersReducedMotion = useReducedMotion();
   const [selectedPeriod, setSelectedPeriod] = useState<string>(ACTIVE_PERIOD);
   const [selectedDivision, setSelectedDivision] = useState<string>("Semua");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeModalMember, setActiveModalMember] =
     useState<PengurusMember | null>(null);
   const profileModalBodyRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  // List of unique divisions for current period
   const currentPeriodMembers = useMemo(() => {
     return PENGURUS_DATA[selectedPeriod] || [];
   }, [selectedPeriod]);
@@ -43,409 +42,458 @@ export default function KepengurusanSection() {
     return list;
   }, [currentPeriodMembers]);
 
-  // Filtered members by division and search query
   const filteredMembers = useMemo(() => {
     return currentPeriodMembers.filter((m) => {
       const matchDivision =
         selectedDivision === "Semua" || m.division === selectedDivision;
+      const q = searchQuery.toLowerCase().trim();
       const matchQuery =
-        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.classGrade.toLowerCase().includes(searchQuery.toLowerCase());
+        !q ||
+        m.name.toLowerCase().includes(q) ||
+        m.role.toLowerCase().includes(q) ||
+        m.classGrade.toLowerCase().includes(q) ||
+        m.division.toLowerCase().includes(q);
       return matchDivision && matchQuery;
     });
   }, [currentPeriodMembers, selectedDivision, searchQuery]);
 
-  const isActivePeriod = selectedPeriod === ACTIVE_PERIOD;
+  // Modal Escape & scroll lock
+  useEffect(() => {
+    if (!activeModalMember) return;
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const timer = setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 30);
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setActiveModalMember(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      previousFocusRef.current?.focus?.();
+    };
+  }, [activeModalMember]);
+
+  const formatClassLabel = (grade: string) => {
+    if (!grade) return "";
+    return grade.toLowerCase().startsWith("kelas") ? grade : `Kelas ${grade}`;
+  };
 
   return (
-    <section className="py-16 sm:py-24 bg-white relative overflow-hidden" id="kepengurusan">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ── 1. HORIZONTAL PERIOD FILTER TABS (MATCHES REFERENCE PHOTO) ── */}
-        <div className="flex items-center justify-center mb-10 px-4">
-          <div className="inline-flex items-center gap-2 sm:gap-3 bg-[#f4f6f8] p-1.5 rounded-full border border-slate-200/80 shadow-inner">
+    <section
+      id="kepengurusan"
+      aria-label="Kenali Pengurus Kami"
+      className="py-10 sm:py-14 relative overflow-hidden scroll-mt-24"
+    >
+      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header (Matches 04_profil_pengurus.png) */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+          <div>
+            <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#153E32] tracking-tight">
+              Kenali Pengurus Kami
+            </h2>
+            <p className="text-xs sm:text-sm font-semibold text-[#4A6B5F] mt-1">
+              Periode {selectedPeriod} • {currentPeriodMembers.length} pengurus
+            </p>
+          </div>
+
+          {/* Period Selector Pills */}
+          <div
+            role="tablist"
+            aria-label="Pilih Periode Kepengurusan"
+            className="inline-flex items-center gap-1.5 p-1.5 rounded-full clay-inner self-start sm:self-auto"
+          >
             {KEPENGURUSAN_PERIODS.map((period) => {
               const isActive = selectedPeriod === period;
               return (
                 <button
                   key={period}
+                  role="tab"
+                  aria-selected={isActive}
+                  type="button"
                   onClick={() => {
                     setSelectedPeriod(period);
                     setSelectedDivision("Semua");
                     setSearchQuery("");
                   }}
-                  className={`px-5 sm:px-7 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap flex items-center gap-2 cursor-pointer ${
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer whitespace-nowrap min-h-[36px] ${
                     isActive
-                      ? "bg-[#0b1c14] text-white shadow-md shadow-emerald-950/20"
-                      : "bg-[#e5ecf2] hover:bg-[#d9e3ec] text-slate-700 font-semibold"
+                      ? "clay-btn-emerald text-white"
+                      : "text-[#3B5E52] hover:text-[#153E32]"
                   }`}
                 >
-                  {isActive && (
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse shrink-0" />
-                  )}
-                  <span>{period}</span>
+                  Periode {period}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* ── 2. HEADER INFO ── */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-          {/* Heading */}
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-2">
-            Kepengurusan {selectedPeriod}
-          </h2>
-
-          {/* Subtitle with dynamic member count */}
-          <p className="text-sm sm:text-base font-medium text-slate-500">
-            {currentPeriodMembers.length} pengurus terdaftar
-          </p>
-        </div>
-
-        {/* ── 3. DIVISION TABS & SEARCH (OPTIONAL ENHANCEMENT) ── */}
-        {divisions.length > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10 pb-6 border-b border-slate-100">
-            {/* Division Filter Pills */}
-            <div
-              data-lenis-prevent="true"
-              onWheel={(e) => {
-                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                  e.currentTarget.scrollLeft += e.deltaY;
-                }
-              }}
-              className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto w-full sm:w-auto py-1 no-scrollbar overscroll-contain"
-            >
-              {divisions.map((div) => {
-                const isDivActive = selectedDivision === div;
-                const count =
-                  div === "Semua"
-                    ? currentPeriodMembers.length
-                    : currentPeriodMembers.filter((m) => m.division === div).length;
-                return (
-                  <button
-                    key={div}
-                    onClick={() => setSelectedDivision(div)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                      isDivActive
-                        ? "bg-emerald-800 text-white shadow-sm"
-                        : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                    }`}
-                  >
-                    {div} ({count})
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Quick Search */}
-            <div className="relative w-full sm:w-64">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari nama / jabatan..."
-                className="w-full pl-9 pr-4 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-600 transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ── 4. MEMBER CARDS GRID (EXACT LAYOUT AS REFERENCE PHOTO) ── */}
-        {filteredMembers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-            {filteredMembers.map((member) => (
-              <div
-                key={member.id}
-                onClick={() => setActiveModalMember(member)}
-                className="bg-white rounded-3xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group flex flex-col cursor-pointer"
-              >
-                {/* Image Frame with clean white backdrop matching silhouette reference */}
-                <div className="h-80 sm:h-96 relative flex items-center justify-center overflow-hidden bg-white p-4 sm:p-6 border-b border-slate-100">
-                  {/* Subtle top pill badge for Division / Sash */}
-                  {member.sashTitle && (
-                    <div className="absolute top-3.5 right-3.5 z-10">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-slate-100/90 backdrop-blur-md text-emerald-950 border border-slate-200/80 shadow-xs">
-                        {member.sashTitle}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Silhouette avatar icon matching reference */}
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-
-                {/* White bottom text container */}
-                <div className="bg-white p-5 text-center flex flex-col items-center justify-center flex-1 border-t border-slate-100/60">
-                  <h3 className="font-extrabold text-base sm:text-lg text-slate-900 group-hover:text-emerald-800 transition-colors leading-snug line-clamp-1 mb-0.5">
-                    {member.name}
-                  </h3>
-                  {member.nickname && (
-                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full mb-1">
-                      Panggilan: {member.nickname}
-                    </span>
-                  )}
-                  <p className="text-xs sm:text-sm font-semibold text-emerald-700 mb-0.5 line-clamp-1">
-                    {member.role}
-                  </p>
-                  <p className="text-xs font-medium text-slate-500 mb-3">
-                    {member.classGrade}
-                  </p>
-
-                  {/* ── FITUR INSTAGRAM & WHATSAPP PERSIS SEPERTI GAMBAR REFERENSI ── */}
-                  <div className="w-full pt-3 border-t border-slate-100 flex flex-col items-center">
-                    <div className="flex items-center justify-center gap-1.5 text-xs text-slate-600 font-semibold mb-0.5">
-                      <GraduationCap size={15} className="text-amber-700/80 shrink-0" />
-                      <span>{SITE.schoolName}</span>
-                    </div>
-                    <p className="text-[11px] font-medium text-slate-400 mb-2.5">
-                      Periode {member.period}
-                    </p>
-
-                    <div className="w-full flex items-center gap-2">
-                      {member.instagram ? (
-                        <a
-                          href={`https://instagram.com/${member.instagram.replace(/^@/, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className={`py-2 px-3 rounded-full bg-gradient-to-r from-[#fa7e1e] via-[#d62976] to-[#962fbf] hover:opacity-95 text-white font-bold text-xs shadow-md shadow-pink-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer truncate ${member.whatsapp ? "flex-1" : "w-full"}`}
-                          title={`Buka Instagram @${member.instagram.replace(/^@/, "")}`}
-                        >
-                          <svg
-                            className="w-3.5 h-3.5 shrink-0 fill-none stroke-current"
-                            viewBox="0 0 24 24"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                          </svg>
-                          <span className="truncate">@{member.instagram.replace(/^@/, "")}</span>
-                        </a>
-                      ) : null}
-
-                      {member.whatsapp ? (
-                        <a
-                          href={`https://wa.me/${member.whatsapp.replace(/[^0-9]/g, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className={`py-2 px-3 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-700/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer ${!member.instagram ? "w-full" : "shrink-0"}`}
-                          title={`Hubungi WhatsApp ${member.whatsapp}`}
-                        >
-                          <svg className="w-3.5 h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
-                            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2z" />
-                          </svg>
-                          {!member.instagram && <span className="truncate">{member.whatsapp}</span>}
-                        </a>
-                      ) : null}
-
-                      {!member.instagram && !member.whatsapp && (
-                        <div className="w-full py-2 px-3 rounded-full bg-slate-100 text-slate-400 text-xs font-medium text-center">
-                          Rohis SMAPA
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16 bg-slate-50 rounded-3xl border border-dashed border-slate-300 max-w-xl mx-auto">
-            <Users size={40} className="mx-auto text-slate-400 mb-3" />
-            <h4 className="text-base font-bold text-slate-700 mb-1">
-              Tidak ada data pengurus
-            </h4>
-            <p className="text-xs text-slate-500 mb-4">
-              Tidak ditemukan pengurus untuk filter yang dipilih.
-            </p>
-            <button
-              onClick={() => {
-                setSelectedDivision("Semua");
-                setSearchQuery("");
-              }}
-              className="px-4 py-2 rounded-xl bg-emerald-800 text-white text-xs font-bold hover:bg-emerald-700 transition-colors"
-            >
-              Reset Filter
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* ── 5. MODAL DETAIL PENGURUS ── */}
-      {activeModalMember && (
-        <div
-          data-lenis-prevent="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 overscroll-contain"
-          onClick={() => setActiveModalMember(null)}
-          onWheel={(e) => {
-            if (profileModalBodyRef.current && !profileModalBodyRef.current.contains(e.target as Node)) {
-              profileModalBodyRef.current.scrollTop += e.deltaY;
-            }
-          }}
-        >
+        {/* Filter Pills & Search Bar in Clay Container (Matches 04_profil_pengurus.png) */}
+        <div className="clay-card p-3 sm:p-4 mb-7 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+          {/* Division Filter Pills */}
           <div
             data-lenis-prevent="true"
-            className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-slate-100 relative animate-in zoom-in-95 duration-200 overscroll-contain"
-            onClick={(e) => e.stopPropagation()}
+            onWheel={(e) => {
+              if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.currentTarget.scrollLeft += e.deltaY;
+              }
+            }}
+            className="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar overscroll-contain"
           >
-            {/* Close button */}
-            <button
-              onClick={() => setActiveModalMember(null)}
-              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-md text-slate-600 hover:text-slate-900 flex items-center justify-center shadow-md transition-colors cursor-pointer"
+            {divisions.map((div) => {
+              const isDivActive = selectedDivision === div;
+              const count =
+                div === "Semua"
+                  ? currentPeriodMembers.length
+                  : currentPeriodMembers.filter((m) => m.division === div)
+                      .length;
+              return (
+                <button
+                  key={div}
+                  type="button"
+                  onClick={() => setSelectedDivision(div)}
+                  className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap cursor-pointer min-h-[38px] ${
+                    isDivActive
+                      ? "clay-btn-emerald text-white"
+                      : "clay-btn-mint text-[#153E32]"
+                  }`}
+                >
+                  {div} ({count})
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Clay Search Input */}
+          <div className="relative w-full lg:w-72 shrink-0">
+            <Search
+              size={16}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A6B5F] pointer-events-none"
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari nama atau jabatan"
+              aria-label="Cari nama atau jabatan pengurus"
+              className="w-full pl-9 pr-9 py-2 rounded-full clay-input text-xs sm:text-sm text-[#153E32] placeholder-[#6A8A7F] min-h-[40px]"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                aria-label="Hapus pencarian"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4A6B5F] hover:text-[#153E32] cursor-pointer"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Member Cards Grid (4-col Desktop, 2-col Mobile matching 04_profil_pengurus.png) */}
+        <AnimatePresence mode="wait">
+          {filteredMembers.length > 0 ? (
+            <motion.div
+              key={`${selectedPeriod}-${selectedDivision}-${searchQuery}`}
+              initial={
+                prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6 }
+              }
+              animate={{ opacity: 1, y: 0 }}
+              exit={
+                prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: -4 }
+              }
+              transition={{
+                duration: prefersReducedMotion ? 0.05 : 0.18,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"
             >
-              <X size={18} />
-            </button>
+              {filteredMembers.map((member) => {
+                const igHandle = member.instagram
+                  ? member.instagram.replace(/^@/, "")
+                  : "";
+                return (
+                  <article
+                    key={member.id}
+                    onClick={() => setActiveModalMember(member)}
+                    className="clay-card clay-card-hover p-2.5 sm:p-4 flex flex-col justify-between cursor-pointer group"
+                  >
+                    <div>
+                      {/* Soft Mint Avatar Box */}
+                      <div className="relative h-36 min-[400px]:h-44 sm:h-52 w-full rounded-[16px] overflow-hidden bg-gradient-to-b from-[#DFF6EC] via-[#ECF9F3] to-[#FFFFFF] border border-white/80 flex items-end justify-center p-2 sm:p-3 mb-3">
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-full h-full object-contain object-bottom transition-transform duration-300 group-hover:scale-103"
+                          loading="lazy"
+                        />
+                      </div>
 
-            {/* Modal Image Header */}
-            <div className="h-60 sm:h-64 bg-white relative flex items-center justify-center p-6 overflow-hidden border-b border-slate-100 shrink-0">
-              <img
-                src={activeModalMember.image}
-                alt={activeModalMember.name}
-                className="w-full h-full object-contain object-center"
-              />
-              <div className="absolute top-4 left-4">
-                <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-800 text-white shadow-md">
-                  Periode {activeModalMember.period}
-                </span>
-              </div>
-            </div>
+                      {/* Identity Details */}
+                      <div className="px-0.5 text-left">
+                        <h3 className="font-heading font-extrabold text-xs sm:text-[15px] text-[#153E32] group-hover:text-[#087A53] transition-colors leading-snug line-clamp-2 min-h-[2.1rem] sm:min-h-[2.4rem] mb-1.5">
+                          {member.name}
+                        </h3>
 
-            {/* Modal Content */}
-            <div
-              ref={profileModalBodyRef}
+                        <div className="mb-2">
+                          <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold clay-pill-mint max-w-full truncate">
+                            {member.role}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-medium text-[#4A6B5F] mb-3">
+                          <GraduationCap
+                            size={14}
+                            className="text-[#087A53] shrink-0"
+                          />
+                          <span className="truncate">
+                            {formatClassLabel(member.classGrade)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Instagram / Contact Pill Button */}
+                    <div className="pt-2 border-t border-[#DCEAE3]">
+                      {igHandle ? (
+                        <a
+                          href={`https://instagram.com/${igHandle}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          title={`Buka Instagram @${igHandle}`}
+                          className="w-full py-2 px-2.5 sm:px-3 rounded-full clay-inner hover:bg-[#DCF8EC] text-[#153E32] text-[11px] sm:text-xs font-bold flex items-center justify-between gap-1.5 transition-colors min-h-[36px]"
+                        >
+                          <span className="inline-flex items-center gap-1.5 min-w-0">
+                            <svg
+                              className="w-3.5 h-3.5 shrink-0 text-[#087A53] fill-none stroke-current"
+                              viewBox="0 0 24 24"
+                              strokeWidth="2.2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect
+                                x="2"
+                                y="2"
+                                width="20"
+                                height="20"
+                                rx="5"
+                                ry="5"
+                              />
+                              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                            </svg>
+                            <span className="truncate">Instagram</span>
+                          </span>
+                          <ArrowUpRight
+                            size={13}
+                            className="text-[#087A53] shrink-0"
+                          />
+                        </a>
+                      ) : (
+                        <span className="w-full py-2 px-3 rounded-full clay-inner text-[#4A6B5F] text-[11px] font-semibold flex items-center justify-center min-h-[36px]">
+                          Rohis SMAPA
+                        </span>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty-state"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-12 clay-card max-w-lg mx-auto px-6"
+            >
+              <Users size={36} className="mx-auto text-[#087A53] mb-3" />
+              <h4 className="font-heading text-base font-extrabold text-[#153E32] mb-1">
+                Tidak ada data pengurus
+              </h4>
+              <p className="text-xs sm:text-sm text-[#4A6B5F] mb-4">
+                Tidak ditemukan pengurus untuk kata kunci atau filter divisi
+                yang dipilih.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedDivision("Semua");
+                  setSearchQuery("");
+                }}
+                className="clay-btn-emerald px-5 py-2 rounded-full text-xs font-bold cursor-pointer"
+              >
+                Reset Filter
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Member Detail Clay Modal */}
+      <AnimatePresence>
+        {activeModalMember && (
+          <div
+            data-lenis-prevent="true"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 overscroll-contain"
+            onClick={() => setActiveModalMember(null)}
+            onWheel={(e) => {
+              if (
+                profileModalBodyRef.current &&
+                !profileModalBodyRef.current.contains(e.target as Node)
+              ) {
+                profileModalBodyRef.current.scrollTop += e.deltaY;
+              }
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: prefersReducedMotion ? 0.05 : 0.2 }}
+              className="fixed inset-0 bg-[#0D2B22]/38 backdrop-blur-[4px]"
+              aria-hidden="true"
+            />
+
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="pengurus-modal-title"
               data-lenis-prevent="true"
-              className="p-6 sm:p-8 overflow-y-auto overscroll-contain flex-1 custom-scrollbar"
+              initial={
+                prefersReducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 12, scale: 0.98 }
+              }
+              animate={
+                prefersReducedMotion
+                  ? { opacity: 1 }
+                  : { opacity: 1, y: 0, scale: 1 }
+              }
+              exit={
+                prefersReducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 10, scale: 0.98 }
+              }
+              transition={{
+                duration: prefersReducedMotion ? 0.08 : 0.24,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="relative z-10 clay-card max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden p-4 sm:p-5 overscroll-contain shadow-[0_24px_60px_-15px_rgba(15,62,46,0.28)]"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="text-center mb-6">
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-1">
-                  {activeModalMember.name}
-                </h3>
-                {activeModalMember.nickname && (
-                  <div className="mb-2">
-                    <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full">
-                      Nama Panggilan: {activeModalMember.nickname}
-                    </span>
+              <button
+                ref={closeBtnRef}
+                type="button"
+                onClick={() => setActiveModalMember(null)}
+                aria-label="Tutup profil pengurus"
+                className="absolute top-6 right-6 z-20 w-9 h-9 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
+              >
+                <X size={17} />
+              </button>
+
+              <div className="h-52 sm:h-56 rounded-[18px] bg-gradient-to-b from-[#DFF6EC] via-[#ECF9F3] to-[#FFFFFF] relative flex items-center justify-center p-4 overflow-hidden shrink-0">
+                <img
+                  src={activeModalMember.image}
+                  alt={activeModalMember.name}
+                  className="w-full h-full object-contain object-center"
+                />
+                <div className="absolute top-3 left-3">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold clay-pill-mint">
+                    Periode {activeModalMember.period}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                ref={profileModalBodyRef}
+                data-lenis-prevent="true"
+                className="pt-4 px-2 overflow-y-auto overscroll-contain flex-1 custom-scrollbar"
+              >
+                <div className="text-center mb-4">
+                  <h3
+                    id="pengurus-modal-title"
+                    className="font-heading text-lg sm:text-xl font-extrabold text-[#153E32] mb-1"
+                  >
+                    {activeModalMember.name}
+                  </h3>
+                  <span className="inline-block px-3 py-0.5 rounded-full text-xs font-bold clay-pill-mint mb-1.5">
+                    {activeModalMember.role}
+                  </span>
+                  <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#4A6B5F]">
+                    <span>{formatClassLabel(activeModalMember.classGrade)}</span>
+                    <span>•</span>
+                    <span>Divisi {activeModalMember.division}</span>
+                  </div>
+                </div>
+
+                {activeModalMember.quote && (
+                  <div className="clay-inner-mint p-4 mb-4">
+                    <Quote size={18} className="text-[#087A53] mb-1" />
+                    <p className="text-xs sm:text-sm italic text-[#153E32] font-medium leading-relaxed">
+                      &ldquo;{activeModalMember.quote}&rdquo;
+                    </p>
                   </div>
                 )}
-                <p className="text-sm font-bold text-emerald-800 mb-1">
-                  {activeModalMember.role}
-                </p>
-                <div className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500">
-                  <span>{activeModalMember.classGrade}</span>
-                  <span>•</span>
-                  <span>Divisi {activeModalMember.division}</span>
-                </div>
-              </div>
 
-              {/* Quote / Motto */}
-              {activeModalMember.quote && (
-                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 mb-6 relative">
-                  <Quote size={20} className="text-emerald-700/30 mb-1" />
-                  <p className="text-xs sm:text-sm italic text-emerald-950 font-medium leading-relaxed">
-                    "{activeModalMember.quote}"
-                  </p>
-                </div>
-              )}
-
-              {/* Actions / Social Link */}
-              <div className="flex flex-col items-center justify-center pt-4 border-t border-slate-100">
-                <div className="flex items-center justify-center gap-1.5 text-xs text-slate-600 font-semibold mb-0.5">
-                  <GraduationCap size={15} className="text-amber-700/80 shrink-0" />
-                  <span>{SITE.schoolName}</span>
-                </div>
-                <p className="text-xs font-medium text-slate-400 mb-3">
-                  Periode {activeModalMember.period}
-                </p>
-
-                <div className="w-full max-w-xs space-y-2 mb-4">
+                <div className="space-y-2 pt-2 border-t border-[#DCEAE3]">
                   {activeModalMember.instagram && (
                     <a
-                      href={`https://instagram.com/${activeModalMember.instagram.replace(/^@/, "")}`}
+                      href={`https://instagram.com/${activeModalMember.instagram.replace(
+                        /^@/,
+                        ""
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-[#fa7e1e] via-[#d62976] to-[#962fbf] hover:opacity-95 text-white font-bold text-xs sm:text-sm shadow-md shadow-pink-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-between gap-2 group/btn cursor-pointer"
-                      title={`Buka Instagram @${activeModalMember.instagram.replace(/^@/, "")}`}
+                      className="w-full py-2.5 px-4 rounded-full clay-btn-mint text-xs sm:text-sm font-bold flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-2 truncate">
-                        <svg
-                          className="w-4 h-4 shrink-0 fill-none stroke-current"
-                          viewBox="0 0 24 24"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                        </svg>
-                        <span className="truncate">@{activeModalMember.instagram.replace(/^@/, "")}</span>
-                      </div>
-                      <svg
-                        className="w-3.5 h-3.5 shrink-0 fill-none stroke-current group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                        <polyline points="15 3 21 3 21 9" />
-                        <line x1="10" y1="14" x2="21" y2="3" />
-                      </svg>
+                      <span>
+                        Instagram @{activeModalMember.instagram.replace(/^@/, "")}
+                      </span>
+                      <ArrowUpRight size={15} />
                     </a>
                   )}
 
                   {activeModalMember.whatsapp && (
                     <a
-                      href={`https://wa.me/${activeModalMember.whatsapp.replace(/[^0-9]/g, "")}`}
+                      href={`https://wa.me/${activeModalMember.whatsapp.replace(
+                        /[^0-9]/g,
+                        ""
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-2.5 px-4 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-700/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-between gap-2 group/btn cursor-pointer"
-                      title={`Hubungi WhatsApp ${activeModalMember.whatsapp}`}
+                      className="w-full py-2.5 px-4 rounded-full clay-btn-emerald text-xs sm:text-sm font-bold flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-2 truncate">
-                        <svg className="w-4 h-4 shrink-0 fill-current" viewBox="0 0 24 24">
-                          <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2z" />
-                        </svg>
-                        <span className="truncate">{activeModalMember.whatsapp}</span>
-                      </div>
-                      <span className="text-xs">↗</span>
+                      <span>WhatsApp {activeModalMember.whatsapp}</span>
+                      <ArrowUpRight size={15} />
                     </a>
                   )}
-                </div>
 
-                <button
-                  onClick={() => setActiveModalMember(null)}
-                  className="px-6 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
-                >
-                  Tutup Jendela
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveModalMember(null)}
+                    className="w-full py-2.5 rounded-full clay-btn-white text-xs font-bold text-[#153E32] cursor-pointer mt-1"
+                  >
+                    Tutup Rincian
+                  </button>
+                </div>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </section>
   );
 }

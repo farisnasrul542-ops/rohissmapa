@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
-import Image from "next/image";
+import React, { useEffect, useRef } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { EventItem } from "@/lib/types";
 import {
   X,
@@ -9,8 +9,7 @@ import {
   MapPin,
   Clock,
   UserCheck,
-  Sparkles,
-  Info,
+  CheckCircle2,
 } from "lucide-react";
 import { formatGoogleDriveUrl, handleGoogleDriveImageError } from "@/lib/driveUtils";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
@@ -22,137 +21,269 @@ interface Props {
 
 export default function EventRegisterModal({ event, onClose }: Props) {
   const bodyRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
-  if (!event) return null;
+  useEffect(() => {
+    if (!event) return;
 
-  const imageUrl = event.image
-    ? formatGoogleDriveUrl(event.image)
-    : "https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1000&auto=format&fit=crop";
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const focusTimer = setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 30);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+      previousFocusRef.current?.focus?.();
+    };
+  }, [event, onClose]);
+
+  const formatDate = (raw?: string) => {
+    if (!raw) return "";
+    if (raw.includes("-") && raw.length === 10) {
+      try {
+        const d = new Date(raw);
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          });
+        }
+      } catch {}
+    }
+    return raw;
+  };
 
   return (
-    <div
-      data-lenis-prevent="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 overscroll-contain"
-      onWheel={(e) => {
-        if (bodyRef.current && !bodyRef.current.contains(e.target as Node)) {
-          bodyRef.current.scrollTop += e.deltaY;
-        }
-      }}
-    >
-      <div
-        data-lenis-prevent="true"
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-emerald-950/10 overflow-hidden max-h-[90vh] flex flex-col overscroll-contain"
-      >
-        {/* Banner Image / Header */}
-        <div className="relative h-44 sm:h-52 w-full bg-emerald-950 shrink-0 overflow-hidden">
-          <img
-            src={parseImageCrop(imageUrl).src}
-            alt={event.title}
-            referrerPolicy="no-referrer"
-            onError={(e) => handleGoogleDriveImageError(e, imageUrl)}
-            style={getImageCropStyle(imageUrl)}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/40 to-transparent" />
-
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors z-10 backdrop-blur-sm cursor-pointer"
-            aria-label="Tutup"
-          >
-            <X size={18} />
-          </button>
-
-          {/* Badge & Title */}
-          <div className="absolute bottom-4 left-5 right-5 text-white">
-            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-emerald-950 mb-1.5 shadow-sm">
-              {event.category || "Kajian & Syiar"}
-            </span>
-            <h3 className="text-lg sm:text-xl font-black leading-snug drop-shadow-sm text-white">
-              {event.title}
-            </h3>
-          </div>
-        </div>
-
-        {/* Modal Body */}
+    <AnimatePresence>
+      {event && (
         <div
-          ref={bodyRef}
           data-lenis-prevent="true"
-          className="p-6 space-y-4 overflow-y-auto overscroll-contain text-xs flex-1 custom-scrollbar"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overscroll-contain"
+          onWheel={(e) => {
+            if (bodyRef.current && !bodyRef.current.contains(e.target as Node)) {
+              bodyRef.current.scrollTop += e.deltaY;
+            }
+          }}
         >
-          {/* Key Schedule Information */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-gray-50 border border-gray-100 text-gray-700">
-            <div className="flex items-center gap-2">
-              <Calendar size={15} className="text-emerald-700 shrink-0" />
-              <div>
-                <p className="text-[10px] text-gray-400 font-bold uppercase">Tanggal</p>
-                <p className="font-bold text-gray-900">{event.date}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Clock size={15} className="text-emerald-700 shrink-0" />
-              <div>
-                <p className="text-[10px] text-gray-400 font-bold uppercase">Waktu</p>
-                <p className="font-bold text-gray-900">{event.time}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 sm:col-span-2">
-              <MapPin size={15} className="text-emerald-700 shrink-0" />
-              <div>
-                <p className="text-[10px] text-gray-400 font-bold uppercase">Tempat</p>
-                <p className="font-bold text-gray-900">{event.location}</p>
-              </div>
-            </div>
-
-            {event.speaker && (
-              <div className="flex items-center gap-2 sm:col-span-2">
-                <UserCheck size={15} className="text-emerald-700 shrink-0" />
-                <div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase">Pemateri / Pembina</p>
-                  <p className="font-bold text-gray-900">
-                    {event.speaker} {event.speakerRole ? `(${event.speakerRole})` : ""}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Description */}
-          <div>
-            <h4 className="font-extrabold text-emerald-950 mb-1 flex items-center gap-1.5 text-xs">
-              <Info size={13} className="text-emerald-700" />
-              <span>Deskripsi & Agenda Kegiatan:</span>
-            </h4>
-            <p className="text-gray-600 leading-relaxed text-xs">
-              {event.description}
-            </p>
-          </div>
-
-          {/* Terbuka Langsung Notice (NO REGISTRATION) */}
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-xs text-emerald-950 space-y-1">
-            <div className="font-extrabold flex items-center gap-1.5 text-emerald-900">
-              <Sparkles size={14} className="text-amber-500" />
-              <span>Terbuka Langsung untuk Seluruh Siswa SMAPA</span>
-            </div>
-            <p className="text-[11px] text-emerald-800 leading-relaxed">
-              Acara ini tidak memerlukan pendaftaran peserta. Seluruh siswa/siswi muslim SMA Negeri 4 Purwokerto dipersilakan langsung hadir di tempat tepat waktu.
-            </p>
-          </div>
-        </div>
-
-        {/* Modal Footer */}
-        <div className="p-4 px-6 border-t border-gray-100 flex items-center justify-end bg-gray-50/50">
-          <button
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0.05 : 0.2 }}
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-800 to-emerald-950 hover:from-emerald-700 hover:to-emerald-900 text-white font-extrabold text-xs shadow-md transition-all"
+            className="fixed inset-0 bg-[#0D2B22]/38 backdrop-blur-[4px]"
+            aria-hidden="true"
+          />
+
+          {/* Clay Modal Panel (Matches 08_agenda_rincian.png) */}
+          <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="agenda-modal-title"
+            data-lenis-prevent="true"
+            initial={
+              prefersReducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: 12, scale: 0.98 }
+            }
+            animate={
+              prefersReducedMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, scale: 1 }
+            }
+            exit={
+              prefersReducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: 10, scale: 0.98 }
+            }
+            transition={{
+              duration: prefersReducedMotion ? 0.08 : 0.24,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="relative z-10 w-full max-w-[540px] clay-card p-3 sm:p-4 max-h-[92vh] flex flex-col overflow-hidden overscroll-contain shadow-[0_24px_60px_-15px_rgba(15,62,46,0.28)]"
           >
-            Tutup Informasi
-          </button>
+            {/* Top Image Frame with Circular Clay Close Button */}
+            <div className="relative h-48 sm:h-56 w-full rounded-[18px] overflow-hidden bg-[#E5F2EC] shrink-0">
+              {(() => {
+                const imageUrl = event.image
+                  ? formatGoogleDriveUrl(event.image)
+                  : "/images/dokumentasi-smapa.jpg";
+                return (
+                  <img
+                    src={parseImageCrop(imageUrl).src}
+                    alt={event.title}
+                    referrerPolicy="no-referrer"
+                    onError={(e) => handleGoogleDriveImageError(e, imageUrl)}
+                    style={getImageCropStyle(imageUrl)}
+                    className="w-full h-full object-cover"
+                  />
+                );
+              })()}
+
+              <button
+                ref={closeBtnRef}
+                type="button"
+                onClick={onClose}
+                className="absolute top-3 right-3 w-10 h-10 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] z-10 cursor-pointer"
+                aria-label="Tutup rincian kegiatan"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Scrollable Body */}
+            <div
+              ref={bodyRef}
+              data-lenis-prevent="true"
+              className="px-2 sm:px-3 pt-4 pb-2 space-y-4 overflow-y-auto overscroll-contain flex-1 custom-scrollbar"
+            >
+              {/* Category Badge & Title */}
+              <div>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold clay-pill-mint mb-2">
+                  {event.category || "Kegiatan Rohis"}
+                </span>
+                <h3
+                  id="agenda-modal-title"
+                  className="font-heading text-xl sm:text-2xl font-extrabold text-[#153E32] leading-snug"
+                >
+                  {event.title}
+                </h3>
+              </div>
+
+              {/* Mint Clay Schedule Table (Matches 08_agenda_rincian.png) */}
+              <div className="clay-inner-mint p-3.5 sm:p-4 space-y-2.5 text-xs sm:text-[13.5px]">
+                <div className="flex items-start gap-3 pb-2 border-b border-[#BFE6D3]/60">
+                  <Calendar
+                    size={16}
+                    className="text-[#087A53] shrink-0 mt-0.5"
+                  />
+                  <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-0.5">
+                    <span className="font-semibold text-[#3B5E52]">
+                      Tanggal:
+                    </span>
+                    <span className="font-bold text-[#153E32]">
+                      {formatDate(event.date)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 pb-2 border-b border-[#BFE6D3]/60">
+                  <Clock size={16} className="text-[#087A53] shrink-0 mt-0.5" />
+                  <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-0.5">
+                    <span className="font-semibold text-[#3B5E52]">Waktu:</span>
+                    <span className="font-bold text-[#153E32]">
+                      {event.time}
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  className={`flex items-start gap-3 ${
+                    event.speaker ? "pb-2 border-b border-[#BFE6D3]/60" : ""
+                  }`}
+                >
+                  <MapPin
+                    size={16}
+                    className="text-[#087A53] shrink-0 mt-0.5"
+                  />
+                  <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-0.5">
+                    <span className="font-semibold text-[#3B5E52]">
+                      Tempat:
+                    </span>
+                    <span className="font-bold text-[#153E32] sm:text-right">
+                      {event.location}
+                    </span>
+                  </div>
+                </div>
+
+                {event.speaker && (
+                  <div className="flex items-start gap-3">
+                    <UserCheck
+                      size={16}
+                      className="text-[#087A53] shrink-0 mt-0.5"
+                    />
+                    <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-0.5">
+                      <span className="font-semibold text-[#3B5E52]">
+                        Pembina / Pemateri:
+                      </span>
+                      <span className="font-bold text-[#153E32] sm:text-right">
+                        {event.speaker}
+                        {event.speakerRole ? ` (${event.speakerRole})` : ""}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Tentang Kegiatan */}
+              <div>
+                <h4 className="font-heading font-extrabold text-sm sm:text-base text-[#153E32] mb-1.5">
+                  Tentang Kegiatan
+                </h4>
+                <p className="text-xs sm:text-sm text-[#3B5E52] leading-relaxed">
+                  {event.description}
+                </p>
+              </div>
+
+              {/* Bottom Notice Pill + Tutup Rincian Button Row */}
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="clay-inner-mint px-3.5 py-2.5 rounded-full flex items-center gap-2 text-xs font-semibold text-[#153E32]">
+                  <CheckCircle2
+                    size={16}
+                    className="text-[#087A53] shrink-0"
+                  />
+                  <span>Terbuka untuk siswa. Tidak perlu pendaftaran.</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="clay-btn-emerald px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold cursor-pointer shrink-0 text-center"
+                >
+                  Tutup rincian
+                </button>
+              </div>
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }

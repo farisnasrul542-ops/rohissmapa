@@ -1,247 +1,274 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { SITE } from "@/lib/constants";
 import {
   Menu,
   X,
   Home,
-  BookOpen,
+  Users,
   Layers,
   Calendar,
   Camera,
-  Phone,
   ArrowRight,
-  ShieldCheck,
-  ChevronRight,
 } from "lucide-react";
-import { SITE } from "@/lib/constants";
+
+const NAV_LINKS = [
+  { href: "/", label: "Beranda", shortLabel: "Beranda", icon: Home },
+  { href: "/tentang", label: "Profil Rohis", shortLabel: "Profil Rohis", icon: Users },
+  { href: "/program", label: "Divisi & Proker", shortLabel: "Divisi & Proker", icon: Layers },
+  { href: "/agenda", label: "Agenda & Kegiatan", shortLabel: "Agenda", icon: Calendar },
+  { href: "/galeri", label: "Galeri Foto", shortLabel: "Galeri Foto", icon: Camera },
+];
 
 export default function Navbar() {
+  const [openPathname, setOpenPathname] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
+  const mobileOpen = openPathname === pathname;
+  const setMobileOpen = (next: boolean | ((prev: boolean) => boolean)) => {
+    const resolved = typeof next === "function" ? next(mobileOpen) : next;
+    setOpenPathname(resolved ? pathname : null);
+  };
+  const prefersReducedMotion = useReducedMotion();
+  const toggleBtnRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 15);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile drawer when route changes
+  // Lock body scroll & handle Escape key + Focus Trap when mobile drawer is open
   useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
+    if (!mobileOpen) return;
 
-  // Lock body scroll and listen for Escape key when mobile menu is open
-  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMobileMenuOpen(false);
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setMobileOpen(false);
+        toggleBtnRef.current?.focus();
+        return;
+      }
+
+      if (e.key === "Tab" && drawerRef.current) {
+        const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
 
-    if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.body.style.overflow = "";
-    }
-
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [mobileMenuOpen]);
+  }, [mobileOpen, setMobileOpen]);
 
-  const navLinks = [
-    { name: "Beranda", href: "/", icon: Home, desc: "Halaman utama website resmi" },
-    { name: "Profil Rohis", href: "/tentang", icon: BookOpen, desc: "Sejarah, visi misi & BPH" },
-    { name: "Divisi & Proker", href: "/program", icon: Layers, desc: "6 divisi dakwah sekolah" },
-    { name: "Agenda & Kegiatan", href: "/agenda", icon: Calendar, desc: "Jadwal kajian & LDKR" },
-    { name: "Galeri Foto", href: "/galeri", icon: Camera, desc: "Dokumentasi syiar SMAPA" },
-  ];
+  const isLinkActive = (href: string) => {
+    if (!pathname) return href === "/";
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const activeItem =
+    NAV_LINKS.find((item) => isLinkActive(item.href)) || NAV_LINKS[0];
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-lg py-2.5 sm:py-3 border-b border-emerald-900/10 shadow-sm shadow-emerald-950/5"
-            : "bg-white/85 backdrop-blur-md py-4 sm:py-4.5 border-b border-white/20"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Logo Brand with proportional scaling */}
-            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
-              <div
-                className={`relative rounded-xl bg-white flex items-center justify-center p-1 shadow-md shadow-emerald-950/10 border border-emerald-900/10 group-hover:scale-105 group-hover:border-emerald-500/40 transition-all duration-300 overflow-hidden ${
-                  scrolled ? "w-9 h-9 sm:w-10 sm:h-10" : "w-11 h-11"
-                }`}
-              >
+      <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pointer-events-none">
+        <nav
+          aria-label="Navigasi Utama"
+          className={`max-w-[1240px] mx-auto pointer-events-auto clay-navbar rounded-full px-3 sm:px-5 lg:px-6 transition-all duration-200 ${
+            scrolled ? "py-2 sm:py-2.5 shadow-[0_14px_32px_-8px_rgba(15,62,46,0.14)]" : "py-2.5 sm:py-3"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            {/* Brand Identity */}
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 sm:gap-3 group shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-[#087A53]"
+            >
+              <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full clay-pill-white p-1 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                 <Image
                   src="/images/logo-transparent.png"
-                  alt={SITE.logoAlt || "Logo Rohis SMAPA"}
-                  width={44}
-                  height={44}
-                  className="w-full h-auto max-h-9 object-contain"
+                  alt={SITE.logoAlt}
+                  fill
+                  sizes="40px"
+                  className="object-contain p-0.5"
                   priority
                 />
               </div>
-              <div>
-                <span className="font-extrabold text-sm sm:text-base tracking-tight text-emerald-950 group-hover:text-emerald-700 transition-colors">
+              <div className="leading-tight">
+                <span className="font-heading font-extrabold text-[13px] sm:text-[15px] tracking-tight block text-[#153E32]">
                   ROHIS SMAN 4
                 </span>
-                <p className="text-[11px] font-medium text-emerald-800/70 leading-none">
-                  SMA Negeri 4 Purwokerto
-                </p>
+                <span className="text-[11px] sm:text-xs font-medium text-[#4A6B5F] block">
+                  Purwokerto
+                </span>
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1.5">
-              {navLinks.map((item) => {
-                const isActive = pathname === item.href;
+            {/* Desktop Navigation Links */}
+            <div className="hidden lg:flex items-center gap-1.5 xl:gap-2">
+              {NAV_LINKS.map((link) => {
+                const isActive = isLinkActive(link.href);
                 return (
                   <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
+                    key={link.href}
+                    href={link.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`relative px-4 xl:px-5 py-2.5 rounded-full text-[13.5px] font-semibold transition-all duration-200 whitespace-nowrap select-none ${
                       isActive
-                        ? "text-emerald-900 bg-emerald-50 ring-1 ring-emerald-300/60 shadow-xs font-extrabold"
-                        : "text-gray-700 hover:text-emerald-800 hover:bg-emerald-50/60"
+                        ? "clay-btn-emerald font-bold text-white"
+                        : "text-[#153E32] hover:text-[#087A53] hover:bg-[#E6F7EF]/80 active:scale-[0.98]"
                     }`}
                   >
-                    {item.name}
+                    {link.label}
                   </Link>
                 );
               })}
-            </nav>
+            </div>
 
-            {/* Mobile Menu Button */}
-            <div className="flex items-center gap-2 lg:hidden">
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen((prev) => !prev)}
-                className="p-2 text-gray-700 hover:text-emerald-900 hover:bg-emerald-50 rounded-xl focus:outline-none transition-colors cursor-pointer"
-                aria-label={mobileMenuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
-                aria-expanded={mobileMenuOpen}
+            {/* Mobile Right Controls: Active Page Pill + Hamburger Button */}
+            <div className="flex lg:hidden items-center gap-2">
+              <span
+                className="clay-btn-emerald px-3 py-1.5 rounded-full text-[11.5px] font-bold tracking-tight truncate max-w-[132px] min-[390px]:max-w-[160px] shadow-xs pointer-events-none"
+                aria-hidden="true"
               >
-                {mobileMenuOpen ? <X size={24} className="text-emerald-900" /> : <Menu size={24} />}
+                {activeItem.shortLabel}
+              </span>
+
+              <button
+                ref={toggleBtnRef}
+                type="button"
+                onClick={() => setMobileOpen((prev) => !prev)}
+                aria-expanded={mobileOpen}
+                aria-controls="mobile-clay-drawer"
+                aria-label={mobileOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
+                className="w-11 h-11 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer shrink-0"
+              >
+                {mobileOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
             </div>
           </div>
-        </div>
+        </nav>
       </header>
 
-      {/* ── MOBILE FULLSCREEN / OVERLAY MENU (OUTSIDE HEADER TO AVOID BACKDROP-FILTER CLIPPING) ── */}
+      {/* Mobile Navigation Drawer & Backdrop */}
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-[9999] flex flex-col justify-start">
-            {/* Dark Backdrop Overlay */}
+        {mobileOpen && (
+          <div className="fixed inset-0 z-40 lg:hidden">
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-emerald-950/70 backdrop-blur-sm cursor-pointer"
+              transition={{ duration: prefersReducedMotion ? 0.05 : 0.2 }}
+              onClick={() => setMobileOpen(false)}
+              className="fixed inset-0 bg-[#0D2B22]/30 backdrop-blur-[3px]"
               aria-hidden="true"
             />
 
-            {/* Slide-down Drawer Panel */}
+            {/* Drawer Panel */}
             <motion.div
-              initial={{ y: "-100%", opacity: 0.95 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "-100%", opacity: 0.95 }}
-              transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="relative w-full max-h-[92vh] bg-white text-emerald-950 rounded-b-3xl shadow-2xl border-b border-emerald-900/15 flex flex-col overflow-hidden z-10"
+              id="mobile-clay-drawer"
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu Navigasi Mobile"
+              initial={
+                prefersReducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: -12 }
+              }
+              animate={
+                prefersReducedMotion
+                  ? { opacity: 1 }
+                  : { opacity: 1, y: 0 }
+              }
+              exit={
+                prefersReducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: -10 }
+              }
+              transition={{
+                duration: prefersReducedMotion ? 0.08 : 0.24,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="fixed top-[72px] sm:top-[80px] left-3 right-3 sm:left-6 sm:right-6 clay-card p-4 sm:p-5 z-50 max-h-[calc(100vh-96px)] overflow-y-auto"
             >
-              {/* Drawer Top Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-900/10 bg-emerald-50/60">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-white p-1 border border-emerald-900/10 shadow-xs flex items-center justify-center">
-                    <Image
-                      src="/images/logo-transparent.png"
-                      alt={SITE.logoAlt || "Logo Rohis SMAPA"}
-                      width={34}
-                      height={34}
-                      className="w-full h-auto object-contain"
-                    />
-                  </div>
-                  <div>
-                    <div className="font-black text-sm text-emerald-950 leading-tight">
-                      ROHIS SMAN 4 PURWOKERTO
-                    </div>
-                    <div className="text-[11px] text-emerald-700 font-semibold">
-                      Menu Navigasi Mobile
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-gray-500 hover:text-emerald-950 hover:bg-white rounded-xl transition-colors cursor-pointer border border-transparent hover:border-emerald-900/10"
-                  aria-label="Tutup menu"
-                >
-                  <X size={22} />
-                </button>
+              <div className="flex items-center justify-between px-2 pb-3 mb-2 border-b border-[#D8E8E1]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#4A6B5F]">
+                  Menu Halaman Rohis SMAPA
+                </span>
+                <span className="text-[11px] font-semibold text-[#087A53] clay-pill-mint px-2.5 py-0.5 rounded-full">
+                  Periode {SITE.period}
+                </span>
               </div>
 
-              {/* Scrollable Navigation List */}
-              <div
-                data-lenis-prevent="true"
-                className="p-5 overflow-y-auto space-y-2 overscroll-contain custom-scrollbar"
-              >
-                <div className="text-[10px] font-black uppercase tracking-wider text-emerald-800/70 px-1 mb-1">
-                  Menu Utama
-                </div>
-
-                {navLinks.map((item) => {
-                  const isActive = pathname === item.href;
-                  const Icon = item.icon;
+              <div className="space-y-1.5">
+                {NAV_LINKS.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = isLinkActive(link.href);
                   return (
                     <Link
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-between p-3 rounded-2xl transition-all duration-200 ${
+                      key={link.href}
+                      href={link.href}
+                      aria-current={isActive ? "page" : undefined}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all min-h-[48px] ${
                         isActive
-                          ? "bg-emerald-50 border border-emerald-300 text-emerald-950 shadow-xs font-black"
-                          : "text-gray-800 hover:bg-emerald-50/50 hover:text-emerald-950 border border-transparent"
+                          ? "clay-btn-emerald font-bold text-white"
+                          : "clay-inner text-[#153E32] hover:bg-[#E4F8EE]"
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                            isActive
-                              ? "bg-emerald-600 text-white shadow-xs"
-                              : "bg-gray-100 text-emerald-800"
-                          }`}
-                        >
-                          <Icon size={18} />
-                        </div>
-                        <div className="text-left">
-                          <div className="text-sm font-bold leading-tight">
-                            {item.name}
-                          </div>
-                          <div className="text-[11px] text-gray-500 font-normal mt-0.5">
-                            {item.desc}
-                          </div>
-                        </div>
+                        <Icon
+                          size={18}
+                          className={isActive ? "text-white" : "text-[#087A53]"}
+                        />
+                        <span>{link.label}</span>
                       </div>
-                      <ChevronRight
+                      <ArrowRight
                         size={16}
-                        className={isActive ? "text-emerald-700" : "text-gray-400"}
+                        className={isActive ? "text-white" : "text-[#5E7D72]"}
                       />
                     </Link>
                   );
                 })}
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-[#D8E8E1] flex items-center justify-between gap-2 px-1 text-xs text-[#4A6B5F]">
+                <span className="truncate">{SITE.mosqueName}</span>
+                <a
+                  href={SITE.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-[#087A53] hover:underline shrink-0"
+                >
+                  {SITE.instagram}
+                </a>
               </div>
             </motion.div>
           </div>

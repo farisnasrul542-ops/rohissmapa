@@ -1,162 +1,107 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SITE } from "@/lib/constants";
-import { Heart, Mail, Phone, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
+
+const FOOTER_LINKS = [
+  { href: "/tentang", label: "Profil" },
+  { href: "/program", label: "Divisi" },
+  { href: "/agenda", label: "Agenda" },
+  { href: "/galeri", label: "Galeri" },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-[#08281d] via-[#051c14] to-[#03120d] text-white pt-16 pb-12 border-t border-emerald-900/40 relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-emerald-500/10 blur-[100px] pointer-events-none" />
+    <footer className="w-full pt-8 pb-8 sm:pt-10 sm:pb-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1240px] mx-auto">
+        <div className="clay-card px-5 py-6 sm:px-8 sm:py-7">
+          {/* Top Row: Brand, Mosque Location, Nav Links, Instagram */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-5 pb-5 border-b border-[#DCEAE3]">
+            {/* Left: Brand + Location */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-5 text-center sm:text-left">
+              <Link
+                href="/"
+                className="flex items-center gap-2.5 group shrink-0"
+              >
+                <div className="relative w-9 h-9 rounded-full clay-pill-white p-1 flex items-center justify-center shrink-0">
+                  <Image
+                    src="/images/logo-transparent.png"
+                    alt={SITE.logoAlt}
+                    fill
+                    sizes="36px"
+                    className="object-contain p-0.5"
+                  />
+                </div>
+                <div className="leading-tight text-left">
+                  <span className="font-heading font-extrabold text-sm text-[#153E32] block">
+                    ROHIS SMAN 4
+                  </span>
+                  <span className="text-xs text-[#4A6B5F] font-medium block">
+                    Purwokerto
+                  </span>
+                </div>
+              </Link>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-emerald-900/50">
-          {/* Brand Col */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="relative w-12 h-12 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-lg border border-white/20 overflow-hidden shrink-0">
-                <Image
-                  src="/images/logo-transparent.png"
-                  alt={SITE.logoAlt || "Logo Rohis SMAPA"}
-                  width={48}
-                  height={48}
-                  className="w-full h-auto max-h-10 object-contain"
-                />
-              </div>
-              <div>
-                <span className="font-extrabold text-base tracking-tight text-white block">
-                  {SITE.fullName}
+              <span
+                className="hidden sm:inline-block w-px h-7 bg-[#D5E6DF]"
+                aria-hidden="true"
+              />
+
+              <div className="inline-flex items-center gap-2 text-xs sm:text-[13px] font-medium text-[#3B5E52]">
+                <span className="w-6 h-6 rounded-full clay-icon-sq flex items-center justify-center shrink-0">
+                  <MapPin size={13} className="text-[#087A53]" />
                 </span>
-                <span className="text-xs text-emerald-300/80 font-medium">
-                  SMA Negeri 4 Purwokerto • Periode {SITE.period}
-                </span>
+                <span>Musholla Al-Ikhlas SMA Negeri 4 Purwokerto</span>
               </div>
             </div>
 
-            <p className="text-sm text-emerald-100/70 leading-relaxed mb-6 max-w-sm">
-              {SITE.tagline} {SITE.narrative}
-            </p>
+            {/* Right: Quick Links + Instagram */}
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2.5">
+              <nav
+                aria-label="Navigasi Footer"
+                className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-1 text-xs sm:text-[13px] font-semibold text-[#153E32]"
+              >
+                {FOOTER_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="hover:text-[#087A53] transition-colors py-1"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
 
-            <div className="flex flex-col gap-2.5 text-xs text-emerald-200/80">
-              <div className="flex items-start gap-2.5">
-                <MapPin size={16} className="text-amber-400 shrink-0 mt-0.5" />
-                <span>{SITE.address}</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Mail size={16} className="text-amber-400 shrink-0" />
-                <span>{SITE.email}</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Phone size={16} className="text-amber-400 shrink-0" />
-                <span>{SITE.phone} (Sekretariat Rohis SMAPA)</span>
-              </div>
-            </div>
-          </div>
+              <span
+                className="hidden sm:inline-block w-px h-5 bg-[#D5E6DF]"
+                aria-hidden="true"
+              />
 
-          {/* Quick Links 1 */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-300 mb-4">
-              Navigasi Utama
-            </h4>
-            <ul className="flex flex-col gap-2.5 text-xs text-emerald-100/70">
-              <li>
-                <Link href="/tentang" className="hover:text-amber-300 transition-colors">
-                  Profil & Visi Misi
-                </Link>
-              </li>
-              <li>
-                <Link href="/tentang#kepengurusan" className="hover:text-amber-300 transition-colors">
-                  Struktur Kepengurusan
-                </Link>
-              </li>
-              <li>
-                <Link href="/program" className="hover:text-amber-300 transition-colors">
-                  6 Divisi & Program Kerja
-                </Link>
-              </li>
-              <li>
-                <Link href="/agenda" className="hover:text-amber-300 transition-colors">
-                  Jadwal Agenda & Kajian
-                </Link>
-              </li>
-              <li>
-                <Link href="/galeri" className="hover:text-amber-300 transition-colors">
-                  Galeri Dokumentasi
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Quick Links 2 */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-300 mb-4">
-              Layanan Siswa
-            </h4>
-            <ul className="flex flex-col gap-2.5 text-xs text-emerald-100/70">
-              <li>
-                <Link href="/agenda" className="hover:text-amber-300 transition-colors">
-                  Jadwal Kegiatan & Kajian
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Socials & Hotline */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-300 mb-4">
-              Koneksi & Media
-            </h4>
-            <p className="text-xs text-emerald-100/60 leading-relaxed mb-4">
-              Ikuti kabar kegiatan, kultum harian, dan dokumentasi rohis di media resmi SMAPA:
-            </p>
-            <div className="flex items-center gap-3 mb-6">
               <a
                 href={SITE.instagramUrl}
                 target="_blank"
-                rel="noreferrer"
-                className="w-9 h-9 rounded-xl bg-emerald-900/60 hover:bg-emerald-800 text-amber-300 flex items-center justify-center transition-colors border border-emerald-700/40"
-                aria-label="Instagram"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full clay-pill-mint text-xs sm:text-[13px] font-bold text-[#087A53] hover:opacity-90 transition-opacity"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                <svg
+                  className="w-3.5 h-3.5 shrink-0 fill-none stroke-current"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                 </svg>
+                <span>{SITE.instagram}</span>
               </a>
-              <a
-                href={SITE.youtubeUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="w-9 h-9 rounded-xl bg-emerald-900/60 hover:bg-emerald-800 text-amber-300 flex items-center justify-center transition-colors border border-emerald-700/40"
-                aria-label="YouTube"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
-                  <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
-                </svg>
-              </a>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-emerald-900/40 border border-emerald-700/30">
-              <span className="text-[10px] font-bold text-emerald-300 block mb-1">
-                Pusat Aktivitas:
-              </span>
-              <p className="text-[11px] text-emerald-100/90 leading-tight">
-                {SITE.mosqueName} • Kampus SMA Negeri 4 Purwokerto
-              </p>
             </div>
           </div>
-        </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-300/60">
-          <p>© {new Date().getFullYear()} {SITE.fullName}. Hak Cipta Dilindungi.</p>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <span>Dikelola dengan cinta</span>
-              <Heart size={13} className="text-amber-400 fill-amber-400 inline" />
-              <span>oleh Tim Medinfo Rohis SMAN 4 Purwokerto</span>
-            </div>
+          {/* Bottom Row: Copyright */}
+          <div className="pt-4 text-center text-xs text-[#5E7D72] font-medium">
+            © 2026 Rohis SMAN 4 Purwokerto. Seluruh hak cipta dilindungi.
           </div>
         </div>
       </div>

@@ -1,122 +1,82 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useSpring, useInView, useTransform } from "framer-motion";
+import React, { useRef } from "react";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useReducedMotion,
+  Variants,
+} from "framer-motion";
+
+const EASE_ENTRANCE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 /**
- * 1. Global Glowing Scroll Progress Bar
- * Placed at the very top of the screen, tracks scroll reading timeline
- * with spring physics and an amber-emerald luxury glow.
+ * 1. Top Scroll Progress Bar (Subtle Emerald Clay Indicator)
  */
 export function ScrollProgressBar() {
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 120,
-    damping: 28,
+    damping: 30,
     restDelta: 0.001,
   });
+
+  if (prefersReducedMotion) return null;
 
   return (
     <motion.div
       style={{ scaleX }}
-      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-400 origin-left z-[9999] pointer-events-none shadow-[0_0_12px_rgba(251,191,36,0.8),0_0_4px_rgba(16,185,129,0.5)]"
+      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#087A53] via-[#12A372] to-[#087A53] origin-left z-[100] pointer-events-none"
     />
   );
 }
 
 /**
- * 2. Animated Counter with Cinematic easeOutExpo
- * Counts up numbers gracefully when scrolled into view.
- */
-interface AnimatedCounterProps {
-  value: number;
-  suffix?: string;
-  duration?: number;
-  className?: string;
-  noSeparator?: boolean;
-}
-
-export function AnimatedCounter({
-  value,
-  suffix = "",
-  duration = 1800,
-  className = "",
-  noSeparator = false,
-}: AnimatedCounterProps) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-40px" });
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-
-    let startTime: number | null = null;
-    let animationFrameId: number;
-
-    const easeOutExpo = (t: number): number => {
-      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-    };
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easedProgress = easeOutExpo(progress);
-
-      const current = Math.floor(easedProgress * value);
-      setDisplayValue(current);
-
-      if (progress < 1) {
-        animationFrameId = requestAnimationFrame(animate);
-      } else {
-        setDisplayValue(value);
-      }
-    };
-
-    animationFrameId = requestAnimationFrame(animate);
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isInView, value, duration]);
-
-  return (
-    <span ref={ref} className={className}>
-      {noSeparator ? displayValue : displayValue.toLocaleString("id-ID")}
-      {suffix && <span className="text-amber-500 font-extrabold">{suffix}</span>}
-    </span>
-  );
-}
-
-/**
- * 3. Cinematic Viewport Reveal
- * Restrained, high-end motion with subtle blur clearing and custom cubic bezier easing.
+ * 2. Section & Block Reveal on Scroll (02_PROMPT_ANIMASI.md: opacity 0->1, y 20->0px, 400-550ms, once: true, threshold 15-20%)
  */
 interface CinematicRevealProps {
   children: React.ReactNode;
   className?: string;
   delay?: number;
+  duration?: number;
   direction?: "up" | "down" | "left" | "right" | "none";
   distance?: number;
-  duration?: number;
+  scale?: number;
+  once?: boolean;
 }
 
 export function CinematicReveal({
   children,
   className = "",
   delay = 0,
+  duration = 0.48,
   direction = "up",
-  distance = 32,
-  duration = 0.75,
+  distance = 20,
+  scale = 1,
+  once = true,
 }: CinematicRevealProps) {
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  const clampedDistance = Math.min(distance, 24);
+  const clampedDelay = Math.min(delay, 0.24);
+
   const getInitialOffset = () => {
     switch (direction) {
       case "up":
-        return { y: distance, x: 0 };
+        return { y: clampedDistance, x: 0 };
       case "down":
-        return { y: -distance, x: 0 };
+        return { y: -clampedDistance, x: 0 };
       case "left":
-        return { x: distance, y: 0 };
+        return { x: clampedDistance, y: 0 };
       case "right":
-        return { x: -distance, y: 0 };
+        return { x: -clampedDistance, y: 0 };
       case "none":
         return { x: 0, y: 0 };
     }
@@ -130,17 +90,19 @@ export function CinematicReveal({
         opacity: 0,
         x: offset.x,
         y: offset.y,
+        scale: scale === 1 ? 1 : Math.max(scale, 0.98),
       }}
       whileInView={{
         opacity: 1,
         x: 0,
         y: 0,
+        scale: 1,
       }}
-      viewport={{ once: true, margin: "-60px" }}
+      viewport={{ once, amount: 0.16 }}
       transition={{
-        duration,
-        delay,
-        ease: [0.16, 1, 0.3, 1], // Smooth filmic deceleration
+        duration: Math.min(Math.max(duration, 0.4), 0.55),
+        delay: clampedDelay,
+        ease: EASE_ENTRANCE,
       }}
       className={className}
     >
@@ -150,31 +112,46 @@ export function CinematicReveal({
 }
 
 /**
- * 4. Cinematic Stagger Container & Items
- * For cards, badges, and features that appear in sequential rhythm.
+ * 3. Card Grid Stagger Container (02_PROMPT_ANIMASI.md: 40-60ms per item, max total delay 240ms)
  */
-export function CinematicStagger({
-  children,
-  className = "",
-  staggerDelay = 0.1,
-}: {
+interface CinematicStaggerProps {
   children: React.ReactNode;
   className?: string;
   staggerDelay?: number;
-}) {
+  delayChildren?: number;
+  once?: boolean;
+}
+
+export function CinematicStagger({
+  children,
+  className = "",
+  staggerDelay = 0.05,
+  delayChildren = 0.04,
+  once = true,
+}: CinematicStaggerProps) {
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: Math.min(staggerDelay, 0.06),
+        delayChildren: Math.min(delayChildren, 0.12),
+      },
+    },
+  };
+
   return (
     <motion.div
+      variants={containerVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-60px" }}
-      variants={{
-        hidden: {},
-        visible: {
-          transition: {
-            staggerChildren: staggerDelay,
-          },
-        },
-      }}
+      viewport={{ once, amount: 0.15 }}
       className={className}
     >
       {children}
@@ -185,24 +162,65 @@ export function CinematicStagger({
 export function CinematicStaggerItem({
   children,
   className = "",
-  distance = 28,
 }: {
   children: React.ReactNode;
   className?: string;
-  distance?: number;
 }) {
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  const itemVariants: Variants = {
+    hidden: {
+      opacity: 0,
+      y: 16,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.45,
+        ease: EASE_ENTRANCE,
+      },
+    },
+  };
+
+  return (
+    <motion.div variants={itemVariants} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * 4. Hero & Section Text Entrance (02_PROMPT_ANIMASI.md: opacity 0->1, y 16->0px, 450-600ms, stagger 60-80ms)
+ */
+export function CinematicTextLine({
+  children,
+  className = "",
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
-      variants={{
-        hidden: { opacity: 0, y: distance },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: {
-            duration: 0.7,
-            ease: [0.16, 1, 0.3, 1],
-          },
-        },
+      initial={{ y: 16, opacity: 0 }}
+      whileInView={{ y: 0, opacity: 1 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: 0.5,
+        delay: Math.min(delay, 0.28),
+        ease: EASE_ENTRANCE,
       }}
       className={className}
     >
@@ -212,81 +230,35 @@ export function CinematicStaggerItem({
 }
 
 /**
- * 5. Cinematic Text Line Reveal
- * Reveals lines of text with elegant deceleration and subtle blur clearing.
+ * 5. Subtle Parallax Image Container (Disabled on Reduced Motion)
  */
-interface CinematicTextLineProps {
-  children: React.ReactNode;
-  delay?: number;
-  duration?: number;
-  className?: string;
-  distance?: number;
-}
-
-export function CinematicTextLine({
+export function ParallaxImageContainer({
   children,
-  delay = 0,
-  duration = 0.8,
   className = "",
-  distance = 24,
-}: CinematicTextLineProps) {
+  offset = 12,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  offset?: number;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  const safeOffset = prefersReducedMotion ? 0 : Math.min(offset, 14);
+  const y = useTransform(scrollYProgress, [0, 1], [-safeOffset, safeOffset]);
+
   return (
-    <div className={`overflow-hidden ${className}`}>
+    <div ref={ref} className={`relative overflow-hidden ${className}`}>
       <motion.div
-        initial={{ opacity: 0, y: distance }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{
-          duration,
-          delay,
-          ease: [0.16, 1, 0.3, 1],
-        }}
+        style={{ y, scale: prefersReducedMotion ? 1 : 1.03 }}
+        className="w-full h-full will-change-transform"
       >
         {children}
       </motion.div>
     </div>
   );
 }
-
-/**
- * 6. Subtle Parallax Image Container
- * Shifts images gently inside overflow-hidden frames as the visitor scrolls by.
- */
-interface ParallaxImageContainerProps {
-  children: React.ReactNode;
-  className?: string;
-  speed?: number;
-  offset?: number;
-}
-
-export function ParallaxImageContainer({
-  children,
-  className = "",
-  speed = 18,
-  offset,
-}: ParallaxImageContainerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const effectiveSpeed = offset ?? speed;
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [-effectiveSpeed, effectiveSpeed]);
-
-  const hasPos =
-    className.includes("absolute") ||
-    className.includes("fixed") ||
-    className.includes("relative");
-
-  return (
-    <div
-      ref={containerRef}
-      className={`${hasPos ? "" : "relative"} overflow-hidden ${className}`}
-    >
-      <motion.div style={{ y }} className="w-full h-full relative will-change-transform">
-        {children}
-      </motion.div>
-    </div>
-  );
-}
-

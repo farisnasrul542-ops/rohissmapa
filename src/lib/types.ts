@@ -2,7 +2,7 @@ export interface EventItem {
   id: string;
   slug: string;
   title: string;
-  category: "Kajian" | "MABIT" | "Pelatihan" | "Sosial" | "Lomba";
+  category: "Kajian" | "MABIT" | "Pelatihan" | "Sosial" | "Lomba" | string;
   date: string;
   time: string;
   location: string;
