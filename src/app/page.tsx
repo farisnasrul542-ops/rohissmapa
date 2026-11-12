@@ -671,95 +671,129 @@ export default function HomePage() {
         >
           <CinematicReveal direction="up" delay={0.08}>
             <div className="clay-card p-5 sm:p-8 lg:p-10">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-[#DCEAE3]">
-                <div>
-                  <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#153E32] tracking-tight">
-                    Dewan Pembina & Sambutan
-                  </h2>
-                  <p className="text-xs sm:text-sm text-[#4A6B5F] mt-1">
-                    Bimbingan guru Pendidikan Agama Islam SMA Negeri 4 Purwokerto
-                  </p>
-                </div>
-
-                {/* Switcher Pill Tabs for Both Pembina */}
-                <div
-                  role="tablist"
-                  aria-label="Pilih Pembina Rohis"
-                  className="inline-flex items-center gap-2 p-1.5 rounded-full clay-inner self-start md:self-auto"
-                >
-                  {pembinaList.map((p, idx) => {
-                    const isActive = activePembinaIndex === idx;
-                    return (
-                      <button
-                        key={p.id}
-                        role="tab"
-                        aria-selected={isActive}
-                        type="button"
-                        onClick={() => setActivePembinaIndex(idx)}
-                        className={`px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold transition-all duration-200 cursor-pointer whitespace-nowrap min-h-[40px] ${
-                          isActive
-                            ? "clay-btn-emerald text-white"
-                            : "text-[#3B5E52] hover:text-[#153E32]"
-                        }`}
-                      >
-                        {p.name.split(",")[0]} ({p.role})
-                      </button>
-                    );
-                  })}
-                </div>
+              {/* Clean Section Header (Matches Mockup) */}
+              <div className="pb-6 mb-6 border-b border-[#DCEAE3]">
+                <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#153E32] tracking-tight">
+                  Dewan Pembina & Sambutan
+                </h2>
+                <p className="text-xs sm:text-sm text-[#4A6B5F] mt-1">
+                  Bimbingan guru Pendidikan Agama Islam SMA Negeri 4 Purwokerto
+                </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-                {/* Left: Both Pembina Selector Cards (Atas-Bawah Layout) */}
-                <div className="lg:col-span-5 flex flex-col gap-3 sm:gap-4">
-                  {pembinaList.map((pembina, idx) => {
-                    const isActive = activePembinaIndex === idx;
-                    return (
-                      <button
-                        key={pembina.id}
-                        type="button"
-                        onClick={() => setActivePembinaIndex(idx)}
-                        className={`w-full text-left p-3.5 sm:p-4.5 rounded-[22px] transition-all duration-200 cursor-pointer flex items-center gap-3.5 sm:gap-4 ${
-                          isActive
-                            ? "clay-card-mint ring-2 ring-[#087A53]/35 shadow-sm"
-                            : "clay-inner hover:bg-[#EBF7F1]"
-                        }`}
-                      >
-                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden clay-photo-frame p-1 shrink-0">
-                          <img
-                            src={parseImageCrop(pembina.image).src}
-                            alt={pembina.name}
-                            referrerPolicy="no-referrer"
-                            onError={(e) =>
-                              handleGoogleDriveImageError(e, pembina.image)
-                            }
-                            style={getImageCropStyle(pembina.image)}
-                            className="w-full h-full object-cover rounded-xl"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span
-                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold mb-1.5 ${
-                              isActive
-                                ? "clay-btn-emerald text-white"
-                                : "clay-pill-mint text-[#087A53]"
-                            }`}
-                          >
-                            {pembina.role} ROHIS
-                          </span>
-                          <h3 className="font-heading font-extrabold text-sm sm:text-base text-[#153E32] leading-snug line-clamp-2">
-                            {pembina.name}
-                          </h3>
-                          <p className="text-[11px] sm:text-xs text-[#4A6B5F] mt-0.5">
-                            Guru Pembina PAI SMA Negeri 4 Purwokerto
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
+                {/* Left: Active Pembina Big Card + Switcher Bar Below (Matches Mockup PC & HP) */}
+                <div className="lg:col-span-5 flex flex-col items-center">
+                  {/* Big Card with Photo + Overlay Box */}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activePembina.id}
+                      initial={
+                        prefersReducedMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, scale: 0.96 }
+                      }
+                      animate={
+                        prefersReducedMotion
+                          ? { opacity: 1 }
+                          : { opacity: 1, scale: 1 }
+                      }
+                      exit={
+                        prefersReducedMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, scale: 0.96 }
+                      }
+                      transition={{
+                        duration: prefersReducedMotion ? 0.08 : 0.22,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="w-full max-w-[340px] sm:max-w-[370px] rounded-[30px] clay-card p-3 sm:p-3.5 relative bg-white flex flex-col items-center text-center shadow-[0_16px_36px_-12px_rgba(15,62,46,0.14)]"
+                    >
+                      {/* Photo Frame */}
+                      <div className="relative w-full aspect-[4/4.6] rounded-[22px] overflow-hidden bg-[#E5F2EC]">
+                        <img
+                          src={parseImageCrop(activePembina.image).src}
+                          alt={activePembina.name}
+                          referrerPolicy="no-referrer"
+                          onError={(e) =>
+                            handleGoogleDriveImageError(e, activePembina.image)
+                          }
+                          style={getImageCropStyle(activePembina.image)}
+                          className="w-full h-full object-cover object-top"
+                        />
+                      </div>
+
+                      {/* White Clay Card Overlay at the bottom */}
+                      <div className="w-[92%] -mt-9 relative z-10 bg-white rounded-[20px] p-3.5 sm:p-4 shadow-[0_8px_24px_-6px_rgba(15,62,46,0.12)] border border-[#E5F0EB]">
+                        <span className="clay-pill-mint px-3.5 py-0.5 rounded-full text-[11px] font-bold text-[#087A53] inline-block mb-1">
+                          {activePembina.role} ROHIS
+                        </span>
+                        <h3 className="font-heading font-extrabold text-base sm:text-lg text-[#153E32] leading-snug">
+                          {activePembina.name}
+                        </h3>
+                        <p className="text-[11px] sm:text-xs text-[#4A6B5F] mt-0.5">
+                          Guru Pembina PAI SMA Negeri 4 Purwokerto
+                        </p>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Switcher Bar Directly Below Big Card */}
+                  <div
+                    role="tablist"
+                    aria-label="Pilih Pembina Rohis"
+                    className="mt-4 sm:mt-5 w-full max-w-[340px] sm:max-w-[370px] clay-inner p-1.5 rounded-[22px] grid grid-cols-2 gap-2"
+                  >
+                    {pembinaList.map((p, idx) => {
+                      const isActive = activePembinaIndex === idx;
+                      return (
+                        <button
+                          key={p.id}
+                          role="tab"
+                          aria-selected={isActive}
+                          type="button"
+                          onClick={() => setActivePembinaIndex(idx)}
+                          className={`flex items-center gap-2 p-1.5 sm:p-2 rounded-[16px] transition-all duration-200 cursor-pointer text-left ${
+                            isActive
+                              ? "clay-btn-emerald text-white shadow-sm"
+                              : "text-[#3B5E52] hover:bg-[#EBF7F1]"
+                          }`}
+                        >
+                          <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] overflow-hidden shrink-0 border border-white/40 bg-[#E5F2EC]">
+                            <img
+                              src={parseImageCrop(p.image).src}
+                              alt={p.name}
+                              referrerPolicy="no-referrer"
+                              onError={(e) =>
+                                handleGoogleDriveImageError(e, p.image)
+                              }
+                              style={getImageCropStyle(p.image)}
+                              className="w-full h-full object-cover object-top"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1 leading-tight">
+                            <p
+                              className={`text-[11px] sm:text-xs font-bold truncate ${
+                                isActive ? "text-white" : "text-[#153E32]"
+                              }`}
+                            >
+                              {p.name.split(",")[0]}
+                            </p>
+                            <p
+                              className={`text-[10px] truncate ${
+                                isActive ? "text-emerald-100" : "text-[#4A6B5F]"
+                              }`}
+                            >
+                              {p.name.split(",")[1]?.trim() || p.role}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* Right: Active Pembina Greeting Content with Smooth Crossfade (02_PROMPT_ANIMASI.md: 180-240ms + y 6px) */}
+                {/* Right: Active Pembina Greeting Content (Matches Mockup PC & HP) */}
                 <div className="lg:col-span-7">
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -783,52 +817,47 @@ export default function HomePage() {
                         duration: prefersReducedMotion ? 0.08 : 0.2,
                         ease: [0.22, 1, 0.36, 1],
                       }}
-                      className="clay-inner p-5 sm:p-7"
+                      className="clay-inner p-6 sm:p-8 rounded-[28px] flex flex-col justify-between h-full"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <span className="clay-pill-mint px-3 py-1 rounded-full text-xs font-bold">
-                          Sambutan {activePembina.role} — {activePembina.name}
-                        </span>
-                      </div>
-
-                      <p className="font-heading text-sm sm:text-base font-bold text-[#153E32] mb-3">
-                        {activePembina.salamPembuka}
-                      </p>
-
-                      <div className="space-y-3 text-xs sm:text-sm text-[#3B5E52] leading-relaxed">
-                        {activePembina.paragraphs.map((para, i) => (
-                          <p key={i}>{para}</p>
-                        ))}
-                      </div>
-
-                      <p className="font-heading text-sm font-bold text-[#153E32] mt-4 mb-5">
-                        {activePembina.salamPenutup}
-                      </p>
-
-                      <div className="pt-3 border-t border-[#DCEAE3] flex flex-wrap items-center justify-between gap-3">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setActivePembinaIndex(
-                              activePembinaIndex === 0 ? 1 : 0
-                            )
-                          }
-                          className="clay-btn-mint px-4 py-2 rounded-full text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <span>
-                            {activePembinaIndex === 0
-                              ? "Baca Sambutan Pembina 2"
-                              : "Baca Sambutan Pembina 1"}
+                      <div>
+                        <div className="mb-3.5">
+                          <span className="clay-pill-mint px-3.5 py-1 rounded-full text-xs font-bold text-[#087A53] inline-block">
+                            Sambutan {activePembina.role}
                           </span>
-                          <ArrowRight size={14} />
-                        </button>
+                        </div>
 
+                        <h3 className="font-heading text-base sm:text-lg font-bold text-[#153E32] mb-3">
+                          {activePembina.salamPembuka}
+                        </h3>
+
+                        <div className="space-y-3 text-xs sm:text-[14px] text-[#3B5E52] leading-relaxed">
+                          {activePembina.paragraphs.map((para, i) => (
+                            <p key={i}>{para}</p>
+                          ))}
+                        </div>
+
+                        {/* Highlight Quote Callout Box */}
+                        <div className="my-4 py-2.5 px-4 rounded-2xl bg-[#DCF8EC]/70 border border-[#BCECD7] text-center sm:text-left">
+                          <p className="font-heading italic font-bold text-xs sm:text-sm text-[#087A53]">
+                            “Belajar bersama, bertumbuh dalam kebaikan.”
+                          </p>
+                        </div>
+
+                        <p className="font-heading text-xs sm:text-sm font-semibold text-[#153E32] mt-3">
+                          {activePembina.salamPenutup}
+                        </p>
+                        <p className="font-heading text-sm sm:text-base font-extrabold text-[#153E32] mt-1">
+                          {activePembina.name}
+                        </p>
+                      </div>
+
+                      <div className="pt-4 mt-4 border-t border-[#DCEAE3] flex justify-end">
                         <Link
                           href="/tentang#pembina"
-                          className="text-xs font-bold text-[#087A53] hover:underline inline-flex items-center gap-1"
+                          className="text-xs sm:text-sm font-bold text-[#087A53] hover:underline inline-flex items-center gap-1.5 cursor-pointer"
                         >
                           <span>Lihat Profil & Kepengurusan</span>
-                          <ArrowRight size={13} />
+                          <ArrowRight size={14} />
                         </Link>
                       </div>
                     </motion.div>
