@@ -1,20 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  User,
-  Lock,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  ShieldCheck,
-  AlertCircle,
-  KeyRound,
-  Globe,
-} from "lucide-react";
+import { Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import {
   verifyAdminPassword,
   loginAdminSession,
@@ -54,144 +43,119 @@ export default function LoginPage() {
         loginAdminSession(rememberMe);
         router.push("/admin");
       } else {
-        setErrorMsg(
-          "Kata sandi (Password) atau Username salah! Silakan coba kembali."
-        );
+        setErrorMsg("Username atau Password yang Anda masukkan salah!");
         setIsLoading(false);
       }
-    }, 300);
+    }, 250);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#041811] via-[#07261b] to-[#03110c] p-4 text-white relative overflow-hidden select-none">
-      {/* Subtle Ambient Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Brand */}
-        <div className="text-center mb-7">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white p-2 shadow-[0_14px_30px_rgba(0,0,0,0.4)] border border-white/25 mb-3">
+    <div className="min-h-screen bg-[#edf4f0] flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200/80">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <div className="relative w-28 h-24">
             <Image
               src="/images/logo-transparent.png"
-              alt="Logo Rohis SMA Negeri 4 Purwokerto"
-              width={64}
-              height={64}
-              className="w-full h-auto object-contain"
+              alt="Logo ROHIS SMAPA"
+              fill
+              sizes="112px"
+              className="object-contain"
               priority
             />
           </div>
-          <div className="flex items-center justify-center gap-1.5 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-[10px] font-black tracking-widest uppercase text-amber-300 inline-flex items-center gap-1">
-              <ShieldCheck size={12} />
-              <span>PORTAL KHUSUS PENGURUS BPH</span>
-            </span>
-          </div>
-          <h1 className="text-2xl font-black tracking-tight text-white">
-            Login Admin Rohis SMAPA
-          </h1>
-          <p className="text-xs text-emerald-200/70 mt-1">
-            SMA Negeri 4 Purwokerto • Terproteksi Kata Sandi
-          </p>
         </div>
 
-        {/* 3D Tactile Card Box */}
-        <div className="bg-white text-slate-900 rounded-[28px] overflow-hidden shadow-[0_28px_70px_-15px_rgba(0,0,0,0.55)] border border-slate-200/90 border-b-[5px] border-b-slate-300">
-          <div className="h-1.5 w-full bg-gradient-to-r from-[#062017] via-emerald-700 to-[#062017]" />
+        {/* Heading */}
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center shrink-0">
+            <Lock size={18} />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 leading-tight">
+              Masuk Panel Admin
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Kelola konten dan kegiatan Rohis SMAPA.
+            </p>
+          </div>
+        </div>
 
-          <div className="p-7 sm:p-8">
-            {errorMsg && (
-              <div className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-start gap-2.5">
-                <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
+        {errorMsg && (
+          <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
+            <AlertCircle size={15} className="shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
-                  Username Pengurus
-                </label>
-                <div className="relative">
-                  <User
-                    size={15}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                  />
-                  <input
-                    type="text"
-                    required
-                    placeholder="admin"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/60 focus:bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                  />
-                </div>
-              </div>
+        {/* Login Form */}
+        <form onSubmit={handleLogin} className="mt-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              Username
+            </label>
+            <input
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="admin"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all font-medium"
+            />
+          </div>
 
-              <div>
-                <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
-                  Kata Sandi (Password) *
-                </label>
-                <div className="relative">
-                  <KeyRound
-                    size={15}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                  />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    autoFocus
-                    placeholder="Masukkan password admin..."
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/60 focus:bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer"
-                    aria-label="Tampilkan sandi"
-                  >
-                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-1">
-                <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-slate-300 text-emerald-800 focus:ring-emerald-800"
-                  />
-                  <span>Simpan sesi login di perangkat ini</span>
-                </label>
-              </div>
-
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Masukkan password"
+                className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-200 bg-[#f8faf9] text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all font-medium"
+              />
               <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] hover:from-[#114a35] hover:to-[#072419] text-white font-extrabold text-xs tracking-wide border border-emerald-700/40 border-b-[3px] border-b-black shadow-md transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                aria-label="Tampilkan password"
               >
-                <Lock size={14} className="text-amber-300" />
-                <span>
-                  {isLoading
-                    ? "Memverifikasi kredensial..."
-                    : "Masuk ke Panel Admin BPH"}
-                </span>
-                <ArrowRight size={14} className="text-amber-300" />
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
-            </form>
+            </div>
           </div>
-        </div>
 
-        <div className="mt-7 text-center text-xs text-emerald-200/70">
+          <div className="flex items-center">
+            <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded border-slate-300 text-[#007a4d] focus:ring-[#007a4d]"
+              />
+              <span>Ingat saya</span>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3 px-4 rounded-xl bg-[#007a4d] hover:bg-[#006841] text-white font-semibold text-sm transition-all shadow-sm cursor-pointer disabled:opacity-60"
+          >
+            {isLoading ? "Memeriksa..." : "Masuk ke Dashboard"}
+          </button>
+        </form>
+
+        {/* Back to Public Web */}
+        <div className="mt-5 text-center">
           <a
             href="https://rohis-sman4pwt.web.id/"
-            className="hover:text-amber-300 font-semibold transition-colors inline-flex items-center gap-1.5"
+            className="text-xs font-semibold text-[#007a4d] hover:underline"
           >
-            <Globe size={13} />
-            <span>Buka Website Umum (rohis-sman4pwt.web.id)</span>
+            Kembali ke Website Publik
           </a>
         </div>
       </div>

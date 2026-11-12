@@ -1,18 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import {
   Lock,
-  User,
   Eye,
   EyeOff,
-  ShieldCheck,
-  ArrowRight,
   AlertCircle,
-  KeyRound,
-  Globe,
+  X,
+  Info,
+  CheckCircle2,
 } from "lucide-react";
 import { AdminProvider } from "@/context/AdminContext";
 import AdminSidebar from "@/components/admin/AdminSidebar";
@@ -22,6 +19,9 @@ import {
   isAdminAuthenticated,
   verifyAdminPassword,
   loginAdminSession,
+  getStoredAdminUsername,
+  getStoredAdminPassword,
+  updateAdminCredentials,
 } from "@/lib/adminAuth";
 
 export default function AdminLayout({
@@ -30,10 +30,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
 
-  // Login Gate Form State
+  // Login Gate State
   const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -41,8 +42,19 @@ export default function AdminLayout({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
+  // Pengaturan Akun State
+  const [accUsername, setAccUsername] = useState("admin");
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [accFeedback, setAccFeedback] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
   useEffect(() => {
-    // Jika dibuka dari domain publik (rohis-sman4pwt.web.id), blokir akses /admin dan kembalikan ke beranda umum
+    // Jika dibuka dari domain publik (rohis-sman4pwt.web.id), alihkan ke beranda publik
     if (
       typeof window !== "undefined" &&
       window.location.hostname.toLowerCase().includes("rohis-sman4pwt.web.id")
@@ -53,6 +65,7 @@ export default function AdminLayout({
 
     setMounted(true);
     setAuthenticated(isAdminAuthenticated());
+    setAccUsername(getStoredAdminUsername());
 
     const syncAuth = () => {
       setAuthenticated(isAdminAuthenticated());
@@ -66,7 +79,7 @@ export default function AdminLayout({
     };
   }, []);
 
-  const handleUnlockSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsVerifying(true);
@@ -78,154 +91,172 @@ export default function AdminLayout({
         setAuthenticated(true);
         setPassword("");
       } else {
-        setErrorMsg(
-          "Kata sandi (Password) atau Username salah! Silakan periksa kembali."
-        );
+        setErrorMsg("Username atau Password yang Anda masukkan salah!");
       }
       setIsVerifying(false);
-    }, 300);
+    }, 250);
+  };
+
+  const openAccountModal = () => {
+    setAccUsername(getStoredAdminUsername());
+    setCurrentPw("");
+    setNewPw("");
+    setShowCurrentPw(false);
+    setShowNewPw(false);
+    setAccFeedback(null);
+    setAccountModalOpen(true);
+  };
+
+  const handleSaveAccount = (e: React.FormEvent) => {
+    e.preventDefault();
+    const actualCurrent = getStoredAdminPassword();
+
+    if (currentPw !== actualCurrent) {
+      setAccFeedback({
+        type: "error",
+        text: "Password saat ini salah!",
+      });
+      return;
+    }
+
+    if (newPw.trim().length > 0 && newPw.trim().length < 4) {
+      setAccFeedback({
+        type: "error",
+        text: "Password baru minimal 4 karakter.",
+      });
+      return;
+    }
+
+    const finalPw = newPw.trim() ? newPw.trim() : actualCurrent;
+    const finalUser = accUsername.trim() || "admin";
+
+    updateAdminCredentials(finalPw, finalUser);
+    setAccFeedback({
+      type: "success",
+      text: "Pengaturan akun berhasil disimpan!",
+    });
+    setTimeout(() => {
+      setAccountModalOpen(false);
+    }, 900);
   };
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#041811] flex items-center justify-center text-emerald-200 text-xs font-bold">
-        Memeriksa otorisasi keamanan Panel Admin...
+      <div className="min-h-screen bg-[#edf4f0] flex items-center justify-center text-slate-500 text-xs font-semibold">
+        Memeriksa sesi login admin...
       </div>
     );
   }
 
-  // ── PASSWORD PROTECTION GATE FOR ALL /admin/* LINKS ──
+  // ── LOGIN PAGE (MOCKUP 01: AKSES ADMIN & AKUN) ──
   if (!authenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#041811] via-[#07261b] to-[#03110c] p-4 text-white relative overflow-hidden select-none">
-        {/* Ambient Subtle Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[520px] h-[320px] bg-emerald-500/10 blur-[140px] rounded-full pointer-events-none" />
-
-        <div className="w-full max-w-md relative z-10">
-          {/* Brand Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white p-2 shadow-[0_14px_30px_rgba(0,0,0,0.45)] border border-white/25 mb-3">
+      <div className="min-h-screen bg-[#edf4f0] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200/80">
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <div className="relative w-28 h-24">
               <Image
                 src="/images/logo-transparent.png"
-                alt="Logo Rohis SMA Negeri 4 Purwokerto"
-                width={60}
-                height={60}
-                className="w-full h-auto object-contain"
+                alt="Logo ROHIS SMAPA"
+                fill
+                sizes="112px"
+                className="object-contain"
                 priority
               />
             </div>
-            <div className="flex items-center justify-center gap-1.5 mb-1.5">
-              <span className="px-3 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-[10px] font-black tracking-widest uppercase text-amber-300 inline-flex items-center gap-1">
-                <ShieldCheck size={12} />
-                <span>AKSES TERPROTEKSI PASSWORD</span>
-              </span>
-            </div>
-            <h1 className="text-2xl font-black tracking-tight text-white">
-              Portal Eksekutif Admin BPH
-            </h1>
-            <p className="text-xs text-emerald-200/75 mt-1">
-              Masukkan kata sandi resmi pengurus untuk membuka sistem manajemen.
-            </p>
           </div>
 
-          {/* 3D Tactile Password Card */}
-          <div className="bg-white text-slate-900 rounded-[28px] overflow-hidden shadow-[0_28px_70px_-15px_rgba(0,0,0,0.65)] border border-slate-200/90 border-b-[5px] border-b-slate-300">
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#062017] via-emerald-700 to-[#062017]" />
+          {/* Heading */}
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center shrink-0">
+              <Lock size={18} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 leading-tight">
+                Masuk Panel Admin
+              </h1>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Kelola konten dan kegiatan Rohis SMAPA.
+              </p>
+            </div>
+          </div>
 
-            <div className="p-7 sm:p-8">
-              {errorMsg && (
-                <div className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-start gap-2.5 animate-in fade-in duration-150">
-                  <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
-                  <span>{errorMsg}</span>
-                </div>
-              )}
+          {errorMsg && (
+            <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
+              <AlertCircle size={15} className="shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
 
-              <form onSubmit={handleUnlockSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
-                    Username Pengurus
-                  </label>
-                  <div className="relative">
-                    <User
-                      size={15}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      required
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="admin"
-                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/70 focus:bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                  </div>
-                </div>
+          {/* Login Form */}
+          <form onSubmit={handleLoginSubmit} className="mt-5 space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Username
+              </label>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="admin"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all font-medium"
+              />
+            </div>
 
-                <div>
-                  <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
-                    Password Admin *
-                  </label>
-                  <div className="relative">
-                    <KeyRound
-                      size={15}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      required
-                      autoFocus
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Masukkan password admin..."
-                      className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/70 focus:bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer"
-                      aria-label="Tampilkan sandi"
-                    >
-                      {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-1">
-                  <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded border-slate-300 text-emerald-800 focus:ring-emerald-800"
-                    />
-                    <span>Simpan sesi login di perangkat ini</span>
-                  </label>
-                </div>
-
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Masukkan password"
+                  className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-200 bg-[#f8faf9] text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all font-medium"
+                />
                 <button
-                  type="submit"
-                  disabled={isVerifying}
-                  className="w-full py-3 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] hover:from-[#114a35] hover:to-[#072419] text-white font-extrabold text-xs tracking-wide border border-emerald-700/40 border-b-[3px] border-b-black shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  aria-label="Tampilkan password"
                 >
-                  <Lock size={14} className="text-amber-300" />
-                  <span>
-                    {isVerifying
-                      ? "Memverifikasi Password..."
-                      : "Buka Kunci Panel Admin"}
-                  </span>
-                  <ArrowRight size={14} className="text-amber-300" />
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-              </form>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-6 text-center">
+            <div className="flex items-center">
+              <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="rounded border-slate-300 text-[#007a4d] focus:ring-[#007a4d]"
+                />
+                <span>Ingat saya</span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isVerifying}
+              className="w-full py-3 px-4 rounded-xl bg-[#007a4d] hover:bg-[#006841] text-white font-semibold text-sm transition-all shadow-sm cursor-pointer disabled:opacity-60"
+            >
+              {isVerifying ? "Memeriksa..." : "Masuk ke Dashboard"}
+            </button>
+          </form>
+
+          {/* Back to Public Web */}
+          <div className="mt-5 text-center">
             <a
               href="https://rohis-sman4pwt.web.id/"
-              className="inline-flex items-center gap-1.5 text-xs text-emerald-200/75 hover:text-amber-300 font-semibold transition-colors"
+              className="text-xs font-semibold text-[#007a4d] hover:underline"
             >
-              <Globe size={13} />
-              <span>Buka Website Umum (rohis-sman4pwt.web.id)</span>
+              Kembali ke Website Publik
             </a>
           </div>
         </div>
@@ -233,34 +264,154 @@ export default function AdminLayout({
     );
   }
 
+  // ── AUTHENTICATED ADMIN LAYOUT ──
   return (
     <AdminProvider>
-      <div className="min-h-screen bg-[#f6f8f6] text-gray-900 font-sans antialiased flex flex-col">
-        {/* Isolated Sidebar */}
+      <div className="min-h-screen bg-[#edf4f0] text-slate-800">
+        {/* Sidebar */}
         <AdminSidebar
           mobileOpen={mobileSidebarOpen}
           setMobileOpen={setMobileSidebarOpen}
+          onOpenAccountModal={openAccountModal}
         />
 
-        {/* Main Content Area (offset by sidebar width on desktop) */}
+        {/* Main Content Area */}
         <div className="lg:pl-64 flex flex-col min-h-screen">
           <AdminTopbar
-            onMenuToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+            onMenuToggle={() => setMobileSidebarOpen(true)}
+            onOpenAccountModal={openAccountModal}
           />
 
           <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
             {children}
           </main>
-
-          {/* Admin Dedicated Mini Footer */}
-          <footer className="py-4 px-6 border-t border-emerald-950/5 text-center text-[11px] text-gray-400">
-            <span>
-              ROHIS SMA Negeri 4 Purwokerto • Sistem Informasi Manajemen Pengurus BPH © 2026
-            </span>
-          </footer>
         </div>
 
-        {/* Toast notifications */}
+        {/* ── MODAL PENGATURAN AKUN (MOCKUP 01 & 02) ── */}
+        {accountModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="bg-white rounded-3xl w-full max-w-md border border-slate-200/80 shadow-xl overflow-hidden animate-in zoom-in-95 duration-150">
+              <div className="p-6 border-b border-slate-100 flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    Pengaturan Akun
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Ubah informasi akun admin Anda.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAccountModalOpen(false)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+                  aria-label="Tutup"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveAccount} className="p-6 space-y-4">
+                {accFeedback && (
+                  <div
+                    className={`p-3 rounded-xl text-xs font-medium flex items-center gap-2 ${
+                      accFeedback.type === "success"
+                        ? "bg-[#d7f0e3] text-[#006d44] border border-[#006d44]/20"
+                        : "bg-rose-50 text-rose-700 border border-rose-200"
+                    }`}
+                  >
+                    {accFeedback.type === "success" ? (
+                      <CheckCircle2 size={15} />
+                    ) : (
+                      <AlertCircle size={15} />
+                    )}
+                    <span>{accFeedback.text}</span>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={accUsername}
+                    onChange={(e) => setAccUsername(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Password saat ini
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCurrentPw ? "text" : "password"}
+                      required
+                      value={currentPw}
+                      onChange={(e) => setCurrentPw(e.target.value)}
+                      placeholder="Masukkan password saat ini"
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPw(!showCurrentPw)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    >
+                      {showCurrentPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Password baru
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPw ? "text" : "password"}
+                      value={newPw}
+                      onChange={(e) => setNewPw(e.target.value)}
+                      placeholder="Kosongkan jika tidak ingin mengubah password"
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPw(!showNewPw)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    >
+                      {showNewPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Status Notice Pill */}
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#d7f0e3]/60 text-[#006d44] border border-[#006d44]/15 text-xs font-medium">
+                  <Info size={14} className="shrink-0" />
+                  <span>Perubahan belum disimpan.</span>
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setAccountModalOpen(false)}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#007a4d] hover:bg-[#006841] text-white shadow-xs transition-colors cursor-pointer"
+                  >
+                    Simpan Perubahan
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         <AdminToast />
       </div>
     </AdminProvider>

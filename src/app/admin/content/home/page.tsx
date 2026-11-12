@@ -198,14 +198,14 @@ export default function HomeCmsEditorPage() {
   };
 
   const subnavItems: Array<{ id: SubnavTab; label: string; icon: any }> = [
-    { id: "hero", label: "1. Hero & Headline", icon: Sparkles },
-    { id: "stats", label: "2. Statistik Capaian", icon: BarChart3 },
-    { id: "about", label: "3. Tentang Kami (About)", icon: BookOpen },
-    { id: "sambutan", label: "4. Sambutan Pembina 1 & 2", icon: GraduationCap },
-    { id: "agenda", label: "5. Agenda & 3D Coverflow", icon: Calendar },
-    { id: "gallery", label: "6. Galeri Dokumentasi", icon: ImageIcon },
-    { id: "closing", label: "7. Ajakan Bergabung (CTA)", icon: Send },
-    { id: "sections", label: "8. Konfigurasi Seksi", icon: Sliders },
+    { id: "hero", label: "Hero", icon: Sparkles },
+    { id: "stats", label: "Statistik", icon: BarChart3 },
+    { id: "about", label: "Tentang Kami", icon: BookOpen },
+    { id: "sambutan", label: "Sambutan Pembina", icon: GraduationCap },
+    { id: "agenda", label: "Agenda", icon: Calendar },
+    { id: "gallery", label: "Galeri", icon: ImageIcon },
+    { id: "closing", label: "Ajakan Bergabung", icon: Send },
+    { id: "sections", label: "Konfigurasi Seksi", icon: Sliders },
   ];
 
   const agenda = draft?.agenda || DEFAULT_HOME_CMS.agenda;
@@ -220,26 +220,26 @@ export default function HomeCmsEditorPage() {
   return (
     <div className="space-y-6 pb-28">
       {/* Top Header Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-emerald-950/10 shadow-sm shadow-emerald-950/5 flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200">
-              CONTENT MANAGEMENT SYSTEM
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[10.5px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#d7f0e3] text-[#006d44]">
+              Editor Beranda
             </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-              Live Home Editor
+            <span className="text-[10.5px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
+              Live Home CMS
             </span>
             {hasChanges && (
-              <span className="text-[10px] font-black text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 animate-pulse">
-                • Perubahan belum disimpan
+              <span className="text-[10.5px] font-semibold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 animate-pulse">
+                &bull; Perubahan belum disimpan
               </span>
             )}
           </div>
-          <h1 className="text-2xl font-black text-emerald-950 tracking-tight">
-            Editor Konten Beranda ROHIS SMAPA
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Editor Konten Beranda
           </h1>
-          <p className="text-xs text-gray-500 mt-1 max-w-2xl leading-relaxed">
-            Sesuaikan konten 7 seksi beranda publik secara langsung. Seluruh perubahan yang disimpan akan otomatis tersinkronisasi ke web publik.
+          <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
+            Sesuaikan konten dan tampilan halaman beranda website publik ROHIS SMAPA. Seluruh perubahan yang disimpan akan otomatis tersinkronisasi ke web publik.
           </p>
         </div>
 
@@ -248,8 +248,8 @@ export default function HomeCmsEditorPage() {
           <button
             type="button"
             onClick={handleReset}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 hover:bg-gray-100 text-gray-700 text-xs font-bold transition-all"
-            title="Kembalikan seluruh teks ke konfigurasi awal"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-medium transition-all cursor-pointer"
+            title="Kembalikan ke konfigurasi awal"
           >
             <RotateCcw size={13} />
             <span>Reset Default</span>
@@ -258,20 +258,20 @@ export default function HomeCmsEditorPage() {
           <Link
             href="/"
             target="_blank"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold transition-all border border-emerald-900/10"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition-all"
           >
-            <Eye size={13} className="text-emerald-700" />
+            <Eye size={13} className="text-slate-500" />
             <span>Pratinjau Beranda</span>
-            <ExternalLink size={11} className="text-emerald-700/60" />
+            <ExternalLink size={11} className="text-slate-400" />
           </Link>
 
           <button
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-800 to-emerald-950 hover:from-emerald-700 hover:to-emerald-900 text-white font-extrabold text-xs shadow-md shadow-emerald-950/20 transition-all hover:scale-[1.02] disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#007a4d] hover:bg-[#006841] text-white font-semibold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50"
           >
-            <Save size={14} className="text-amber-300" />
+            <Save size={14} />
             <span>{isSaving ? "Menyimpan & Menyinkron..." : "Simpan Perubahan"}</span>
           </button>
         </div>
@@ -285,9 +285,9 @@ export default function HomeCmsEditorPage() {
             e.currentTarget.scrollLeft += e.deltaY;
           }
         }}
-        className="bg-white p-2 rounded-2xl border border-emerald-950/10 shadow-sm overflow-x-auto scrollbar-thin overscroll-contain"
+        className="bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-2xs overflow-x-auto scrollbar-thin overscroll-contain"
       >
-        <div className="flex items-center gap-1.5 min-w-max">
+        <div className="flex items-center gap-1 min-w-max">
           {subnavItems.map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -296,15 +296,15 @@ export default function HomeCmsEditorPage() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                   active
-                    ? "bg-gradient-to-r from-emerald-800 to-emerald-950 text-white shadow-sm font-extrabold"
-                    : "text-gray-600 hover:text-emerald-950 hover:bg-emerald-50/70"
+                    ? "bg-[#007a4d] text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
                 <Icon
                   size={14}
-                  className={active ? "text-amber-300" : "text-gray-400"}
+                  className={active ? "text-white" : "text-slate-400"}
                 />
                 <span>{tab.label}</span>
               </button>
@@ -1790,14 +1790,14 @@ export default function HomeCmsEditorPage() {
 
       {/* Floating Sticky Save Footer Bar */}
       <div className="fixed bottom-6 left-4 sm:left-auto right-4 sm:right-8 z-40 max-w-xl ml-auto">
-        <div className="p-3.5 px-5 rounded-2xl bg-gradient-to-r from-[#062017] via-[#0b3324] to-[#041610] text-white shadow-2xl border border-emerald-500/30 flex items-center justify-between gap-4 backdrop-blur-md">
+        <div className="p-3 px-5 rounded-2xl bg-white/95 backdrop-blur-md text-slate-800 shadow-xl border border-slate-200/90 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <span
               className={`w-2.5 h-2.5 rounded-full ${
-                hasChanges ? "bg-amber-400 animate-pulse" : "bg-emerald-400"
+                hasChanges ? "bg-amber-500 animate-pulse" : "bg-[#007a4d]"
               }`}
             />
-            <span className="text-xs font-semibold text-emerald-100">
+            <span className="text-xs font-medium text-slate-600">
               {hasChanges
                 ? "Ada perubahan belum disimpan"
                 : "Semua perubahan telah tersimpan & sinkron"}
@@ -1812,7 +1812,7 @@ export default function HomeCmsEditorPage() {
                   setDraft(normalizeHomeCms(homeCms));
                   setHasChanges(false);
                 }}
-                className="px-3 py-1.5 rounded-xl border border-white/20 hover:bg-white/10 text-white font-bold text-xs transition-colors"
+                className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-medium text-xs transition-colors cursor-pointer"
               >
                 Batal
               </button>
@@ -1822,7 +1822,7 @@ export default function HomeCmsEditorPage() {
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md transition-all hover:scale-[1.02] disabled:opacity-50"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#007a4d] hover:bg-[#006841] text-white font-semibold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50"
             >
               <Save size={14} />
               <span>{isSaving ? "Menyimpan..." : "Simpan Perubahan"}</span>

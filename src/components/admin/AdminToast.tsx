@@ -9,37 +9,36 @@ export default function AdminToast() {
 
   if (!toast) return null;
 
-  const getIcon = () => {
+  const getStyle = () => {
     switch (toast.type) {
       case "success":
-        return <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />;
+        return {
+          icon: <CheckCircle2 size={17} className="text-[#006d44] shrink-0" />,
+          classes: "bg-[#d7f0e3] text-[#006d44] border border-[#006d44]/25 shadow-lg",
+        };
       case "warning":
-        return <AlertTriangle size={18} className="text-amber-400 shrink-0" />;
+        return {
+          icon: <AlertTriangle size={17} className="text-amber-600 shrink-0" />,
+          classes: "bg-amber-50 text-amber-900 border border-amber-200 shadow-lg",
+        };
       case "info":
       default:
-        return <Info size={18} className="text-blue-400 shrink-0" />;
+        return {
+          icon: <Info size={17} className="text-slate-600 shrink-0" />,
+          classes: "bg-white text-slate-800 border border-slate-200 shadow-xl",
+        };
     }
   };
 
-  const getBorderColor = () => {
-    switch (toast.type) {
-      case "success":
-        return "border-emerald-500/40 bg-[#062017]";
-      case "warning":
-        return "border-amber-500/40 bg-[#1c1404]";
-      case "info":
-      default:
-        return "border-blue-500/40 bg-[#061824]";
-    }
-  };
+  const { icon, classes } = getStyle();
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-200">
+    <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-200 pointer-events-none">
       <div
-        className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-white shadow-2xl border ${getBorderColor()} backdrop-blur-md max-w-md`}
+        className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl ${classes} max-w-md pointer-events-auto`}
       >
-        {getIcon()}
-        <span className="text-xs font-semibold tracking-wide leading-snug">
+        {icon}
+        <span className="text-xs font-semibold leading-snug">
           {toast.message}
         </span>
       </div>

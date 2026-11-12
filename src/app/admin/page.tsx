@@ -4,321 +4,175 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Users,
+  FileEdit,
   CalendarDays,
-  TrendingUp,
-  ArrowRight,
-  Clock,
-  Sparkles,
-  MapPin,
-  PlusCircle,
   ImageIcon,
   Megaphone,
+  ArrowRight,
+  ExternalLink,
+  Users,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 import { DIVISIONS } from "@/lib/constants";
 
 export default function AdminDashboardPage() {
-  const {
-    events,
-    gallery,
-    announcement,
-    toggleEventStatus,
-  } = useAdmin();
+  const { events, gallery, announcement } = useAdmin();
 
-  const activeEvents = events.filter((e) => e.status !== "completed");
+  const activeEventsCount = events.filter((e) => e.status !== "completed").length;
   const totalMembers = DIVISIONS.reduce(
     (sum, div) => sum + (div.members?.length || 0),
     0
   );
 
+  const modules = [
+    {
+      title: "Editor Beranda",
+      description: "Kelola banner hero, sambutan pembina, statistik, dan seksi beranda.",
+      icon: FileEdit,
+      href: "/admin/content/home",
+      stat: "7 Seksi Beranda",
+    },
+    {
+      title: "Manajemen Agenda",
+      description: "Kelola jadwal kajian, peringatan hari besar, dan kegiatan organisasi.",
+      icon: CalendarDays,
+      href: "/admin/agenda",
+      stat: `${activeEventsCount} Agenda Terdaftar`,
+    },
+    {
+      title: "Dokumentasi & Galeri",
+      description: "Kelola foto album syiar dakwah dan dokumentasi aktivitas siswa.",
+      icon: ImageIcon,
+      href: "/admin/galeri",
+      stat: `${gallery.length} Foto Dokumentasi`,
+    },
+    {
+      title: "Pengumuman & Pembina",
+      description: "Atur running announcement publik dan informasi dewan guru pembina.",
+      icon: Megaphone,
+      href: "/admin/pengumuman",
+      stat: announcement.isActive ? "Siaran Aktif" : "Siaran Nonaktif",
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* ── WELCOME HERO BANNER ── */}
-      <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#062017] via-[#0b3324] to-[#041610] p-6 sm:p-8 text-white shadow-[0_20px_50px_-12px_rgba(6,32,23,0.25)] border border-emerald-800/40 border-b-[5px] border-b-[#020d09]">
-        <div className="absolute -top-12 -right-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 right-32 w-48 h-48 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[10.5px] font-black tracking-wider text-amber-300 mb-3">
-              <Sparkles size={12} className="text-amber-400" />
-              <span>PORTAL EKSEKUTIF PENGURUS • ROHIS SMAPA 2026/2027</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Ahlan wa Sahlan, Pengurus BPH SMAPA
-            </h1>
-            <p className="text-xs sm:text-sm text-emerald-100/80 mt-1.5 max-w-2xl leading-relaxed">
-              Pusat kendali kegiatan dakwah, pengelolaan kajian Musholla Al-Ikhlas, dan dokumentasi publikasi pelajar SMA Negeri 4 Purwokerto.
-            </p>
+      {/* ── TOP BANNER: SELAMAT DATANG (MOCKUP 02) ── */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
+        <div className="max-w-xl">
+          <div className="inline-block bg-[#d7f0e3] text-[#006d44] font-semibold text-xs px-3 py-1 rounded-full mb-3">
+            Selamat Datang di Panel Admin
           </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            ROHIS SMA Negeri 4 Purwokerto
+          </h1>
+          <p className="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
+            Kelola konten website Rohis SMAPA dengan mudah, tertata, dan sesuai kebutuhan kegiatan organisasi.
+          </p>
 
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 shrink-0">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
             <Link
               href="/admin/agenda"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-b from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs border-b-[3px] border-b-amber-700 shadow-md transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#007a4d] hover:bg-[#006841] text-white text-xs font-semibold shadow-xs transition-colors"
             >
-              <PlusCircle size={15} />
-              <span>Agenda Baru</span>
+              <CalendarDays size={15} />
+              <span>Kelola Agenda</span>
             </Link>
+            <a
+              href="https://rohis-sman4pwt.web.id/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors"
+            >
+              <span>Lihat Web Publik</span>
+              <ExternalLink size={13} className="text-slate-400" />
+            </a>
           </div>
         </div>
 
-        {/* Running Announcement Notice */}
-        {announcement.isActive && (
-          <div className="mt-6 pt-4 border-t border-emerald-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-emerald-100/90">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span className="shrink-0 px-2.5 py-0.5 rounded-md bg-amber-400/20 text-amber-300 font-black text-[10px] uppercase tracking-wider border border-amber-400/30">
-                SIARAN AKTIF
-              </span>
-              <p className="truncate font-semibold">{announcement.content}</p>
-            </div>
+        {/* School Banner Image */}
+        <div className="relative w-full lg:w-96 h-48 sm:h-52 rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm shrink-0">
+          <Image
+            src="/images/rohis-akhdir-38.jpg"
+            alt="Kegiatan ROHIS SMAN 4 Purwokerto"
+            fill
+            sizes="(max-width: 768px) 100vw, 384px"
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex items-end p-3">
+            <span className="text-[11px] font-semibold text-white/90 drop-shadow-sm">
+              Rohis SMA Negeri 4 Purwokerto
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── MODULE CARDS (MOCKUP 02) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {modules.map((m) => {
+          const Icon = m.icon;
+          return (
             <Link
-              href="/admin/pengumuman"
-              className="shrink-0 text-amber-300 hover:text-amber-200 font-extrabold flex items-center gap-1 hover:underline text-[11px] self-end sm:self-auto"
+              key={m.href}
+              href={m.href}
+              className="group bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md hover:border-[#007a4d]/40 transition-all flex flex-col justify-between"
             >
-              <span>Kelola Siaran</span>
-              <ArrowRight size={12} />
+              <div>
+                <div className="w-10 h-10 rounded-2xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center mb-3.5 group-hover:bg-[#007a4d] group-hover:text-white transition-colors">
+                  <Icon size={20} />
+                </div>
+                <h2 className="text-sm font-bold text-slate-900 group-hover:text-[#007a4d] transition-colors">
+                  {m.title}
+                </h2>
+                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                  {m.description}
+                </p>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="font-semibold text-slate-600">{m.stat}</span>
+                <span className="text-[#007a4d] font-semibold inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                  Buka <ArrowRight size={13} />
+                </span>
+              </div>
             </Link>
-          </div>
-        )}
+          );
+        })}
       </div>
 
-      {/* ── 3D TACTILE KPI STATS GRID (UNIFIED MONOCHROME EMERALD & SLATE) ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-        {/* Stat 1: Total Pengurus & Kader */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_8px_20px_-6px_rgba(6,32,23,0.06)] hover:-translate-y-0.5 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
-              Pengurus & Kader
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-emerald-100 flex items-center justify-center border border-emerald-700/40 border-b-2 border-b-black shadow-xs">
-              <Users size={18} />
+      {/* ── BROADCAST STATUS BANNER ── */}
+      {announcement.isActive && (
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center shrink-0">
+              <Megaphone size={16} />
             </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">{totalMembers}</span>
-            <span className="text-xs font-bold text-slate-400">Kader Inti</span>
-          </div>
-          <div className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-emerald-800">
-            <TrendingUp size={13} />
-            <span>Tersebar di 6 Divisi Resmi</span>
-          </div>
-        </div>
-
-        {/* Stat 2: Agenda Berjalan */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_8px_20px_-6px_rgba(6,32,23,0.06)] hover:-translate-y-0.5 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
-              Agenda Aktif
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-emerald-100 flex items-center justify-center border border-emerald-700/40 border-b-2 border-b-black shadow-xs">
-              <CalendarDays size={18} />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">
-              {activeEvents.length}
-            </span>
-            <span className="text-xs font-bold text-slate-400">Kegiatan</span>
-          </div>
-          <div className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
-            <Clock size={13} className="text-emerald-800" />
-            <span>Terjadwal di Musholla Al-Ikhlas</span>
-          </div>
-        </div>
-
-        {/* Stat 3: Dokumentasi & Galeri */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_8px_20px_-6px_rgba(6,32,23,0.06)] hover:-translate-y-0.5 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
-              Galeri Syiar
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-emerald-100 flex items-center justify-center border border-emerald-700/40 border-b-2 border-b-black shadow-xs">
-              <ImageIcon size={18} />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">
-              {gallery.length}
-            </span>
-            <span className="text-xs font-bold text-slate-400">Dokumentasi</span>
-          </div>
-          <div className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-emerald-800">
-            <CheckCircle2 size={13} />
-            <span>Tersinkron ke Galeri Publik</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── MAIN WORKSPACE ── */}
-      <div className="space-y-6">
-          {/* Card: Manajemen Agenda Cepat */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_10px_28px_-8px_rgba(6,32,23,0.06)]">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-slate-900">
-                  Agenda & Jadwal Kegiatan Mendatang
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Monitoring jadwal kajian dakwah dan kegiatan syiar SMAPA
-                </p>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-[#006d44] bg-[#d7f0e3] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Siaran Berjalan
+                </span>
+                <span className="text-xs font-bold text-slate-800 truncate">
+                  {announcement.title || "Pengumuman Publik"}
+                </span>
               </div>
-              <Link
-                href="/admin/agenda"
-                className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#062017] text-slate-800 hover:text-white text-xs font-extrabold transition-colors flex items-center gap-1.5"
-              >
-                <span>Kelola Semua</span>
-                <ArrowRight size={13} />
-              </Link>
-            </div>
-
-            <div className="space-y-3.5">
-              {events.slice(0, 3).map((event) => (
-                <div
-                  key={event.id}
-                  className="p-4 rounded-2xl border border-slate-200/80 border-b-[2.5px] border-b-slate-300/80 bg-slate-50/50 hover:bg-white hover:border-emerald-800/35 transition-all"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-start gap-3.5 min-w-0">
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-[#062017] shrink-0 border border-slate-200 hidden sm:block">
-                        <Image
-                          src={event.image}
-                          alt={event.title}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                          sizes="56px"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#062017] text-emerald-100">
-                            {event.category}
-                          </span>
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
-                              event.status === "completed"
-                                ? "bg-slate-100 text-slate-600 border-slate-200"
-                                : "bg-emerald-50 text-emerald-900 border-emerald-200/80"
-                            }`}
-                          >
-                            {event.status === "completed"
-                              ? "Selesai Dilaksanakan"
-                              : "Akan Datang"}
-                          </span>
-                        </div>
-                        <h3 className="font-extrabold text-sm text-slate-900 truncate">
-                          {event.title}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1 font-medium">
-                          <span className="flex items-center gap-1">
-                            <Clock size={12} className="text-emerald-800" />
-                            {event.date} • {event.time}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin size={12} className="text-emerald-800" />
-                            {event.location}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Quick Action Buttons */}
-                    <div className="flex items-center gap-2 shrink-0 sm:self-center">
-                      <Link
-                        href="/admin/agenda"
-                        className="text-[11px] font-extrabold px-3 py-1.5 rounded-xl border border-slate-200/90 border-b-2 border-b-slate-300 bg-white hover:bg-[#062017] text-slate-800 hover:text-white transition-all"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() =>
-                          toggleEventStatus(
-                            event.id,
-                            event.status === "completed" ? "open" : "completed"
-                          )
-                        }
-                        className="text-[11px] font-bold px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
-                      >
-                        {event.status === "completed" ? "Aktifkan" : "Selesai"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              <p className="text-xs text-slate-500 truncate mt-0.5">
+                {announcement.content}
+              </p>
             </div>
           </div>
 
-          {/* Card: Pintasan Pengelolaan Konten & Media (3D Monochrome Cards) */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 border-b-[4px] border-b-slate-300/90 shadow-[0_10px_28px_-8px_rgba(6,32,23,0.06)]">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-slate-900">
-                  Pusat Pengelolaan Konten & Publikasi
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Pintasan cepat pengelolaan konten beranda, dokumentasi galeri, dan siaran pengumuman
-                </p>
-              </div>
-              <Link
-                href="/admin/content/home"
-                className="text-xs font-extrabold text-emerald-900 hover:underline flex items-center gap-1"
-              >
-                <span>Buka Live CMS</span>
-                <ArrowRight size={13} />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Link
-                href="/admin/content/home"
-                className="p-4.5 rounded-2xl bg-gradient-to-b from-white to-slate-50/80 border border-slate-200/90 border-b-[3px] border-b-slate-300 hover:border-emerald-800/40 hover:border-b-[#062017] shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-amber-300 flex items-center justify-center mb-3 border border-emerald-700/40 border-b-2 border-b-black shadow-xs group-hover:scale-105 transition-transform">
-                  <Sparkles size={18} />
-                </div>
-                <h3 className="font-extrabold text-xs text-slate-900 mb-1">
-                  Editor Live CMS Beranda
-                </h3>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Sesuaikan teks hero, statistik, dan sambutan pembina secara langsung.
-                </p>
-              </Link>
-
-              <Link
-                href="/admin/galeri"
-                className="p-4.5 rounded-2xl bg-gradient-to-b from-white to-slate-50/80 border border-slate-200/90 border-b-[3px] border-b-slate-300 hover:border-emerald-800/40 hover:border-b-[#062017] shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-emerald-100 flex items-center justify-center mb-3 border border-emerald-700/40 border-b-2 border-b-black shadow-xs group-hover:scale-105 transition-transform">
-                  <ImageIcon size={18} />
-                </div>
-                <h3 className="font-extrabold text-xs text-slate-900 mb-1">
-                  Galeri Dokumentasi
-                </h3>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Unggah dan perbarui foto kegiatan kajian, LDKR, dan syiar sekolah.
-                </p>
-              </Link>
-
-              <Link
-                href="/admin/pengumuman"
-                className="p-4.5 rounded-2xl bg-gradient-to-b from-white to-slate-50/80 border border-slate-200/90 border-b-[3px] border-b-slate-300 hover:border-emerald-800/40 hover:border-b-[#062017] shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-emerald-100 flex items-center justify-center mb-3 border border-emerald-700/40 border-b-2 border-b-black shadow-xs group-hover:scale-105 transition-transform">
-                  <Megaphone size={18} />
-                </div>
-                <h3 className="font-extrabold text-xs text-slate-900 mb-1">
-                  Siaran Pengumuman
-                </h3>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Atur teks running announcement dan amanat pembina di portal publik.
-                </p>
-              </Link>
-            </div>
-          </div>
+          <Link
+            href="/admin/pengumuman"
+            className="text-xs font-semibold text-[#007a4d] hover:underline shrink-0"
+          >
+            Ubah Siaran &rarr;
+          </Link>
         </div>
-      </div>
+      )}
+    </div>
   );
 }

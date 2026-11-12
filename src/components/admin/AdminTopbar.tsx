@@ -1,417 +1,185 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Menu,
-  Search,
-  Bell,
-  PlusCircle,
   ExternalLink,
-  Calendar,
-  CheckCircle2,
-  X,
-  KeyRound,
-  Lock,
-  Eye,
-  EyeOff,
-  Save,
+  ChevronDown,
+  Home,
+  User,
+  LogOut,
+  Settings,
 } from "lucide-react";
-import { useAdmin } from "@/context/AdminContext";
-import {
-  logoutAdmin,
-  getStoredAdminPassword,
-  getStoredAdminUsername,
-  updateAdminCredentials,
-} from "@/lib/adminAuth";
+import { logoutAdmin, getStoredAdminUsername } from "@/lib/adminAuth";
 
 interface AdminTopbarProps {
   onMenuToggle: () => void;
-  onOpenCreateAgenda?: () => void;
+  onOpenAccountModal: () => void;
 }
 
 export default function AdminTopbar({
   onMenuToggle,
+  onOpenAccountModal,
 }: AdminTopbarProps) {
   const pathname = usePathname();
-  const { searchQuery, setSearchQuery } = useAdmin();
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [adminUsername, setAdminUsername] = useState("admin");
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Change Password Modal State
-  const [newUsername, setNewUsername] = useState("admin");
-  const [currentPwInput, setCurrentPwInput] = useState("");
-  const [newPwInput, setNewPwInput] = useState("");
-  const [showPw, setShowPw] = useState(false);
-  const [pwFeedback, setPwFeedback] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  useEffect(() => {
+    setAdminUsername(getStoredAdminUsername());
 
-  React.useEffect(() => {
-    setMounted(true);
-    setNewUsername(getStoredAdminUsername());
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const openPasswordModal = () => {
-    setNewUsername(getStoredAdminUsername());
-    setCurrentPwInput("");
-    setNewPwInput("");
-    setPwFeedback(null);
-    setPasswordModalOpen(true);
-  };
-
-  const handleSaveNewPassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    const currentActual = getStoredAdminPassword();
-    if (currentPwInput !== currentActual) {
-      setPwFeedback({
-        type: "error",
-        text: "Password lama tidak sesuai!",
-      });
-      return;
-    }
-    if (newPwInput.trim().length < 4) {
-      setPwFeedback({
-        type: "error",
-        text: "Password baru minimal 4 karakter.",
-      });
-      return;
-    }
-    updateAdminCredentials(newPwInput.trim(), newUsername.trim() || "admin");
-    setPwFeedback({
-      type: "success",
-      text: "✓ Password & Username Admin berhasil diperbarui!",
-    });
-    setCurrentPwInput("");
-    setNewPwInput("");
-  };
 
   const getBreadcrumb = () => {
     switch (pathname) {
       case "/admin":
-        return { section: "Dashboard", title: "Ringkasan Eksekutif BPH" };
+        return { parent: null, current: "Dashboard" };
       case "/admin/content/home":
-        return { section: "Content Management", title: "Editor Konten Beranda (Live CMS)" };
+        return { parent: "Panel Admin", current: "Editor Beranda" };
       case "/admin/agenda":
-        return { section: "Agenda & Kajian", title: "Manajemen Jadwal Kegiatan" };
-      case "/admin/aspirasi":
-        return { section: "Layanan Pelajar", title: "Kotak Aspirasi & Konseling" };
+        return { parent: "Panel Admin", current: "Manajemen Agenda" };
       case "/admin/galeri":
-        return { section: "Publikasi Media", title: "Dokumentasi & Galeri Foto" };
+        return { parent: "Panel Admin", current: "Dokumentasi & Galeri" };
       case "/admin/pengumuman":
-        return { section: "Informasi", title: "Broadcast Pengumuman & Pembina" };
+        return { parent: "Panel Admin", current: "07 • Pengumuman & Pembina" };
       default:
-        return { section: "Admin", title: "Panel Pengurus BPH SMAPA" };
+        return { parent: "Panel Admin", current: "Admin SMAPA" };
     }
   };
 
   const breadcrumb = getBreadcrumb();
-  const totalNotifications = 0;
-
-  const formattedDate = mounted
-    ? new Intl.DateTimeFormat("id-ID", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(new Date())
-    : "Periode 2026/2027";
 
   return (
-    <>
-      <header className="sticky top-0 z-30 h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_2px_12px_rgba(6,32,23,0.03)] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-        {/* Left: Mobile hamburger & Breadcrumbs */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onMenuToggle}
-            className="p-2 text-slate-700 hover:text-emerald-950 hover:bg-slate-100 rounded-xl lg:hidden focus:outline-none cursor-pointer"
-            aria-label="Buka navigasi admin"
-          >
-            <Menu size={20} />
-          </button>
+    <header className="sticky top-0 z-30 h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      {/* Left: Mobile Toggle & Breadcrumb */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuToggle}
+          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl lg:hidden cursor-pointer"
+          aria-label="Buka Menu"
+        >
+          <Menu size={20} />
+        </button>
 
-          <div className="hidden sm:block">
-            <div className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
-              <span>ROHIS SMAPA</span>
-              <span>/</span>
-              <span className="text-emerald-800">{breadcrumb.section}</span>
-            </div>
-            <h2 className="text-sm font-black text-slate-900 leading-tight">
-              {breadcrumb.title}
-            </h2>
-          </div>
-        </div>
-
-        {/* Center: Global Search Input */}
-        <div className="flex-1 max-w-md hidden md:block">
-          <div className="relative">
-            <Search
-              size={14}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-            />
-            <input
-              type="text"
-              placeholder="Cari cepat agenda atau foto dokumentasi..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200/90 bg-slate-50/80 text-xs text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 focus:bg-white transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/60"
-                aria-label="Bersihkan pencarian"
-              >
-                <X size={13} />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Right: Date Badge, Quick Add, Notification, Password/Lock, View Public */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Date Stamp */}
-          <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 border border-slate-200/80 text-slate-700 text-[11px]">
-            <Calendar size={13} className="text-emerald-800" />
-            <span className="font-extrabold text-slate-900">{formattedDate}</span>
-          </div>
-
-          {/* Action button: Go to Agenda */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
           <Link
-            href="/admin/agenda"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] hover:from-[#114a35] hover:to-[#072419] text-white text-xs font-extrabold border border-emerald-700/40 border-b-[2.5px] border-b-black shadow-sm transition-all hover:-translate-y-0.5"
+            href="/admin"
+            className="flex items-center gap-1.5 hover:text-slate-800 transition-colors"
           >
-            <PlusCircle size={14} className="text-amber-300" />
-            <span className="hidden sm:inline">Agenda Baru</span>
-            <span className="sm:hidden">+ Agenda</span>
+            <Home size={15} className="text-slate-500" />
+            <span className="hidden sm:inline">Dashboard</span>
           </Link>
 
-          {/* Notification Bell Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setNotificationOpen(!notificationOpen)}
-              className="p-2 rounded-xl text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 relative border border-slate-200/90 border-b-[2px] border-b-slate-300 transition-all cursor-pointer"
-              aria-label="Pemberitahuan"
-            >
-              <Bell size={17} />
-              {mounted && totalNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-slate-950 text-[9.5px] font-black flex items-center justify-center shadow-xs border border-white">
-                  {totalNotifications}
-                </span>
-              )}
-            </button>
+          {breadcrumb.parent && (
+            <>
+              <span className="text-slate-300">/</span>
+              <span className="text-slate-600 hidden sm:inline">{breadcrumb.parent}</span>
+            </>
+          )}
 
-            {/* Notification Popover */}
-            {notificationOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-20"
-                  onClick={() => setNotificationOpen(false)}
-                />
-                <div className="absolute right-0 mt-2.5 w-80 sm:w-96 rounded-2xl bg-white shadow-[0_20px_50px_-12px_rgba(6,32,23,0.25)] border border-slate-200/90 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50/90 border-b border-slate-200/80">
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-xs text-slate-900">
-                        Notifikasi Pengurus
-                      </span>
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-950 text-amber-300">
-                        {totalNotifications} Aktif
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => setNotificationOpen(false)}
-                      className="text-[11px] font-bold text-slate-400 hover:text-slate-700 cursor-pointer"
-                    >
-                      Tutup
-                    </button>
-                  </div>
+          {breadcrumb.current !== "Dashboard" && (
+            <>
+              <span className="text-slate-300">/</span>
+              <span className="font-semibold text-slate-800">
+                {breadcrumb.current}
+              </span>
+            </>
+          )}
+        </nav>
+      </div>
 
-                  <div className="p-3 space-y-2 max-h-72 overflow-y-auto custom-scrollbar">
-                    <div className="text-center py-6 text-slate-400 text-xs">
-                      <CheckCircle2
-                        size={28}
-                        className="mx-auto mb-2 text-emerald-700"
-                      />
-                      Semua sistem dan pembaruan berjalan optimal!
-                    </div>
-                  </div>
+      {/* Right: Lihat Web Publik & User Profile */}
+      <div className="flex items-center gap-3">
+        <a
+          href="https://rohis-sman4pwt.web.id/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors shadow-2xs"
+        >
+          <ExternalLink size={13} className="text-slate-500" />
+          <span className="hidden sm:inline">Lihat Web Publik</span>
+          <span className="sm:hidden">Web</span>
+        </a>
 
-                  <div className="px-4 py-2.5 bg-slate-50/80 border-t border-slate-200/80 text-center">
-                    <Link
-                      href="/admin"
-                      onClick={() => setNotificationOpen(false)}
-                      className="text-[11px] font-extrabold text-emerald-900 hover:underline"
-                    >
-                      Lihat Ringkasan Dashboard →
-                    </Link>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Password & Lock Settings Button */}
+        {/* User Profile Dropdown */}
+        <div className="relative" ref={dropdownRef}>
           <button
             type="button"
-            onClick={openPasswordModal}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 border-b-[2px] border-b-slate-300 text-xs font-extrabold text-slate-800 transition-all cursor-pointer"
-            title="Pengaturan Password & Kunci Panel Admin"
+            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200/60"
           >
-            <KeyRound size={14} className="text-emerald-800" />
-            <span className="hidden lg:inline">Password</span>
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-emerald-100 border border-slate-200 shrink-0 relative">
+              <Image
+                src="/images/pembina-2.png"
+                alt="Foto Profil"
+                fill
+                sizes="32px"
+                className="object-cover"
+              />
+            </div>
+            <div className="text-left hidden md:block">
+              <span className="block text-xs font-semibold text-slate-800 leading-tight">
+                Saifur Ro&apos;yi, S.Pd.
+              </span>
+              <span className="block text-[10.5px] text-slate-400 font-medium">
+                {adminUsername === "admin" ? "Administrator" : adminUsername}
+              </span>
+            </div>
+            <ChevronDown size={14} className="text-slate-400 hidden sm:block" />
           </button>
 
-          {/* Public Website Preview Link */}
-          <a
-            href="https://rohis-sman4pwt.web.id/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 border-b-[2px] border-b-slate-300 text-xs font-extrabold text-slate-800 transition-all"
-            title="Buka Website Umum: https://rohis-sman4pwt.web.id/"
-          >
-            <span>Web Umum</span>
-            <ExternalLink size={12} className="text-emerald-800" />
-          </a>
-        </div>
-      </header>
-
-      {/* ── MODAL PENGATURAN PASSWORD & KUNCI ADMIN ── */}
-      {passwordModalOpen && (
-        <div
-          data-lenis-prevent="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150"
-        >
-          <div className="bg-white rounded-[28px] w-full max-w-md border border-slate-200/90 border-b-[5px] border-b-slate-300 shadow-[0_28px_70px_-15px_rgba(6,32,23,0.4)] overflow-hidden">
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#062017] via-emerald-700 to-[#062017]" />
-            <div className="p-6 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/70">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-950 bg-emerald-950/10 border border-emerald-800/20 px-2.5 py-1 rounded-md">
-                  KEAMANAN PANEL ADMIN
-                </span>
-                <h3 className="text-lg font-black text-slate-900 mt-1.5">
-                  Atur Password &amp; Kunci Akses
-                </h3>
+          {profileDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-52 rounded-2xl bg-white shadow-lg border border-slate-200/90 py-1.5 z-40 animate-in fade-in zoom-in-95 duration-100">
+              <div className="px-4 py-2 border-b border-slate-100">
+                <p className="text-xs font-bold text-slate-800">
+                  Saifur Ro&apos;yi, S.Pd.
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Pembina &bull; @{adminUsername}
+                </p>
               </div>
+
               <button
                 type="button"
-                onClick={() => setPasswordModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 bg-white hover:bg-slate-100 border border-slate-200/80 cursor-pointer"
+                onClick={() => {
+                  setProfileDropdownOpen(false);
+                  onOpenAccountModal();
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer text-left"
               >
-                <X size={18} />
+                <Settings size={14} className="text-slate-400" />
+                <span>Pengaturan Akun</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileDropdownOpen(false);
+                  logoutAdmin();
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer text-left"
+              >
+                <LogOut size={14} className="text-rose-400" />
+                <span>Keluar</span>
               </button>
             </div>
-
-            <div className="p-6 space-y-5 text-xs">
-              {/* Quick Lock Button */}
-              <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200/90 flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-extrabold text-slate-900">
-                    Kunci Panel Admin Sekarang
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Keluar dari sesi aktif dan minta password kembali.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPasswordModalOpen(false);
-                    logoutAdmin();
-                  }}
-                  className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
-                >
-                  <Lock size={13} />
-                  <span>Kunci</span>
-                </button>
-              </div>
-
-              {pwFeedback && (
-                <div
-                  className={`p-3.5 rounded-xl font-bold ${
-                    pwFeedback.type === "success"
-                      ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
-                      : "bg-rose-50 text-rose-800 border border-rose-200"
-                  }`}
-                >
-                  {pwFeedback.text}
-                </div>
-              )}
-
-              <form onSubmit={handleSaveNewPassword} className="space-y-3.5">
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1">
-                    Username Admin
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={newUsername}
-                    onChange={(e) => setNewUsername(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white font-bold text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1">
-                    Password Saat Ini *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPw ? "text" : "password"}
-                      required
-                      value={currentPwInput}
-                      onChange={(e) => setCurrentPwInput(e.target.value)}
-                      placeholder="Masukkan password saat ini..."
-                      className="w-full px-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white font-bold text-slate-900"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPw(!showPw)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer"
-                    >
-                      {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1">
-                    Password Baru *
-                  </label>
-                  <input
-                    type={showPw ? "text" : "password"}
-                    required
-                    value={newPwInput}
-                    onChange={(e) => setNewPwInput(e.target.value)}
-                    placeholder="Minimal 4 karakter..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white font-bold text-slate-900"
-                  />
-                </div>
-
-                <div className="pt-2 flex items-center justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPasswordModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl border border-slate-200 font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    Tutup
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-white font-extrabold border border-emerald-700/40 border-b-[2.5px] border-b-black flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Save size={14} className="text-amber-300" />
-                    <span>Simpan Password Baru</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          )}
         </div>
-      )}
-    </>
+      </div>
+    </header>
   );
 }

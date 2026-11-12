@@ -1,990 +1,672 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import {
   CalendarDays,
-  PlusCircle,
+  Plus,
   Search,
   Clock,
   MapPin,
   Trash2,
   Edit3,
   X,
-  Sparkles,
-  UserCheck,
-  ChevronDown,
-  Save,
-  Link2,
-  Type,
-  FileText,
+  ExternalLink,
   User,
-  Briefcase,
+  Info,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Save,
 } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 import { EventItem } from "@/lib/types";
 import { formatGoogleDriveUrl, handleGoogleDriveImageError } from "@/lib/driveUtils";
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
+import { pushCloudSync } from "@/lib/cloudSync";
 import ImageCropField from "@/components/admin/ImageCropField";
 
 export default function AdminAgendaPage() {
-  const { events, addEvent, updateEvent, deleteEvent, toggleEventStatus, searchQuery } =
-    useAdmin();
+  const { events, addEvent, updateEvent, deleteEvent, showToast } = useAdmin();
 
-  const [activeTab, setActiveTab] = useState<string>("all");
-  const [localSearch, setLocalSearch] = useState("");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
+  // Filters & Search
+  const [activeTab, setActiveTab] = useState<"all" | "upcoming" | "completed">("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const addFormRef = useRef<HTMLFormElement>(null);
-  const editFormRef = useRef<HTMLFormElement>(null);
+  // Modal / Drawer State
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<EventItem | null>(null);
 
+  // Delete Confirmation State
+  const [deletingItem, setDeletingItem] = useState<EventItem | null>(null);
+
+  // Form Fields
   const [formData, setFormData] = useState({
     title: "",
     category: "Kajian" as EventItem["category"],
-    date: "30 Oktober 2026",
-    time: "15:30 - 17:00 WIB",
-    location: "Musholla Al-Ikhlas SMAN 4 Purwokerto",
-    speaker: "Ustadz Toyyib Yuliadi, Sh. M.Pd",
-    speakerRole: "Guru PAI & Pembina Rohis SMAPA",
+    date: "27 Jan 2025",
+    time: "08.00 - 11.30",
+    location: "Aula SMA N 4 Purwokerto",
+    speaker: "Saifur Ro'yi, S.Pd.",
+    speakerRole: "Guru Pembina PAI SMA Negeri 4 Purwokerto",
     status: "open" as EventItem["status"],
-    image:
-      "https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1000&auto=format&fit=crop",
+    image: "/images/rohis-akhdir-38.jpg",
     description: "",
   });
 
-  const [editFormData, setEditFormData] = useState({
-    title: "",
-    category: "Kajian" as EventItem["category"],
-    date: "",
-    time: "",
-    location: "",
-    speaker: "",
-    speakerRole: "",
-    status: "open" as EventItem["status"],
-    image: "",
-    description: "",
-  });
+  const categories = [
+    "Kajian",
+    "Kajian & Peringatan Islam",
+    "Organisasi",
+    "Sosial",
+    "Pelatihan",
+    "PHBI",
+    "Muskerta",
+  ];
 
-  // Lock body scroll & Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsAddModalOpen(false);
-        setEditingEvent(null);
+  // Filtered Events
+  const filteredEvents = useMemo(() => {
+    return events.filter((e) => {
+      // Tab filter
+      if (activeTab === "upcoming" && e.status === "completed") {
+        return false;
       }
-    };
-    if (isAddModalOpen || editingEvent) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isAddModalOpen, editingEvent]);
+      if (activeTab === "completed" && e.status !== "completed") {
+        return false;
+      }
 
-  const openEditEventModal = (event: EventItem) => {
-    setEditingEvent(event);
-    setEditFormData({
-      title: event.title,
-      category: event.category,
-      date: event.date,
-      time: event.time,
-      location: event.location,
-      speaker: event.speaker || "",
-      speakerRole: event.speakerRole || "",
-      status: event.status,
-      image: event.image,
-      description: event.description,
+      // Search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matches =
+          e.title.toLowerCase().includes(q) ||
+          e.location.toLowerCase().includes(q) ||
+          (e.speaker && e.speaker.toLowerCase().includes(q)) ||
+          e.category.toLowerCase().includes(q);
+        if (!matches) return false;
+      }
+
+      return true;
     });
-  };
+  }, [events, activeTab, searchQuery]);
 
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingEvent || !editFormData.title.trim() || !editFormData.description.trim())
-      return;
-
-    updateEvent(editingEvent.id, {
-      title: editFormData.title.trim(),
-      category: editFormData.category,
-      date: editFormData.date.trim(),
-      time: editFormData.time.trim(),
-      location: editFormData.location.trim(),
-      speaker: editFormData.speaker.trim(),
-      speakerRole: editFormData.speakerRole.trim(),
-      status: editFormData.status,
-      image: formatGoogleDriveUrl(editFormData.image.trim()),
-      description: editFormData.description.trim(),
-    });
-
-    setEditingEvent(null);
-  };
-
-  const query = (localSearch || searchQuery).toLowerCase();
-
-  const filteredEvents = events.filter((e) => {
-    const matchesTab =
-      activeTab === "all"
-        ? true
-        : activeTab === "upcoming"
-        ? e.status !== "completed"
-        : e.status === "completed";
-
-    const matchesSearch =
-      e.title.toLowerCase().includes(query) ||
-      e.category.toLowerCase().includes(query) ||
-      e.location.toLowerCase().includes(query) ||
-      (e.speaker && e.speaker.toLowerCase().includes(query));
-
-    return matchesTab && matchesSearch;
-  });
-
-  const handleCreateSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.title || !formData.description) return;
-
-    addEvent({
-      ...formData,
-      quota: 0,
-      registered: 0,
-      image: formatGoogleDriveUrl(formData.image.trim()),
-    });
-
-    setIsAddModalOpen(false);
+  const openAddForm = () => {
+    setEditingItem(null);
     setFormData({
       title: "",
-      category: "Kajian",
-      date: "30 Oktober 2026",
-      time: "15:30 - 17:00 WIB",
-      location: "Musholla Al-Ikhlas SMAN 4 Purwokerto",
-      speaker: "Ustadz Toyyib Yuliadi, Sh. M.Pd",
-      speakerRole: "Guru PAI & Pembina Rohis SMAPA",
+      category: "Kajian & Peringatan Islam" as any,
+      date: "Sen, 27 Jan 2025",
+      time: "08.00 - 11.30",
+      location: "Aula SMAN 4 Purwokerto",
+      speaker: "Saifur Ro'yi, S.Pd.",
+      speakerRole: "Guru Pembina PAI SMA Negeri 4 Purwokerto",
       status: "open",
-      image:
-        "https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1000&auto=format&fit=crop",
+      image: "/images/rohis-akhdir-38.jpg",
       description: "",
     });
+    setIsFormOpen(true);
   };
 
-  const upcomingCount = events.filter((e) => e.status !== "completed").length;
-  const completedCount = events.filter((e) => e.status === "completed").length;
+  const openEditForm = (item: EventItem) => {
+    setEditingItem(item);
+    setFormData({
+      title: item.title,
+      category: item.category,
+      date: item.date,
+      time: item.time,
+      location: item.location,
+      speaker: item.speaker || "",
+      speakerRole: item.speakerRole || "",
+      status: item.status,
+      image: item.image,
+      description: item.description,
+    });
+    setIsFormOpen(true);
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title.trim() || !formData.date.trim()) {
+      showToast("Judul dan Tanggal kegiatan wajib diisi!", "warning");
+      return;
+    }
+
+    const payload = {
+      title: formData.title.trim(),
+      category: formData.category,
+      date: formData.date.trim(),
+      time: formData.time.trim(),
+      location: formData.location.trim(),
+      speaker: formData.speaker.trim(),
+      speakerRole: formData.speakerRole.trim(),
+      status: formData.status,
+      image: formData.image.trim() || "/images/rohis-akhdir-38.jpg",
+      description: formData.description.trim(),
+      quota: 150,
+      registered: 45,
+    };
+
+    if (editingItem) {
+      updateEvent(editingItem.id, payload);
+      showToast("Agenda berhasil diperbarui!", "success");
+    } else {
+      addEvent(payload);
+      showToast("Agenda baru berhasil ditambahkan!", "success");
+    }
+
+    setIsFormOpen(false);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deletingItem) return;
+    deleteEvent(deletingItem.id);
+    showToast(`Agenda "${deletingItem.title}" berhasil dihapus.`, "info");
+    setDeletingItem(null);
+  };
 
   return (
     <div className="space-y-6">
-      {/* ── PAGE HEADER ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/90 border-b-[4px] border-b-slate-300/80 shadow-[0_8px_24px_-6px_rgba(6,32,23,0.05)]">
-        <div className="flex items-start sm:items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] text-white flex items-center justify-center border border-emerald-700/40 border-b-[3px] border-b-black shadow-md shrink-0">
-            <CalendarDays size={22} className="text-emerald-100" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-emerald-950/[0.06] text-emerald-950 border border-emerald-900/15">
-                PENJADWALAN SYIAR
-              </span>
-              <span className="text-[11px] font-bold text-slate-400">
-                • {upcomingCount} Terjadwal / {completedCount} Selesai
-              </span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              Manajemen Agenda & Jadwal Kajian
-            </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Kelola jadwal kegiatan dakwah, kajian Jumat, LDKR, dan informasi pemateri Musholla Al-Ikhlas SMAPA
-            </p>
-          </div>
+      {/* ── HEADER (MOCKUP 04) ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Manajemen Agenda
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Kelola agenda dan kegiatan ROHIS SMAN 4 Purwokerto.
+          </p>
         </div>
 
         <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] hover:from-[#114a35] hover:to-[#072419] text-white font-extrabold text-xs border border-emerald-700/40 border-b-[3px] border-b-black shadow-md transition-all hover:-translate-y-0.5 shrink-0 self-start sm:self-auto cursor-pointer"
+          type="button"
+          onClick={openAddForm}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#007a4d] hover:bg-[#006841] text-white text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
         >
-          <PlusCircle size={15} className="text-amber-300" />
-          <span>Tambah Agenda Baru</span>
+          <Plus size={16} />
+          <span>Tambah Agenda</span>
         </button>
       </div>
 
-      {/* ── FILTER & SEARCH BAR ── */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/90 border-b-[3px] border-b-slate-300/70 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3">
-        <div
-          data-lenis-prevent="true"
-          onWheel={(e) => {
-            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-              e.currentTarget.scrollLeft += e.deltaY;
-            }
-          }}
-          className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full md:w-auto pb-1 md:pb-0 overscroll-contain"
-        >
-          {[
-            { id: "all", label: `Semua (${events.length})` },
-            { id: "upcoming", label: `Akan Datang (${upcomingCount})` },
-            { id: "completed", label: `Selesai (${completedCount})` },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                activeTab === tab.id
-                  ? "bg-[#062017] text-white border border-emerald-800 border-b-2 border-b-black shadow-xs"
-                  : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+      {/* ── TABS & SEARCH BAR (MOCKUP 04) ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-slate-200/80 shadow-2xs self-start">
+          <button
+            type="button"
+            onClick={() => setActiveTab("all")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === "all"
+                ? "bg-[#d7f0e3] text-[#006d44]"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Semua
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("upcoming")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === "upcoming"
+                ? "bg-[#d7f0e3] text-[#006d44]"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Akan Datang
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("completed")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === "completed"
+                ? "bg-[#d7f0e3] text-[#006d44]"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Selesai
+          </button>
         </div>
 
-        <div className="w-full md:w-80 relative shrink-0">
+        {/* Search Input */}
+        <div className="relative w-full sm:w-72">
           <Search
             size={14}
             className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
           />
           <input
             type="text"
-            placeholder="Cari judul kegiatan, lokasi, atau pemateri..."
-            value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
-            className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200/90 bg-slate-50/70 focus:bg-white text-xs text-slate-800 font-medium focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Cari judul, lokasi, atau pemateri"
+            className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#007a4d] transition-all"
           />
-          {localSearch && (
+          {searchQuery && (
             <button
               type="button"
-              onClick={() => setLocalSearch("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
-              <X size={13} />
+              <X size={14} />
             </button>
           )}
         </div>
       </div>
 
-      {/* ── EVENTS GRID ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredEvents.map((event) => (
-          <div
-            key={event.id}
-            className="bg-white rounded-3xl border border-slate-200/90 border-b-[4px] border-b-slate-300/90 hover:border-emerald-800/35 hover:border-b-[#062017] overflow-hidden shadow-[0_8px_24px_-6px_rgba(6,32,23,0.06)] hover:shadow-[0_18px_36px_-8px_rgba(6,32,23,0.12)] flex flex-col hover:-translate-y-0.5 transition-all duration-200 group"
-          >
-            {/* Event Image & Badges */}
-            <div className="relative h-44 w-full bg-[#062017] overflow-hidden">
-              <img
-                src={parseImageCrop(event.image).src}
-                alt={event.title}
-                referrerPolicy="no-referrer"
-                onError={(e) => handleGoogleDriveImageError(e, event.image)}
-                style={getImageCropStyle(event.image)}
-                className="w-full h-full object-cover transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
-
-              <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-[#062017]/90 text-emerald-100 border border-white/15 backdrop-blur-md shadow-xs">
-                  {event.category}
-                </span>
-
-                <span
-                  className={`text-[10px] font-extrabold px-2.5 py-1 rounded-lg backdrop-blur-md shadow-xs border ${
-                    event.status === "completed"
-                      ? "bg-slate-900/85 text-slate-200 border-white/15"
-                      : "bg-white/95 text-emerald-950 border-white"
-                  }`}
-                >
-                  {event.status === "completed" ? "✓ Selesai" : "● Akan Datang"}
-                </span>
-              </div>
-
-              <div className="absolute bottom-3 left-3.5 right-3.5">
-                <p className="text-[10.5px] font-bold text-amber-300 mb-0.5">
-                  {event.date} • {event.time}
-                </p>
-                <h3 className="font-extrabold text-sm text-white line-clamp-1">
-                  {event.title}
-                </h3>
-              </div>
-            </div>
-
-            {/* Event Body */}
-            <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center gap-2 text-slate-600 font-semibold">
-                  <MapPin size={13} className="text-emerald-800 shrink-0" />
-                  <span className="truncate">{event.location}</span>
-                </div>
-
-                {event.speaker && (
-                  <div className="flex items-center gap-2 text-slate-600 font-semibold">
-                    <UserCheck size={13} className="text-emerald-800 shrink-0" />
-                    <span className="truncate">
-                      {event.speaker} ({event.speakerRole || "Pemateri"})
-                    </span>
-                  </div>
-                )}
-
-                <p className="text-slate-500 text-[11.5px] line-clamp-2 leading-relaxed pt-1">
-                  {event.description}
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                <span className="text-[10px] font-extrabold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/80">
-                  Terbuka Umum
-                </span>
-
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => openEditEventModal(event)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#062017] text-slate-800 hover:text-white border border-slate-200/90 border-b-2 border-b-slate-300 hover:border-[#062017] text-[11px] font-extrabold transition-all cursor-pointer shadow-2xs"
-                    title="Edit rincian agenda"
-                  >
-                    <Edit3 size={12} />
-                    <span>Edit</span>
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      toggleEventStatus(
-                        event.id,
-                        event.status === "completed" ? "open" : "completed"
-                      )
-                    }
-                    className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-200/70 text-[11px] font-bold text-slate-700 transition-colors cursor-pointer"
-                    title="Ganti status pelaksanaan"
-                  >
-                    {event.status === "completed" ? "Aktifkan" : "Selesai"}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      if (confirm(`Yakin ingin menghapus agenda "${event.title}"?`)) {
-                        deleteEvent(event.id);
-                      }
-                    }}
-                    className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 bg-white hover:bg-rose-50 border border-slate-200/80 hover:border-rose-200 transition-colors cursor-pointer"
-                    title="Hapus Agenda"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* ── INFO BANNER (MOCKUP 04) ── */}
+      <div className="p-4 rounded-2xl bg-[#d7f0e3]/50 border border-[#006d44]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5 text-[#006d44]">
+          <Info size={16} className="shrink-0" />
+          <span>
+            Agenda yang dikelola di sini akan ditampilkan pada halaman Agenda di website publik ROHIS SMAN 4 Purwokerto.
+          </span>
+        </div>
+        <a
+          href="https://rohis-sman4pwt.web.id/agenda"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-[#006d44] hover:underline flex items-center gap-1 shrink-0"
+        >
+          <span>Lihat di Web Publik</span>
+          <ExternalLink size={12} />
+        </a>
       </div>
 
-      {filteredEvents.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-3xl border border-slate-200/90">
-          <CalendarDays size={36} className="mx-auto mb-2 text-slate-300" />
-          <h3 className="text-sm font-bold text-slate-800">
-            Tidak ada agenda yang cocok
-          </h3>
-          <p className="text-xs text-slate-400 mt-1">
-            Coba ubah kata kunci pencarian atau pilih tab status di atas.
-          </p>
+      {/* ── AGENDA TABLE (MOCKUP 04) ── */}
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-[#f8faf9] text-slate-500 font-semibold border-b border-slate-200/80">
+              <tr>
+                <th className="py-3 px-4 w-12 text-center">No.</th>
+                <th className="py-3 px-4 w-32">Foto Kegiatan</th>
+                <th className="py-3 px-4">Judul Kegiatan</th>
+                <th className="py-3 px-4 w-40">Tanggal</th>
+                <th className="py-3 px-4 w-32">Status</th>
+                <th className="py-3 px-4 w-36 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredEvents.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-slate-400">
+                    Tidak ada agenda yang sesuai dengan pencarian atau filter.
+                  </td>
+                </tr>
+              ) : (
+                filteredEvents.map((item, idx) => {
+                  const isUpcoming = item.status !== "completed";
+                  const { src: imgSrc } = parseImageCrop(item.image);
+
+                  return (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-slate-50/70 transition-colors"
+                    >
+                      {/* No. */}
+                      <td className="py-3 px-4 text-center text-slate-500 font-medium">
+                        {idx + 1}
+                      </td>
+
+                      {/* Foto */}
+                      <td className="py-3 px-4">
+                        <div className="relative w-20 h-13 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                          <Image
+                            src={formatGoogleDriveUrl(imgSrc)}
+                            alt={item.title}
+                            fill
+                            sizes="80px"
+                            className="object-cover"
+                            onError={handleGoogleDriveImageError}
+                          />
+                        </div>
+                      </td>
+
+                      {/* Judul Kegiatan & Category */}
+                      <td className="py-3 px-4">
+                        <span className="font-bold text-slate-900 block">
+                          {item.title}
+                        </span>
+                        <span className="text-[11px] text-slate-400 mt-0.5 block">
+                          {item.category} • {item.location}
+                        </span>
+                      </td>
+
+                      {/* Tanggal */}
+                      <td className="py-3 px-4 text-slate-600 font-medium">
+                        {item.date}
+                      </td>
+
+                      {/* Status */}
+                      <td className="py-3 px-4">
+                        <span
+                          className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${
+                            isUpcoming
+                              ? "bg-[#d7f0e3] text-[#006d44]"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {isUpcoming ? "Akan Datang" : "Selesai"}
+                        </span>
+                      </td>
+
+                      {/* Aksi */}
+                      <td className="py-3 px-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openEditForm(item)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
+                          >
+                            <Edit3 size={12} className="text-slate-500" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeletingItem(item)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50/60 hover:bg-rose-100/80 text-rose-700 text-xs font-medium transition-colors cursor-pointer"
+                          >
+                            <Trash2 size={12} className="text-rose-500" />
+                            <span>Hapus</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
 
-      {/* ════════════════════════════════════════════════════════════════════════
-          MODAL 1: TAMBAH AGENDA BARU (STICKY HEADER + SCROLL BODY + STICKY FOOTER)
-         ════════════════════════════════════════════════════════════════════════ */}
-      {isAddModalOpen && (
-        <div
-          data-lenis-prevent="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150 overscroll-contain"
-          onClick={() => setIsAddModalOpen(false)}
-          onWheel={(e) => {
-            if (addFormRef.current && !addFormRef.current.contains(e.target as Node)) {
-              addFormRef.current.scrollTop += e.deltaY;
-            }
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            data-lenis-prevent="true"
-            className="bg-white rounded-[28px] max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-[0_28px_70px_-15px_rgba(6,32,23,0.45)] border border-slate-200/90 overscroll-contain"
-          >
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#062017] via-emerald-800 to-[#062017] shrink-0" />
+        {/* Footer Counter */}
+        <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>
+            Menampilkan 1–{filteredEvents.length} dari {events.length} agenda
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              disabled
+              className="p-1 rounded-md text-slate-300 border border-slate-200"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <span className="px-2.5 py-0.5 rounded-md bg-[#007a4d] text-white font-semibold">
+              1
+            </span>
+            <button
+              disabled
+              className="p-1 rounded-md text-slate-300 border border-slate-200"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+      </div>
 
-            {/* Sticky Header */}
-            <div className="px-6 sm:px-7 py-4.5 bg-gradient-to-b from-slate-50/90 to-white border-b border-slate-200/80 flex items-center justify-between gap-4 shrink-0">
+      {/* ── MODAL / PANEL TAMBAH & EDIT AGENDA (MOCKUP 04) ── */}
+      {isFormOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl w-full max-w-lg border border-slate-200/80 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="p-6 border-b border-slate-100 flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-950 bg-emerald-950/[0.07] border border-emerald-900/15 px-2.5 py-0.5 rounded-md">
-                  FORMULIR AGENDA BARU
-                </span>
-                <h2 className="text-base sm:text-lg font-black text-slate-900 mt-1 tracking-tight">
-                  Tambah Agenda & Kajian Rohis SMAPA
-                </h2>
+                <h3 className="text-lg font-bold text-slate-900">
+                  {editingItem ? "Edit Agenda" : "Tambah Agenda"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Tambah agenda atau kegiatan baru untuk ditampilkan di website publik.
+                </p>
               </div>
               <button
                 type="button"
-                onClick={() => setIsAddModalOpen(false)}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                onClick={() => setIsFormOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
               >
                 <X size={18} />
               </button>
             </div>
 
-            {/* Scrollable Body */}
-            <form
-              ref={addFormRef}
-              id="add-agenda-form"
-              onSubmit={handleCreateSubmit}
-              data-lenis-prevent="true"
-              className="flex-1 overflow-y-auto overscroll-contain px-6 sm:px-7 py-5 space-y-4 text-xs custom-scrollbar"
-            >
-              <ImageCropField
-                label="URL Gambar Poster / Banner (Atau Upload File)"
-                value={formData.image}
-                onChange={(val) => setFormData({ ...formData, image: val })}
-                aspectRatio="16:10"
-                previewBadge={formData.category}
-                previewTitle={formData.title || "Judul Agenda Baru"}
-                previewSubtitle={`${formData.date} • ${formData.time}`}
-              />
-
+            {/* Form Fields */}
+            <form onSubmit={handleFormSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
+              {/* Foto Kegiatan */}
               <div>
-                <label className="block font-extrabold text-slate-700 mb-1.5">
-                  Judul Kegiatan / Kajian <span className="text-rose-500">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Foto Kegiatan <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative">
-                  <Type
-                    size={14}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                  />
+                <ImageCropField
+                  value={formData.image}
+                  onChange={(val) => setFormData({ ...formData, image: val })}
+                  aspectRatio="16:9"
+                  label=""
+                  placeholder="https://drive.google.com/... atau URL foto"
+                />
+              </div>
+
+              {/* Judul Kegiatan */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Judul Kegiatan <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="Peringatan Isra Mi'raj"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
+                />
+              </div>
+
+              {/* Kategori */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Kategori <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value as any })
+                  }
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
+                >
+                  {categories.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Tanggal & Waktu */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Tanggal <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Kajian Rutin Jumat: Adab Penuntut Ilmu"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    placeholder="Sen, 27 Jan 2025"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Waktu <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    placeholder="08.00 - 11.30"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Kategori Kegiatan <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          category: e.target.value as EventItem["category"],
-                        })
-                      }
-                      className="w-full appearance-none pl-3.5 pr-9 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all cursor-pointer"
-                    >
-                      <option value="Kajian">Kajian</option>
-                      <option value="MABIT">MABIT (Malam Bina Iman & Taqwa)</option>
-                      <option value="Pelatihan">Pelatihan / Leadership</option>
-                      <option value="Sosial">Bakti Sosial & Peduli</option>
-                      <option value="Lomba">Lomba Islami Pelajar</option>
-                    </select>
-                    <ChevronDown
-                      size={15}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Status Pelaksanaan <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={formData.status}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          status: e.target.value as EventItem["status"],
-                        })
-                      }
-                      className="w-full appearance-none pl-3.5 pr-9 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all cursor-pointer"
-                    >
-                      <option value="open">Akan Datang (Terjadwal)</option>
-                      <option value="completed">Selesai Dilaksanakan</option>
-                    </select>
-                    <ChevronDown
-                      size={15}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Tanggal Kegiatan <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <CalendarDays
-                      size={14}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: 30 Oktober 2026"
-                      value={formData.date}
-                      onChange={(e) =>
-                        setFormData({ ...formData, date: e.target.value })
-                      }
-                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Waktu / Jam Pelaksanaan <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Clock
-                      size={14}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: 15:30 - 17:00 WIB"
-                      value={formData.time}
-                      onChange={(e) =>
-                        setFormData({ ...formData, time: e.target.value })
-                      }
-                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
+              {/* Lokasi */}
               <div>
-                <label className="block font-extrabold text-slate-700 mb-1.5">
-                  Lokasi Musholla / Ruangan <span className="text-rose-500">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Lokasi <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <MapPin
                     size={14}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                   />
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Musholla Al-Ikhlas SMAN 4 Purwokerto"
                     value={formData.location}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
-                    }
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    placeholder="Aula SMAN 4 Purwokerto"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {/* Pemateri & Jabatan */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Nama Pemateri / Ustadz
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Pemateri <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <User
                       size={14}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                     />
                     <input
                       type="text"
-                      placeholder="Contoh: Ustadz Toyyib Yuliadi, Sh. M.Pd"
+                      required
                       value={formData.speaker}
                       onChange={(e) =>
                         setFormData({ ...formData, speaker: e.target.value })
                       }
-                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
+                      placeholder="Saifur Ro'yi, S.Pd."
+                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
                     />
                   </div>
                 </div>
-
                 <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Jabatan / Keterangan Pemateri
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Jabatan Pemateri <span className="text-rose-500">*</span>
                   </label>
-                  <div className="relative">
-                    <Briefcase
-                      size={14}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Contoh: Pembina Rohis & Guru PAI SMAPA"
-                      value={formData.speakerRole}
-                      onChange={(e) =>
-                        setFormData({ ...formData, speakerRole: e.target.value })
-                      }
-                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-extrabold text-slate-700 mb-1.5">
-                  Deskripsi & Arahan Kegiatan <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <FileText
-                    size={14}
-                    className="absolute left-3.5 top-3 text-slate-400 pointer-events-none"
-                  />
-                  <textarea
-                    required
-                    rows={3}
-                    placeholder="Jelaskan ringkasan materi kajian, perlengkapan yang perlu dibawa siswa, dsb..."
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-medium leading-relaxed focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                  />
-                </div>
-              </div>
-            </form>
-
-            {/* Sticky Footer */}
-            <div className="px-6 sm:px-7 py-4 bg-slate-50/90 border-t border-slate-200/80 flex items-center justify-end gap-2.5 shrink-0">
-              <button
-                type="button"
-                onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200/90 border-b-2 border-b-slate-300 text-slate-700 font-extrabold text-xs transition-all cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                form="add-agenda-form"
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] hover:from-[#114a35] hover:to-[#072419] text-white font-extrabold text-xs border border-emerald-700/40 border-b-[2.5px] border-b-black shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <Save size={14} className="text-amber-300" />
-                <span>Simpan & Terbitkan Agenda</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ════════════════════════════════════════════════════════════════════════
-          MODAL 2: EDIT AGENDA & KAJIAN (STICKY HEADER + SCROLL BODY + STICKY FOOTER)
-         ════════════════════════════════════════════════════════════════════════ */}
-      {editingEvent && (
-        <div
-          data-lenis-prevent="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150 overscroll-contain"
-          onClick={() => setEditingEvent(null)}
-          onWheel={(e) => {
-            if (editFormRef.current && !editFormRef.current.contains(e.target as Node)) {
-              editFormRef.current.scrollTop += e.deltaY;
-            }
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            data-lenis-prevent="true"
-            className="bg-white rounded-[28px] max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-[0_28px_70px_-15px_rgba(6,32,23,0.45)] border border-slate-200/90 overscroll-contain"
-          >
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#062017] via-emerald-800 to-[#062017] shrink-0" />
-
-            {/* Sticky Header */}
-            <div className="px-6 sm:px-7 py-4.5 bg-gradient-to-b from-slate-50/90 to-white border-b border-slate-200/80 flex items-center justify-between gap-4 shrink-0">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-950 bg-emerald-950/[0.07] border border-emerald-900/15 px-2.5 py-0.5 rounded-md">
-                    EDIT AGENDA
-                  </span>
-                  <span className="text-[10px] font-mono font-bold text-slate-600 bg-slate-100 border border-slate-200/80 px-2 py-0.5 rounded-md">
-                    ID: {editingEvent.id}
-                  </span>
-                </div>
-                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                  Perbarui Agenda & Kajian Dakwah
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditingEvent(null)}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors shrink-0 cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Scrollable Body */}
-            <form
-              ref={editFormRef}
-              id="edit-agenda-form"
-              onSubmit={handleEditSubmit}
-              data-lenis-prevent="true"
-              className="flex-1 overflow-y-auto overscroll-contain px-6 sm:px-7 py-5 space-y-4 text-xs custom-scrollbar"
-            >
-              {/* Interactive Banner Crop & Preview Studio */}
-              <ImageCropField
-                label="URL Gambar Poster / Banner (Atau Upload File)"
-                value={editFormData.image}
-                onChange={(val) =>
-                  setEditFormData({ ...editFormData, image: val })
-                }
-                aspectRatio="16:10"
-                previewBadge={editFormData.category}
-                previewTitle={`Preview Banner: ${editFormData.title || "Tanpa Judul"}`}
-                previewSubtitle={`${editFormData.date} • ${editFormData.time}`}
-              />
-
-              <div>
-                <label className="block font-extrabold text-slate-700 mb-1.5">
-                  Judul Kegiatan / Kajian <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <Type
-                    size={14}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                  />
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Kajian Rutin Jumat: Adab Penuntut Ilmu"
-                    value={editFormData.title}
+                    value={formData.speakerRole}
                     onChange={(e) =>
-                      setEditFormData({ ...editFormData, title: e.target.value })
+                      setFormData({ ...formData, speakerRole: e.target.value })
                     }
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
+                    placeholder="Guru Pembina PAI SMA Negeri 4 Purwokerto"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Kategori Kegiatan <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={editFormData.category}
-                      onChange={(e) =>
-                        setEditFormData({
-                          ...editFormData,
-                          category: e.target.value as EventItem["category"],
-                        })
-                      }
-                      className="w-full appearance-none pl-3.5 pr-9 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all cursor-pointer"
-                    >
-                      <option value="Kajian">Kajian</option>
-                      <option value="MABIT">MABIT (Malam Bina Iman & Taqwa)</option>
-                      <option value="Pelatihan">Pelatihan / Leadership</option>
-                      <option value="Sosial">Bakti Sosial & Peduli</option>
-                      <option value="Lomba">Lomba Islami Pelajar</option>
-                    </select>
-                    <ChevronDown
-                      size={15}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Status Pelaksanaan <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={editFormData.status}
-                      onChange={(e) =>
-                        setEditFormData({
-                          ...editFormData,
-                          status: e.target.value as EventItem["status"],
-                        })
-                      }
-                      className="w-full appearance-none pl-3.5 pr-9 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all cursor-pointer"
-                    >
-                      <option value="open">Akan Datang (Terjadwal)</option>
-                      <option value="completed">Selesai Dilaksanakan</option>
-                    </select>
-                    <ChevronDown
-                      size={15}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Tanggal Kegiatan <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <CalendarDays
-                      size={14}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: 25 Oktober 2026"
-                      value={editFormData.date}
-                      onChange={(e) =>
-                        setEditFormData({ ...editFormData, date: e.target.value })
-                      }
-                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Waktu / Jam Pelaksanaan <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Clock
-                      size={14}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: 15:30 - 17:00 WIB"
-                      value={editFormData.time}
-                      onChange={(e) =>
-                        setEditFormData({ ...editFormData, time: e.target.value })
-                      }
-                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
+              {/* Status Kegiatan */}
               <div>
-                <label className="block font-extrabold text-slate-700 mb-1.5">
-                  Lokasi Musholla / Ruangan <span className="text-rose-500">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Status Kegiatan
                 </label>
-                <div className="relative">
-                  <MapPin
-                    size={14}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                  />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Contoh: Musholla Al-Ikhlas SMAN 4 Purwokerto"
-                    value={editFormData.location}
-                    onChange={(e) =>
-                      setEditFormData({ ...editFormData, location: e.target.value })
-                    }
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                  />
+                <div className="flex gap-3">
+                  <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={formData.status !== "completed"}
+                      onChange={() => setFormData({ ...formData, status: "open" })}
+                      className="text-[#007a4d] focus:ring-[#007a4d]"
+                    />
+                    <span>Akan Datang (Aktif)</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={formData.status === "completed"}
+                      onChange={() => setFormData({ ...formData, status: "completed" })}
+                      className="text-[#007a4d] focus:ring-[#007a4d]"
+                    />
+                    <span>Selesai (Arsip)</span>
+                  </label>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Nama Pemateri / Ustadz
-                  </label>
-                  <div className="relative">
-                    <User
-                      size={14}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Contoh: Ustadz Toyyib Yuliadi, Sh. M.Pd"
-                      value={editFormData.speaker}
-                      onChange={(e) =>
-                        setEditFormData({ ...editFormData, speaker: e.target.value })
-                      }
-                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-extrabold text-slate-700 mb-1.5">
-                    Jabatan / Keterangan Pemateri
-                  </label>
-                  <div className="relative">
-                    <Briefcase
-                      size={14}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Contoh: Pembina Rohis & Guru PAI SMAPA"
-                      value={editFormData.speakerRole}
-                      onChange={(e) =>
-                        setEditFormData({
-                          ...editFormData,
-                          speakerRole: e.target.value,
-                        })
-                      }
-                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-semibold focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
+              {/* Deskripsi */}
               <div>
-                <label className="block font-extrabold text-slate-700 mb-1.5">
-                  Deskripsi & Arahan Kegiatan <span className="text-rose-500">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Deskripsi <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative">
-                  <FileText
-                    size={14}
-                    className="absolute left-3.5 top-3 text-slate-400 pointer-events-none"
-                  />
-                  <textarea
-                    required
-                    rows={3}
-                    placeholder="Jelaskan ringkasan materi kajian, perlengkapan yang perlu dibawa..."
-                    value={editFormData.description}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        description: e.target.value,
-                      })
-                    }
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 font-medium leading-relaxed focus:outline-none focus:border-emerald-800 focus:ring-3 focus:ring-emerald-900/10 transition-all"
-                  />
-                </div>
+                <textarea
+                  required
+                  rows={3}
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Kegiatan peringatan hari besar keagamaan diisi kajian dan hikmah..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-[#f8faf9] text-xs font-medium text-slate-800 focus:outline-none focus:border-[#007a4d] focus:bg-white transition-all resize-none"
+                />
               </div>
-            </form>
 
-            {/* Sticky Footer */}
-            <div className="px-6 sm:px-7 py-4 bg-slate-50/90 border-t border-slate-200/80 flex items-center justify-between gap-3 shrink-0">
-              <span className="text-[11px] font-semibold text-slate-400 hidden sm:inline">
-                Tekan <kbd className="px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-700 font-mono text-[10px]">ESC</kbd> untuk menutup
-              </span>
-              <div className="flex items-center gap-2.5 ml-auto">
+              {/* Notice Pill */}
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#d7f0e3]/60 text-[#006d44] border border-[#006d44]/15 text-xs font-medium">
+                <Info size={14} className="shrink-0" />
+                <span>Perubahan belum disimpan.</span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setEditingEvent(null)}
-                  className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200/90 border-b-2 border-b-slate-300 text-slate-700 font-extrabold text-xs transition-all cursor-pointer"
+                  onClick={() => setIsFormOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  form="edit-agenda-form"
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-b from-[#0d3b2a] to-[#051a12] hover:from-[#114a35] hover:to-[#072419] text-white font-extrabold text-xs border border-emerald-700/40 border-b-[2.5px] border-b-black shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#007a4d] hover:bg-[#006841] text-white shadow-xs transition-colors cursor-pointer"
                 >
-                  <Save size={14} className="text-amber-300" />
-                  <span>Simpan Perubahan Agenda</span>
+                  Simpan Agenda
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── DIALOG KONFIRMASI HAPUS (MOCKUP 04) ── */}
+      {deletingItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl w-full max-w-sm border border-slate-200/80 shadow-2xl p-6 animate-in zoom-in-95 duration-150">
+            <h3 className="text-base font-bold text-slate-900 mb-1.5">
+              Hapus agenda ini?
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed mb-6">
+              Agenda &ldquo;<span className="font-semibold text-slate-900">{deletingItem.title}</span>&rdquo; akan dihapus secara permanen dan tidak dapat dikembalikan.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setDeletingItem(null)}
+                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 size={13} />
+                <span>Hapus</span>
+              </button>
             </div>
           </div>
         </div>
