@@ -710,8 +710,8 @@ export default function HomePage() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-                {/* Left: Both Pembina Selector Cards */}
-                <div className="lg:col-span-5 grid grid-cols-2 gap-3 sm:gap-4">
+                {/* Left: Both Pembina Selector Cards (Atas-Bawah Layout) */}
+                <div className="lg:col-span-5 flex flex-col gap-3 sm:gap-4">
                   {pembinaList.map((pembina, idx) => {
                     const isActive = activePembinaIndex === idx;
                     return (
@@ -719,13 +719,13 @@ export default function HomePage() {
                         key={pembina.id}
                         type="button"
                         onClick={() => setActivePembinaIndex(idx)}
-                        className={`text-left p-3 sm:p-4 rounded-[20px] transition-all duration-200 cursor-pointer flex flex-col items-center text-center ${
+                        className={`w-full text-left p-3.5 sm:p-4.5 rounded-[22px] transition-all duration-200 cursor-pointer flex items-center gap-3.5 sm:gap-4 ${
                           isActive
-                            ? "clay-card-mint ring-2 ring-[#087A53]/35"
+                            ? "clay-card-mint ring-2 ring-[#087A53]/35 shadow-sm"
                             : "clay-inner hover:bg-[#EBF7F1]"
                         }`}
                       >
-                        <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-2xl overflow-hidden clay-photo-frame p-1 mb-3 shrink-0">
+                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden clay-photo-frame p-1 shrink-0">
                           <img
                             src={parseImageCrop(pembina.image).src}
                             alt={pembina.name}
@@ -737,18 +737,23 @@ export default function HomePage() {
                             className="w-full h-full object-cover rounded-xl"
                           />
                         </div>
-                        <h3 className="font-heading font-extrabold text-xs sm:text-sm text-[#153E32] leading-snug line-clamp-2 mb-1.5">
-                          {pembina.name}
-                        </h3>
-                        <span
-                          className={`px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold ${
-                            isActive
-                              ? "clay-btn-emerald text-white"
-                              : "clay-pill-mint text-[#087A53]"
-                          }`}
-                        >
-                          {pembina.role} ROHIS
-                        </span>
+                        <div className="flex-1 min-w-0">
+                          <span
+                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold mb-1.5 ${
+                              isActive
+                                ? "clay-btn-emerald text-white"
+                                : "clay-pill-mint text-[#087A53]"
+                            }`}
+                          >
+                            {pembina.role} ROHIS
+                          </span>
+                          <h3 className="font-heading font-extrabold text-sm sm:text-base text-[#153E32] leading-snug line-clamp-2">
+                            {pembina.name}
+                          </h3>
+                          <p className="text-[11px] sm:text-xs text-[#4A6B5F] mt-0.5">
+                            Guru Pembina PAI SMA Negeri 4 Purwokerto
+                          </p>
+                        </div>
                       </button>
                     );
                   })}
