@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { usePublicSiteUrl } from "@/hooks/usePublicSiteUrl";
 import {
   verifyAdminPassword,
   loginAdminSession,
@@ -12,6 +13,7 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
+  const publicSiteUrl = usePublicSiteUrl();
   const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -50,11 +52,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#edf4f0] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200/80">
+    <div className="admin-clay3d min-h-screen bg-[#edf4f0] flex items-center justify-center p-4">
+      <div className="admin-login-card w-full max-w-md admin-surface bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200/80">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="relative w-28 h-24">
+          <div className="admin-login-logo relative w-28 h-24">
             <Image
               src="/images/logo-transparent.png"
               alt="Logo ROHIS SMAPA"
@@ -68,7 +70,7 @@ export default function LoginPage() {
 
         {/* Heading */}
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center shrink-0">
+          <div className="admin-icon w-9 h-9 rounded-xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center shrink-0">
             <Lock size={18} />
           </div>
           <div>
@@ -121,7 +123,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                aria-label="Tampilkan password"
+                aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -152,7 +154,7 @@ export default function LoginPage() {
         {/* Back to Public Web */}
         <div className="mt-5 text-center">
           <a
-            href="https://rohis-sman4pwt.web.id/"
+            href={publicSiteUrl}
             className="text-xs font-semibold text-[#007a4d] hover:underline"
           >
             Kembali ke Website Publik

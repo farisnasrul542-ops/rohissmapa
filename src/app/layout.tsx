@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./public-clay.css";
+import "./admin-clay.css";
 import { SITE } from "@/lib/constants";
 import SmoothScroll from "@/components/SmoothScroll";
+import PublicAppearance from "@/components/PublicAppearance";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.publicUrl || "https://rohis-sman4pwt.web.id"),
@@ -52,7 +55,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased clay-canvas text-[#153E32] selection:bg-[#DCF8EC] selection:text-[#087A53] overflow-x-hidden">
-        <SmoothScroll>{children}</SmoothScroll>
+        <SmoothScroll><PublicAppearance>{children}</PublicAppearance></SmoothScroll>
       </body>
     </html>
   );

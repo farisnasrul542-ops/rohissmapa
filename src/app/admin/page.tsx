@@ -10,21 +10,20 @@ import {
   Megaphone,
   ArrowRight,
   ExternalLink,
-  Users,
-  CheckCircle2,
-  Sparkles,
 } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
-import { DIVISIONS } from "@/lib/constants";
+import ClayTilt from "@/components/ClayTilt";
+import { usePublicSiteUrl } from "@/hooks/usePublicSiteUrl";
+import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
+import { handleGoogleDriveImageError } from "@/lib/driveUtils";
 
 export default function AdminDashboardPage() {
-  const { events, gallery, announcement } = useAdmin();
+  const { events, gallery, announcement, homeCms } = useAdmin();
+  const publicSiteUrl = usePublicSiteUrl();
 
   const activeEventsCount = events.filter((e) => e.status !== "completed").length;
-  const totalMembers = DIVISIONS.reduce(
-    (sum, div) => sum + (div.members?.length || 0),
-    0
-  );
+  const enabledSections = Object.values(homeCms.sections).filter(Boolean).length;
+  const heroImage = homeCms.hero.showcaseImageUrl || "/images/rohis-akhdir-38.jpg";
 
   const modules = [
     {
@@ -32,7 +31,7 @@ export default function AdminDashboardPage() {
       description: "Kelola banner hero, sambutan pembina, statistik, dan seksi beranda.",
       icon: FileEdit,
       href: "/admin/content/home",
-      stat: "7 Seksi Beranda",
+      stat: `${enabledSections} Bagian Aktif`,
     },
     {
       title: "Manajemen Agenda",
@@ -60,7 +59,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       {/* ── TOP BANNER: SELAMAT DATANG (MOCKUP 02) ── */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
+      <div className="admin-hero admin-surface">
         <div className="max-w-xl">
           <div className="inline-block bg-[#d7f0e3] text-[#006d44] font-semibold text-xs px-3 py-1 rounded-full mb-3">
             Selamat Datang di Panel Admin
@@ -81,7 +80,7 @@ export default function AdminDashboardPage() {
               <span>Kelola Agenda</span>
             </Link>
             <a
-              href="https://rohis-sman4pwt.web.id/"
+              href={publicSiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors"
@@ -93,38 +92,42 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* School Banner Image */}
-        <div className="relative w-full lg:w-96 h-48 sm:h-52 rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm shrink-0">
-          <Image
-            src="/images/rohis-akhdir-38.jpg"
-            alt="Kegiatan ROHIS SMAN 4 Purwokerto"
-            fill
-            sizes="(max-width: 768px) 100vw, 384px"
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex items-end p-3">
-            <span className="text-[11px] font-semibold text-white/90 drop-shadow-sm">
-              Rohis SMA Negeri 4 Purwokerto
-            </span>
+        <ClayTilt className="admin-hero-photo">
+          <div>
+            <Image
+              src={parseImageCrop(heroImage).src}
+              alt={homeCms.hero.showcaseTitle || "Kegiatan ROHIS SMAN 4 Purwokerto"}
+              fill
+              sizes="(max-width: 1280px) 100vw, 420px"
+              className="object-cover"
+              style={getImageCropStyle(heroImage)}
+              onError={handleGoogleDriveImageError}
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex items-end p-3">
+              <span className="text-[11px] font-semibold text-white/90 drop-shadow-sm">
+                {homeCms.hero.showcaseTitle || "Rohis SMA Negeri 4 Purwokerto"}
+              </span>
+            </div>
           </div>
-        </div>
+        </ClayTilt>
       </div>
 
       {/* ── MODULE CARDS (MOCKUP 02) ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6">
         {modules.map((m) => {
           const Icon = m.icon;
           return (
             <Link
               key={m.href}
               href={m.href}
-              className="group bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md hover:border-[#007a4d]/40 transition-all flex flex-col justify-between"
+              className="admin-module group admin-surface flex flex-col justify-between"
             >
               <div>
-                <div className="w-10 h-10 rounded-2xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center mb-3.5 group-hover:bg-[#007a4d] group-hover:text-white transition-colors">
+                <div className="admin-icon w-12 h-12 rounded-2xl flex items-center justify-center mb-5">
                   <Icon size={20} />
                 </div>
-                <h2 className="text-sm font-bold text-slate-900 group-hover:text-[#007a4d] transition-colors">
+                <h2 className="text-base font-bold text-slate-900 group-hover:text-[#007a4d] transition-colors">
                   {m.title}
                 </h2>
                 <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
@@ -145,7 +148,7 @@ export default function AdminDashboardPage() {
 
       {/* ── BROADCAST STATUS BANNER ── */}
       {announcement.isActive && (
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="admin-notice rounded-2xl p-4 sm:p-5 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-8 h-8 rounded-xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center shrink-0">
               <Megaphone size={16} />

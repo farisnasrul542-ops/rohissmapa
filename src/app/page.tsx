@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import ClayTilt from "@/components/ClayTilt";
 import Footer from "@/components/Footer";
 import EventRegisterModal from "@/components/EventRegisterModal";
 import Gallery3DShowcase, {
@@ -425,12 +426,13 @@ export default function HomePage() {
       {cms.sections.showHero && (
         <section
           aria-label="Beranda Rohis SMAN 4 Purwokerto"
-          className="pt-24 pb-8 sm:pt-28 sm:pb-10 lg:pt-32 lg:pb-12 relative overflow-hidden"
+          className="clay-hero-section pt-24 pb-8 sm:pt-28 sm:pb-10 lg:pt-32 lg:pb-12 relative"
         >
           <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            <div className="clay-hero-panel clay-card-mint grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
               {/* Left Column: Headline, Narrative & Clay Action Pills */}
-              <div className="lg:col-span-6 text-left">
+              <div className="clay-hero-copy lg:col-span-6 text-left">
+                <span className="clay-hero-eyebrow clay-pill-mint">PELAJAR MUSLIM SMAPA</span>
                 <CinematicTextLine delay={0.04}>
                   <h1 className="font-heading text-3xl sm:text-5xl lg:text-[54px] font-extrabold text-[#153E32] tracking-tight leading-[1.08] mb-4 sm:mb-5">
                     {isDefaultHeroTitle ? (
@@ -470,7 +472,7 @@ export default function HomePage() {
 
                     <Link
                       href="/agenda"
-                      className="clay-btn-mint px-6 sm:px-7 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-bold inline-flex items-center gap-2 min-h-[44px]"
+                      className="clay-btn-white px-6 sm:px-7 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-bold inline-flex items-center gap-2 min-h-[44px]"
                     >
                       <span>Lihat kegiatan</span>
                       <ArrowRight size={16} />
@@ -486,7 +488,9 @@ export default function HomePage() {
                 distance={18}
                 className="lg:col-span-6"
               >
-                <div className="clay-photo-frame p-2.5 sm:p-3.5">
+                <ClayTilt>
+                <div className="clay-hero-sculpture">
+                <div className="clay-photo-frame clay-hero-frame p-2.5 sm:p-3.5">
                   <div className="relative aspect-[16/10] w-full rounded-[18px] overflow-hidden bg-[#E5F2EC]">
                     <img
                       src={
@@ -513,7 +517,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Mint Clay Caption Bar beneath Hero Photo */}
-                  <div className="mt-2.5 clay-inner-mint px-4 py-2.5 rounded-[14px] flex items-center justify-between gap-3">
+                  <div className="clay-hero-caption clay-inner-mint px-4 py-2.5 rounded-[14px] flex items-center justify-between gap-3">
                     <span className="font-heading font-extrabold text-xs sm:text-sm text-[#153E32] tracking-wide uppercase">
                       {cms.hero?.showcaseTitle || "ROHIS AKHDIR 38"}
                     </span>
@@ -523,18 +527,20 @@ export default function HomePage() {
                     </span>
                   </div>
                 </div>
+                </div>
+                </ClayTilt>
               </CinematicReveal>
             </div>
 
             {/* ── 2. 4-ITEM CLAY SHORTCUT BAR (Matches 01_beranda_hero.png) ── */}
-            <CinematicStagger className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-10">
+            <CinematicStagger className="clay-shortcuts clay-card grid grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-10">
               {SHORTCUT_ITEMS.map((item) => {
                 const Icon = item.icon;
                 return (
                   <CinematicStaggerItem key={item.id}>
                     <Link
                       href={item.href}
-                      className="clay-card clay-card-hover px-3.5 py-3 sm:px-5 sm:py-4 flex items-center justify-between gap-2.5 group min-h-[54px]"
+                      className="clay-shortcut flex items-center justify-center gap-2.5 group min-h-[54px] rounded-2xl"
                     >
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl clay-icon-sq flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
@@ -876,7 +882,7 @@ export default function HomePage() {
           aria-label="Agenda dan Kegiatan Rohis"
           className="py-12 sm:py-16 lg:py-20 relative overflow-hidden"
         >
-          <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="clay-stage-podium max-w-[1176px] mx-4 sm:mx-6 lg:mx-auto px-1 sm:px-6 lg:px-8 relative z-10">
             <CinematicReveal
               direction="up"
               delay={0.06}
@@ -935,7 +941,7 @@ export default function HomePage() {
               onTouchCancel={handleAgendaDragEnd}
             >
               <div
-                className="relative w-full h-[395px] sm:h-[435px] lg:h-[455px] flex items-center justify-center"
+                className="relative w-full h-[425px] sm:h-[465px] lg:h-[485px] flex items-center justify-center"
                 style={{
                   transformStyle: prefersReducedMotion ? "flat" : "preserve-3d",
                 }}
@@ -1009,23 +1015,23 @@ export default function HomePage() {
                     opacity = isCenter ? 1 : isVisible ? 0.55 : 0;
                     pointerEvents = isVisible ? "auto" : "none";
                   } else if (isCenter) {
-                    transform = `translate3d(${currentDrag}px, 0, 36px) rotateY(${dragAngle}deg) scale(1)`;
+                    transform = `translate3d(${currentDrag}px, -4px, 64px) rotateY(${dragAngle}deg) scale(1)`;
                     zIndex = 35;
                     opacity = 1;
                     pointerEvents = "auto";
                   } else if (isLeft) {
                     transform = `translate3d(calc(-56% + ${
                       currentDrag * 0.55
-                    }px), 6px, -65px) rotateY(${15 + dragAngle}deg) scale(0.89)`;
+                    }px), 8px, -90px) rotateY(${23 + dragAngle}deg) scale(0.88)`;
                     zIndex = 15;
-                    opacity = 0.78;
+                    opacity = 0.96;
                     pointerEvents = "auto";
                   } else if (isRight) {
                     transform = `translate3d(calc(56% + ${
                       currentDrag * 0.55
-                    }px), 6px, -65px) rotateY(${-15 + dragAngle}deg) scale(0.89)`;
+                    }px), 8px, -90px) rotateY(${-23 + dragAngle}deg) scale(0.88)`;
                     zIndex = 15;
-                    opacity = 0.78;
+                    opacity = 0.96;
                     pointerEvents = "auto";
                   } else if (dist < -1) {
                     transform =
@@ -1042,6 +1048,7 @@ export default function HomePage() {
                   return (
                     <article
                       key={event.id}
+                      data-active={isCenter}
                       onClick={() => {
                         if (agendaHasMovedRef.current) return;
                         if (isLeft) prevAgenda();
@@ -1067,7 +1074,7 @@ export default function HomePage() {
                           ? "opacity 100ms ease"
                           : "transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 380ms cubic-bezier(0.22, 1, 0.36, 1)",
                       }}
-                      className={`absolute w-[78vw] min-w-[255px] max-w-[330px] sm:w-[380px] sm:max-w-none lg:w-[430px] clay-card p-3 sm:p-4 flex flex-col justify-between text-left select-none cursor-pointer ${
+                      className={`clay-coverflow-card absolute w-[68vw] min-w-[220px] max-w-[305px] sm:w-[350px] sm:max-w-none lg:w-[400px] clay-card p-3 sm:p-4 flex flex-col justify-between text-left select-none cursor-pointer ${
                         isCenter
                           ? "shadow-[0_20px_42px_-12px_rgba(15,62,46,0.18)]"
                           : "hover:opacity-90"

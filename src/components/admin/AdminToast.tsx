@@ -33,7 +33,7 @@ export default function AdminToast() {
   const { icon, classes } = getStyle();
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-200 pointer-events-none">
+    <div role="status" aria-live="polite" className="admin-toast fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-200 pointer-events-none">
       <div
         className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl ${classes} max-w-md pointer-events-auto`}
       >

@@ -212,7 +212,7 @@ export default function Gallery3DShowcase({
       aria-label="Galeri Syiar dan Ukhuwah"
       className="scroll-mt-24 py-12 sm:py-16 lg:py-20 relative overflow-hidden"
     >
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="clay-stage-podium max-w-[1176px] mx-4 sm:mx-6 lg:mx-auto px-1 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#153E32] tracking-tight">
@@ -263,7 +263,7 @@ export default function Gallery3DShowcase({
           onTouchCancel={handleDragEnd}
         >
           <div
-            className="relative w-full h-[380px] sm:h-[420px] lg:h-[440px] flex items-center justify-center"
+            className="relative w-full h-[445px] sm:h-[470px] lg:h-[480px] flex items-center justify-center"
             style={{
               transformStyle: prefersReducedMotion ? "flat" : "preserve-3d",
             }}
@@ -332,23 +332,23 @@ export default function Gallery3DShowcase({
                 opacity = isCenter ? 1 : isVisible ? 0.55 : 0;
                 pointerEvents = isVisible ? "auto" : "none";
               } else if (isCenter) {
-                transform = `translate3d(${currentDrag}px, 0, 36px) rotateY(${dragAngle}deg) scale(1)`;
+                transform = `translate3d(${currentDrag}px, -4px, 64px) rotateY(${dragAngle}deg) scale(1)`;
                 zIndex = 35;
                 opacity = 1;
                 pointerEvents = "auto";
               } else if (isLeft) {
                 transform = `translate3d(calc(-56% + ${
                   currentDrag * 0.55
-                }px), 6px, -65px) rotateY(${15 + dragAngle}deg) scale(0.89)`;
+                }px), 8px, -90px) rotateY(${23 + dragAngle}deg) scale(0.88)`;
                 zIndex = 15;
-                opacity = 0.78;
+                opacity = 0.96;
                 pointerEvents = "auto";
               } else if (isRight) {
                 transform = `translate3d(calc(56% + ${
                   currentDrag * 0.55
-                }px), 6px, -65px) rotateY(${-15 + dragAngle}deg) scale(0.89)`;
+                }px), 8px, -90px) rotateY(${-23 + dragAngle}deg) scale(0.88)`;
                 zIndex = 15;
-                opacity = 0.78;
+                opacity = 0.96;
                 pointerEvents = "auto";
               } else if (dist < -1) {
                 transform =
@@ -377,6 +377,7 @@ export default function Gallery3DShowcase({
               return (
                 <article
                   key={item.id}
+                  data-active={isCenter}
                   onClick={() => {
                     if (hasMovedRef.current) return;
                     if (isLeft) prevSlide();
@@ -397,7 +398,7 @@ export default function Gallery3DShowcase({
                       ? "opacity 100ms ease"
                       : "transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 380ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
-                  className={`absolute w-[78vw] min-w-[255px] max-w-[330px] sm:w-[380px] sm:max-w-none lg:w-[430px] clay-card p-3 sm:p-4 flex flex-col justify-between text-left select-none cursor-pointer ${
+                  className={`clay-coverflow-card absolute w-[68vw] min-w-[220px] max-w-[305px] sm:w-[350px] sm:max-w-none lg:w-[400px] clay-card p-3 sm:p-4 flex flex-col justify-between text-left select-none cursor-pointer ${
                     isCenter
                       ? "shadow-[0_20px_42px_-12px_rgba(15,62,46,0.18)]"
                       : "hover:opacity-90"

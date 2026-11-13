@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -16,6 +16,8 @@ import {
   X,
 } from "lucide-react";
 import { logoutAdmin } from "@/lib/adminAuth";
+import { useAdminOverlay } from "@/hooks/useAdminOverlay";
+import { usePublicSiteUrl } from "@/hooks/usePublicSiteUrl";
 
 interface AdminSidebarProps {
   mobileOpen: boolean;
@@ -29,6 +31,15 @@ export default function AdminSidebar({
   onOpenAccountModal,
 }: AdminSidebarProps) {
   const pathname = usePathname();
+  const publicSiteUrl = usePublicSiteUrl();
+  const drawerRef = useRef<HTMLDivElement>(null);
+  useAdminOverlay(mobileOpen, drawerRef, () => setMobileOpen(false));
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => { if (desktop.matches) setMobileOpen(false); };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, [setMobileOpen]);
 
   const navItems = [
     {
@@ -67,15 +78,15 @@ export default function AdminSidebar({
   };
 
   const SidebarContent = (
-    <div className="flex flex-col h-full bg-white text-slate-800 border-r border-slate-200/80 select-none shadow-[2px_0_16px_rgba(0,0,0,0.02)]">
+    <div className="admin-sidebar-shell flex flex-col h-full bg-white text-slate-800 select-none">
       {/* Brand Header */}
       <div className="p-6 border-b border-slate-100 flex items-center justify-between">
         <Link
           href="/admin"
-          className="flex items-center gap-3.5 group"
+          className="flex items-center gap-3 group"
           onClick={() => setMobileOpen(false)}
         >
-          <div className="w-11 h-11 rounded-2xl bg-[#edf4f0] flex items-center justify-center p-2 border border-slate-200/80 shrink-0 group-hover:scale-105 transition-transform">
+          <div className="admin-icon w-12 h-12 rounded-2xl flex items-center justify-center p-1.5 shrink-0">
             <Image
               src="/images/logo-transparent.png"
               alt="Logo Rohis SMAPA"
@@ -105,7 +116,8 @@ export default function AdminSidebar({
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-1.5 custom-scrollbar">
+      <nav aria-label="Navigasi admin" className="flex-1 overflow-y-auto px-4 py-5 custom-scrollbar" data-lenis-prevent>
+        <p className="admin-sidebar-label">KELOLA WEBSITE</p>
         {navItems.map((item) => {
           const active = isActive(item.href, item.exact);
           const Icon = item.icon;
@@ -114,8 +126,9 @@ export default function AdminSidebar({
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+              className={`admin-nav-item flex items-center gap-3 rounded-xl text-xs font-semibold transition-all duration-150 ${
                 active
                   ? "bg-[#007a4d] text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
@@ -129,12 +142,12 @@ export default function AdminSidebar({
             </Link>
           );
         })}
-      </div>
+      </nav>
 
       {/* Bottom Section: Lihat Web Publik, Akun, Keluar */}
-      <div className="p-4 border-t border-slate-100 space-y-1 bg-white">
+      <div className="admin-sidebar-footer p-4 border-t border-slate-100 space-y-1">
         <a
-          href="https://rohis-sman4pwt.web.id/"
+          href={publicSiteUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:text-[#007a4d] hover:bg-[#edf4f0]/60 transition-colors"
@@ -170,7 +183,7 @@ export default function AdminSidebar({
   return (
     <>
       {/* Desktop Sidebar (Permanent) */}
-      <aside className="hidden lg:block w-64 h-screen fixed left-0 top-0 z-40">
+      <aside className="hidden lg:block w-[272px] h-screen fixed left-0 top-0 z-40">
         {SidebarContent}
       </aside>
 
@@ -178,10 +191,10 @@ export default function AdminSidebar({
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+            className="admin-drawer-backdrop fixed inset-0 bg-[#153e32]/35 backdrop-blur-xs"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 w-64 max-w-[80vw] z-10 shadow-2xl animate-in slide-in-from-left duration-200">
+          <div ref={drawerRef} role="dialog" aria-modal="true" aria-label="Menu admin" tabIndex={-1} className="admin-drawer fixed inset-y-0 left-0 w-72 max-w-[88vw] z-10">
             {SidebarContent}
           </div>
         </div>

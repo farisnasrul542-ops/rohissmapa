@@ -220,7 +220,7 @@ export default function HomeCmsEditorPage() {
   return (
     <div className="space-y-6 pb-28">
       {/* Top Header Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div className="admin-surface bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10.5px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#d7f0e3] text-[#006d44]">
@@ -285,7 +285,7 @@ export default function HomeCmsEditorPage() {
             e.currentTarget.scrollLeft += e.deltaY;
           }
         }}
-        className="bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-2xs overflow-x-auto scrollbar-thin overscroll-contain"
+        className="admin-tabs bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-2xs overflow-x-auto scrollbar-thin overscroll-contain"
       >
         <div className="flex items-center gap-1 min-w-max">
           {subnavItems.map((tab) => {
@@ -295,6 +295,7 @@ export default function HomeCmsEditorPage() {
               <button
                 key={tab.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                   active
@@ -315,7 +316,7 @@ export default function HomeCmsEditorPage() {
 
       {/* ── 1. HERO & HEADLINE ── */}
       {activeTab === "hero" && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
@@ -344,7 +345,7 @@ export default function HomeCmsEditorPage() {
             </div>
             <div>
               <label className="block font-bold text-gray-700 mb-1">
-                Headline Baris 2 (Gradasi Emas)
+                Headline Baris 2 (Aksen Hijau)
               </label>
               <input
                 type="text"
@@ -356,7 +357,7 @@ export default function HomeCmsEditorPage() {
 
             <div className="md:col-span-2">
               <label className="block font-bold text-gray-700 mb-1">
-                Lead Phrase (Sub-Headline Emas)
+                Teks Pengantar
               </label>
               <input
                 type="text"
@@ -381,7 +382,7 @@ export default function HomeCmsEditorPage() {
             {/* Buttons */}
             <div>
               <label className="block font-bold text-gray-700 mb-1">
-                Teks Tombol Profil Rohis (Putih)
+                Teks Tombol Profil Rohis
               </label>
               <input
                 type="text"
@@ -405,7 +406,7 @@ export default function HomeCmsEditorPage() {
 
             <div>
               <label className="block font-bold text-gray-700 mb-1">
-                Teks Tombol Galeri (Emas)
+                Teks Tombol Galeri
               </label>
               <input
                 type="text"
@@ -563,7 +564,7 @@ export default function HomeCmsEditorPage() {
 
       {/* ── 2. STATISTIK CAPAIAN (4 ANGKA) ── */}
       {activeTab === "stats" && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
@@ -652,7 +653,7 @@ export default function HomeCmsEditorPage() {
 
       {/* ── 3. TENTANG KAMI (ABOUT EDITORIAL) ── */}
       {activeTab === "about" && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
@@ -824,7 +825,7 @@ export default function HomeCmsEditorPage() {
 
       {/* ── 4. SAMBUTAN PEMBINA 1 & 2 ── */}
       {activeTab === "sambutan" && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 gap-3">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
@@ -1367,7 +1368,7 @@ export default function HomeCmsEditorPage() {
 
       {/* ── 5. AGENDA & 3D COVERFLOW ── */}
       {activeTab === "agenda" && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
@@ -1443,7 +1444,7 @@ export default function HomeCmsEditorPage() {
 
       {/* ── 6. GALERI DOKUMENTASI KEGIATAN SMAPA ── */}
       {activeTab === "gallery" && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
@@ -1606,7 +1607,7 @@ export default function HomeCmsEditorPage() {
 
       {/* ── 7. AJAKAN BERGABUNG (CTA CLOSING) ── */}
       {activeTab === "closing" && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
@@ -1711,7 +1712,7 @@ export default function HomeCmsEditorPage() {
 
       {/* ── 8. KONFIGURASI SEKSI (VISIBILITAS) ── */}
       {activeTab === "sections" && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
@@ -1789,7 +1790,7 @@ export default function HomeCmsEditorPage() {
       )}
 
       {/* Floating Sticky Save Footer Bar */}
-      <div className="fixed bottom-6 left-4 sm:left-auto right-4 sm:right-8 z-40 max-w-xl ml-auto">
+      <div className="admin-savebar fixed bottom-6 left-4 sm:left-auto right-4 sm:right-8 z-40 max-w-xl ml-auto">
         <div className="p-3 px-5 rounded-2xl bg-white/95 backdrop-blur-md text-slate-800 shadow-xl border border-slate-200/90 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <span

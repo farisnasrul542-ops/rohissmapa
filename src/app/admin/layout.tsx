@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   Lock,
@@ -15,6 +15,8 @@ import { AdminProvider } from "@/context/AdminContext";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminTopbar from "@/components/admin/AdminTopbar";
 import AdminToast from "@/components/admin/AdminToast";
+import { useAdminOverlay } from "@/hooks/useAdminOverlay";
+import { usePublicSiteUrl } from "@/hooks/usePublicSiteUrl";
 import {
   isAdminAuthenticated,
   verifyAdminPassword,
@@ -33,6 +35,9 @@ export default function AdminLayout({
   const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const publicSiteUrl = usePublicSiteUrl();
+  const accountDialogRef = useRef<HTMLDivElement>(null);
+  useAdminOverlay(accountModalOpen, accountDialogRef, () => setAccountModalOpen(false));
 
   // Login Gate State
   const [username, setUsername] = useState("admin");
@@ -63,9 +68,11 @@ export default function AdminLayout({
       return;
     }
 
-    setMounted(true);
-    setAuthenticated(isAdminAuthenticated());
-    setAccUsername(getStoredAdminUsername());
+    queueMicrotask(() => {
+      setMounted(true);
+      setAuthenticated(isAdminAuthenticated());
+      setAccUsername(getStoredAdminUsername());
+    });
 
     const syncAuth = () => {
       setAuthenticated(isAdminAuthenticated());
@@ -142,7 +149,7 @@ export default function AdminLayout({
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#edf4f0] flex items-center justify-center text-slate-500 text-xs font-semibold">
+      <div className="admin-clay3d min-h-screen bg-[#edf4f0] flex items-center justify-center text-slate-500 text-xs font-semibold">
         Memeriksa sesi login admin...
       </div>
     );
@@ -151,11 +158,11 @@ export default function AdminLayout({
   // ── LOGIN PAGE (MOCKUP 01: AKSES ADMIN & AKUN) ──
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-[#edf4f0] flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200/80">
+      <div className="admin-clay3d min-h-screen bg-[#edf4f0] flex items-center justify-center p-4">
+        <div className="admin-login-card w-full max-w-md admin-surface bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200/80">
           {/* Logo */}
           <div className="flex justify-center mb-6">
-            <div className="relative w-28 h-24">
+            <div className="admin-login-logo relative w-28 h-24">
               <Image
                 src="/images/logo-transparent.png"
                 alt="Logo ROHIS SMAPA"
@@ -169,7 +176,7 @@ export default function AdminLayout({
 
           {/* Heading */}
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center shrink-0">
+            <div className="admin-icon w-9 h-9 rounded-xl bg-[#d7f0e3] text-[#006d44] flex items-center justify-center shrink-0">
               <Lock size={18} />
             </div>
             <div>
@@ -222,7 +229,7 @@ export default function AdminLayout({
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  aria-label="Tampilkan password"
+                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -253,7 +260,7 @@ export default function AdminLayout({
           {/* Back to Public Web */}
           <div className="mt-5 text-center">
             <a
-              href="https://rohis-sman4pwt.web.id/"
+              href={publicSiteUrl}
               className="text-xs font-semibold text-[#007a4d] hover:underline"
             >
               Kembali ke Website Publik
@@ -267,7 +274,7 @@ export default function AdminLayout({
   // ── AUTHENTICATED ADMIN LAYOUT ──
   return (
     <AdminProvider>
-      <div className="min-h-screen bg-[#edf4f0] text-slate-800">
+      <div className="admin-clay3d min-h-screen bg-[#edf4f0] text-slate-800">
         {/* Sidebar */}
         <AdminSidebar
           mobileOpen={mobileSidebarOpen}
@@ -276,13 +283,13 @@ export default function AdminLayout({
         />
 
         {/* Main Content Area */}
-        <div className="lg:pl-64 flex flex-col min-h-screen">
+        <div className="lg:pl-72 flex flex-col min-h-screen">
           <AdminTopbar
             onMenuToggle={() => setMobileSidebarOpen(true)}
             onOpenAccountModal={openAccountModal}
           />
 
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+          <main className="admin-main flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
             {children}
           </main>
         </div>
@@ -290,10 +297,10 @@ export default function AdminLayout({
         {/* ── MODAL PENGATURAN AKUN (MOCKUP 01 & 02) ── */}
         {accountModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
-            <div className="bg-white rounded-3xl w-full max-w-md border border-slate-200/80 shadow-xl overflow-hidden animate-in zoom-in-95 duration-150">
+            <div ref={accountDialogRef} role="dialog" aria-modal="true" aria-labelledby="admin-account-title" tabIndex={-1} className="admin-dialog admin-surface bg-white rounded-3xl w-full max-w-md border border-slate-200/80 shadow-xl overflow-hidden flex flex-col">
               <div className="p-6 border-b border-slate-100 flex items-start justify-between">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">
+                  <h3 id="admin-account-title" className="text-lg font-bold text-slate-900">
                     Pengaturan Akun
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -310,7 +317,7 @@ export default function AdminLayout({
                 </button>
               </div>
 
-              <form onSubmit={handleSaveAccount} className="p-6 space-y-4">
+              <form onSubmit={handleSaveAccount} className="p-6 space-y-4 overflow-y-auto" data-lenis-prevent>
                 {accFeedback && (
                   <div
                     className={`p-3 rounded-xl text-xs font-medium flex items-center gap-2 ${
@@ -357,6 +364,7 @@ export default function AdminLayout({
                     <button
                       type="button"
                       onClick={() => setShowCurrentPw(!showCurrentPw)}
+                      aria-label={showCurrentPw ? "Sembunyikan password saat ini" : "Tampilkan password saat ini"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
                       {showCurrentPw ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -379,6 +387,7 @@ export default function AdminLayout({
                     <button
                       type="button"
                       onClick={() => setShowNewPw(!showNewPw)}
+                      aria-label={showNewPw ? "Sembunyikan password baru" : "Tampilkan password baru"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
                       {showNewPw ? <EyeOff size={15} /> : <Eye size={15} />}

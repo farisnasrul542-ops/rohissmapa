@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import Image from "next/image";
 import {
   CalendarDays,
@@ -25,8 +25,11 @@ import { formatGoogleDriveUrl, handleGoogleDriveImageError } from "@/lib/driveUt
 import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
 import { pushCloudSync } from "@/lib/cloudSync";
 import ImageCropField from "@/components/admin/ImageCropField";
+import { useAdminOverlay } from "@/hooks/useAdminOverlay";
+import { usePublicSiteUrl } from "@/hooks/usePublicSiteUrl";
 
 export default function AdminAgendaPage() {
+  const publicSiteUrl = usePublicSiteUrl();
   const { events, addEvent, updateEvent, deleteEvent, showToast } = useAdmin();
 
   // Filters & Search
@@ -39,6 +42,11 @@ export default function AdminAgendaPage() {
 
   // Delete Confirmation State
   const [deletingItem, setDeletingItem] = useState<EventItem | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useAdminOverlay(isFormOpen || Boolean(deletingItem), dialogRef, () => {
+    setIsFormOpen(false);
+    setDeletingItem(null);
+  });
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -167,7 +175,7 @@ export default function AdminAgendaPage() {
   return (
     <div className="space-y-6">
       {/* ── HEADER (MOCKUP 04) ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="admin-page-heading flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Manajemen Agenda
@@ -190,10 +198,11 @@ export default function AdminAgendaPage() {
       {/* ── TABS & SEARCH BAR (MOCKUP 04) ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-slate-200/80 shadow-2xs self-start">
+        <div className="flex items-center gap-1.5 admin-tabs p-1 bg-white rounded-2xl border border-slate-200/80 shadow-2xs self-start">
           <button
             type="button"
             onClick={() => setActiveTab("all")}
+            aria-pressed={activeTab === "all"}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "all"
                 ? "bg-[#d7f0e3] text-[#006d44]"
@@ -205,6 +214,7 @@ export default function AdminAgendaPage() {
           <button
             type="button"
             onClick={() => setActiveTab("upcoming")}
+            aria-pressed={activeTab === "upcoming"}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "upcoming"
                 ? "bg-[#d7f0e3] text-[#006d44]"
@@ -216,6 +226,7 @@ export default function AdminAgendaPage() {
           <button
             type="button"
             onClick={() => setActiveTab("completed")}
+            aria-pressed={activeTab === "completed"}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "completed"
                 ? "bg-[#d7f0e3] text-[#006d44]"
@@ -237,6 +248,7 @@ export default function AdminAgendaPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari judul, lokasi, atau pemateri"
+            aria-label="Cari agenda"
             className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#007a4d] transition-all"
           />
           {searchQuery && (
@@ -252,7 +264,7 @@ export default function AdminAgendaPage() {
       </div>
 
       {/* ── INFO BANNER (MOCKUP 04) ── */}
-      <div className="p-4 rounded-2xl bg-[#d7f0e3]/50 border border-[#006d44]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div className="admin-notice p-4 rounded-2xl bg-[#d7f0e3]/50 border border-[#006d44]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5 text-[#006d44]">
           <Info size={16} className="shrink-0" />
           <span>
@@ -260,7 +272,7 @@ export default function AdminAgendaPage() {
           </span>
         </div>
         <a
-          href="https://rohis-sman4pwt.web.id/agenda"
+          href={`${publicSiteUrl}/agenda`}
           target="_blank"
           rel="noopener noreferrer"
           className="font-semibold text-[#006d44] hover:underline flex items-center gap-1 shrink-0"
@@ -271,7 +283,7 @@ export default function AdminAgendaPage() {
       </div>
 
       {/* ── AGENDA TABLE (MOCKUP 04) ── */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="admin-surface bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-[#f8faf9] text-slate-500 font-semibold border-b border-slate-200/80">
@@ -405,7 +417,7 @@ export default function AdminAgendaPage() {
       {/* ── MODAL / PANEL TAMBAH & EDIT AGENDA (MOCKUP 04) ── */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-3xl w-full max-w-lg border border-slate-200/80 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+          <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={editingItem ? "Edit Agenda" : "Tambah Agenda"} tabIndex={-1} className="admin-dialog admin-surface bg-white rounded-3xl w-full max-w-lg border border-slate-200/80 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header */}
             <div className="p-6 border-b border-slate-100 flex items-start justify-between">
               <div>
@@ -419,6 +431,7 @@ export default function AdminAgendaPage() {
               <button
                 type="button"
                 onClick={() => setIsFormOpen(false)}
+                aria-label="Tutup formulir agenda"
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
               >
                 <X size={18} />
@@ -426,7 +439,7 @@ export default function AdminAgendaPage() {
             </div>
 
             {/* Form Fields */}
-            <form onSubmit={handleFormSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
+            <form onSubmit={handleFormSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar" data-lenis-prevent>
               {/* Foto Kegiatan */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -643,7 +656,7 @@ export default function AdminAgendaPage() {
       {/* ── DIALOG KONFIRMASI HAPUS (MOCKUP 04) ── */}
       {deletingItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-3xl w-full max-w-sm border border-slate-200/80 shadow-2xl p-6 animate-in zoom-in-95 duration-150">
+          <div ref={dialogRef} role="alertdialog" aria-modal="true" aria-label="Konfirmasi hapus agenda" tabIndex={-1} className="admin-dialog admin-surface bg-white rounded-3xl w-full max-w-sm border border-slate-200/80 shadow-2xl p-6">
             <h3 className="text-base font-bold text-slate-900 mb-1.5">
               Hapus agenda ini?
             </h3>

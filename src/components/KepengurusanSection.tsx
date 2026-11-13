@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   KEPENGURUSAN_PERIODS,
@@ -17,7 +18,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
-export default function KepengurusanSection() {
+export default function KepengurusanSection({ preview = false }: { preview?: boolean }) {
   const prefersReducedMotion = useReducedMotion();
   const [selectedPeriod, setSelectedPeriod] = useState<string>(ACTIVE_PERIOD);
   const [selectedDivision, setSelectedDivision] = useState<string>("Semua");
@@ -92,7 +93,7 @@ export default function KepengurusanSection() {
     <section
       id="kepengurusan"
       aria-label="Kenali Pengurus Kami"
-      className="py-10 sm:py-14 relative overflow-hidden scroll-mt-24"
+      className={`py-10 sm:py-14 relative overflow-hidden scroll-mt-24 ${preview ? "clay-member-preview" : ""}`}
     >
       <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header (Matches 04_profil_pengurus.png) */}
@@ -219,7 +220,7 @@ export default function KepengurusanSection() {
               }}
               className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"
             >
-              {filteredMembers.map((member) => {
+              {(preview ? filteredMembers.slice(0, 4) : filteredMembers).map((member) => {
                 const igHandle = member.instagram
                   ? member.instagram.replace(/^@/, "")
                   : "";
@@ -227,11 +228,11 @@ export default function KepengurusanSection() {
                   <article
                     key={member.id}
                     onClick={() => setActiveModalMember(member)}
-                    className="clay-card clay-card-hover p-2.5 sm:p-4 flex flex-col justify-between cursor-pointer group"
+                    className="clay-member-card clay-card clay-card-hover p-2.5 sm:p-4 flex flex-col justify-between cursor-pointer group"
                   >
                     <div>
                       {/* Soft Mint Avatar Box */}
-                      <div className="relative h-36 min-[400px]:h-44 sm:h-52 w-full rounded-[16px] overflow-hidden bg-gradient-to-b from-[#DFF6EC] via-[#ECF9F3] to-[#FFFFFF] border border-white/80 flex items-end justify-center p-2 sm:p-3 mb-3">
+                      <div className={`clay-member-avatar relative ${preview ? "h-24 sm:h-32" : "h-36 min-[400px]:h-44 sm:h-52"} w-full rounded-[16px] overflow-hidden bg-gradient-to-b from-[#DFF6EC] via-[#ECF9F3] to-[#FFFFFF] border border-white/80 flex items-end justify-center p-2 sm:p-3 mb-3`}>
                         <img
                           src={member.image}
                           alt={member.name}
@@ -340,6 +341,13 @@ export default function KepengurusanSection() {
             </motion.div>
           )}
         </AnimatePresence>
+        {preview && (
+          <div className="clay-preview-more">
+            <Link href="/tentang#kepengurusan" className="clay-btn-white px-5 py-3 rounded-full text-xs sm:text-sm font-bold inline-flex items-center gap-2 min-h-[44px]">
+              Lihat seluruh pengurus ({currentPeriodMembers.length}) <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Member Detail Clay Modal */}

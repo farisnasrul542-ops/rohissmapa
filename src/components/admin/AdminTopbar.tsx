@@ -2,18 +2,17 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Menu,
   ExternalLink,
   ChevronDown,
   Home,
-  User,
   LogOut,
   Settings,
 } from "lucide-react";
 import { logoutAdmin, getStoredAdminUsername } from "@/lib/adminAuth";
+import { usePublicSiteUrl } from "@/hooks/usePublicSiteUrl";
 
 interface AdminTopbarProps {
   onMenuToggle: () => void;
@@ -25,12 +24,16 @@ export default function AdminTopbar({
   onOpenAccountModal,
 }: AdminTopbarProps) {
   const pathname = usePathname();
+  const publicSiteUrl = usePublicSiteUrl();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [adminUsername, setAdminUsername] = useState("admin");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setAdminUsername(getStoredAdminUsername());
+    const syncUsername = () => setAdminUsername(getStoredAdminUsername());
+    queueMicrotask(syncUsername);
+    window.addEventListener("storage", syncUsername);
+    window.addEventListener("rohis_admin_auth_changed", syncUsername);
 
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -41,7 +44,11 @@ export default function AdminTopbar({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("storage", syncUsername);
+      window.removeEventListener("rohis_admin_auth_changed", syncUsername);
+    };
   }, []);
 
   const getBreadcrumb = () => {
@@ -55,7 +62,7 @@ export default function AdminTopbar({
       case "/admin/galeri":
         return { parent: "Panel Admin", current: "Dokumentasi & Galeri" };
       case "/admin/pengumuman":
-        return { parent: "Panel Admin", current: "07 • Pengumuman & Pembina" };
+        return { parent: "Panel Admin", current: "Pengumuman & Pembina" };
       default:
         return { parent: "Panel Admin", current: "Admin SMAPA" };
     }
@@ -64,12 +71,12 @@ export default function AdminTopbar({
   const breadcrumb = getBreadcrumb();
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+    <header className="admin-topbar sticky z-30 backdrop-blur-md flex items-center justify-between gap-4">
       {/* Left: Mobile Toggle & Breadcrumb */}
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuToggle}
-          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl lg:hidden cursor-pointer"
+          className="admin-button p-2 text-slate-600 rounded-xl lg:hidden cursor-pointer"
           aria-label="Buka Menu"
         >
           <Menu size={20} />
@@ -105,7 +112,7 @@ export default function AdminTopbar({
       {/* Right: Lihat Web Publik & User Profile */}
       <div className="flex items-center gap-3">
         <a
-          href="https://rohis-sman4pwt.web.id/"
+          href={publicSiteUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors shadow-2xs"
@@ -120,36 +127,41 @@ export default function AdminTopbar({
           <button
             type="button"
             onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            aria-expanded={profileDropdownOpen}
+            aria-controls="admin-profile-dropdown"
+            aria-label={`Menu akun ${adminUsername}`}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setProfileDropdownOpen(false);
+            }}
             className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200/60"
           >
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-emerald-100 border border-slate-200 shrink-0 relative">
-              <Image
-                src="/images/pembina-2.png"
-                alt="Foto Profil"
-                fill
-                sizes="32px"
-                className="object-cover"
-              />
+            <div aria-hidden="true" className="admin-avatar w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-bold text-sm text-[#087a53]">
+              {adminUsername.charAt(0).toUpperCase()}
             </div>
             <div className="text-left hidden md:block">
               <span className="block text-xs font-semibold text-slate-800 leading-tight">
-                Saifur Ro&apos;yi, S.Pd.
+                {adminUsername}
               </span>
               <span className="block text-[10.5px] text-slate-400 font-medium">
-                {adminUsername === "admin" ? "Administrator" : adminUsername}
+                Administrator
               </span>
             </div>
             <ChevronDown size={14} className="text-slate-400 hidden sm:block" />
           </button>
 
           {profileDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-52 rounded-2xl bg-white shadow-lg border border-slate-200/90 py-1.5 z-40 animate-in fade-in zoom-in-95 duration-100">
+            <div id="admin-profile-dropdown" onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setProfileDropdownOpen(false);
+                dropdownRef.current?.querySelector("button")?.focus();
+              }
+            }} className="admin-dropdown absolute right-0 mt-3 w-52 rounded-2xl bg-white py-1.5 z-40">
               <div className="px-4 py-2 border-b border-slate-100">
                 <p className="text-xs font-bold text-slate-800">
-                  Saifur Ro&apos;yi, S.Pd.
+                  {adminUsername}
                 </p>
                 <p className="text-[11px] text-slate-400">
-                  Pembina &bull; @{adminUsername}
+                  Administrator &bull; ROHIS SMAPA
                 </p>
               </div>
 

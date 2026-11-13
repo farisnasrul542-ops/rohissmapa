@@ -11,6 +11,7 @@ export default function SmoothScroll({
 }) {
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
+  const isAdminRoute = pathname === "/login" || pathname === "/admin" || pathname.startsWith("/admin/");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -21,7 +22,7 @@ export default function SmoothScroll({
     const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
     // On mobile/touch or reduced-motion, keep native scroll 100% untouched
-    if (prefersReducedMotion || isCoarsePointer) {
+    if (prefersReducedMotion || isCoarsePointer || isAdminRoute) {
       return;
     }
 
@@ -52,7 +53,7 @@ export default function SmoothScroll({
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [isAdminRoute]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

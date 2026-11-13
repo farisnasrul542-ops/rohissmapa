@@ -355,23 +355,23 @@ export default function Directory3DShowcase() {
               opacity = isCenter ? 1 : isVisible ? 0.55 : 0;
               pointerEvents = isVisible ? "auto" : "none";
             } else if (isCenter) {
-              transform = `translate3d(${currentDrag}px, 0, 32px) rotateY(${dragAngle}deg) scale(1)`;
+              transform = `translate3d(${currentDrag}px, -4px, 54px) rotateY(${dragAngle}deg) scale(1)`;
               zIndex = 35;
               opacity = 1;
               pointerEvents = "auto";
             } else if (isLeft) {
               transform = `translate3d(calc(-54% + ${
                 currentDrag * 0.55
-              }px), 4px, -60px) rotateY(${15 + dragAngle}deg) scale(0.89)`;
+              }px), 8px, -85px) rotateY(${23 + dragAngle}deg) scale(0.88)`;
               zIndex = 15;
-              opacity = 0.72;
+              opacity = 0.96;
               pointerEvents = "auto";
             } else if (isRight) {
               transform = `translate3d(calc(54% + ${
                 currentDrag * 0.55
-              }px), 4px, -60px) rotateY(${-15 + dragAngle}deg) scale(0.89)`;
+              }px), 8px, -85px) rotateY(${-23 + dragAngle}deg) scale(0.88)`;
               zIndex = 15;
-              opacity = 0.72;
+              opacity = 0.96;
               pointerEvents = "auto";
             } else if (dist < -1) {
               transform =
@@ -390,6 +390,7 @@ export default function Directory3DShowcase() {
             return (
               <div
                 key={item.id}
+                data-active={isCenter}
                 onClick={() => {
                   if (hasMovedRef.current) return;
                   if (isLeft) prevItem();
@@ -409,7 +410,7 @@ export default function Directory3DShowcase() {
                     ? "opacity 100ms ease"
                     : "transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 380ms cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
-                className={`absolute w-[78vw] min-w-[250px] max-w-[330px] sm:w-[370px] sm:max-w-none lg:w-[410px] h-[225px] sm:h-[240px] clay-card p-5 sm:p-6 flex flex-col justify-between text-left ${
+                className={`clay-coverflow-card absolute w-[68vw] min-w-[220px] max-w-[305px] sm:w-[350px] sm:max-w-none lg:w-[390px] h-[225px] sm:h-[240px] clay-card p-5 sm:p-6 flex flex-col justify-between text-left ${
                   isCenter
                     ? "shadow-[0_18px_38px_-10px_rgba(15,62,46,0.16)] cursor-default"
                     : "cursor-pointer hover:opacity-90"

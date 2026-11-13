@@ -1,0 +1,225 @@
+/* Public-only material system. The side wall is separate from the soft shadow:
+   this keeps the stronger depth legible without turning surfaces into gray blur. */
+.public-clay3d {
+  --clay-wall: #cad8d0;
+  --clay-mint-wall: #a9cdbb;
+  --clay-shadow: rgba(28, 67, 48, .17);
+  --clay-surface-shadow: inset 2px 3px 3px #fff,
+    inset -2px -3px 5px rgba(57, 88, 69, .07),
+    0 5px 0 var(--clay-wall), 0 8px 5px rgba(27, 65, 46, .12),
+    0 18px 28px -14px rgba(27, 65, 46, .24);
+  min-height: 100vh;
+  background: #e8efeb;
+  isolation: isolate;
+}
+
+.public-clay3d .clay-canvas {
+  background-color: #e8efeb;
+  background-image: radial-gradient(ellipse at 14% 0%, #eef9f3 0%, transparent 52%),
+    radial-gradient(ellipse at 95% 32%, #f8fbf9 0%, transparent 48%);
+}
+
+.public-clay3d :is(.clay-card, .clay-card-mint, .clay-photo-frame, .clay-navbar) {
+  border: 1px solid rgba(255, 255, 255, .97);
+  box-shadow: var(--clay-surface-shadow);
+}
+.public-clay3d .clay-card {
+  background: linear-gradient(145deg, #fff 0%, #f8fbf9 65%, #eef4f0 100%);
+}
+.public-clay3d .clay-card-mint {
+  --clay-wall: var(--clay-mint-wall);
+  background: linear-gradient(145deg, #effbf5, #d5f0e2);
+}
+.public-clay3d .clay-photo-frame {
+  background: linear-gradient(145deg, #fff, #f0f6f2);
+  border-radius: 28px;
+}
+.public-clay3d .clay-navbar {
+  border-radius: 23px;
+  background: linear-gradient(150deg, rgba(255,255,255,.98), rgba(240,247,243,.97));
+  box-shadow: inset 1px 2px 3px #fff, inset -1px -2px 3px #e0e9e3,
+    0 5px 0 #c5d2ca, 0 8px 5px #2648341c, 0 17px 25px -13px #2648344a;
+}
+
+.public-clay3d :is(.clay-btn-white, .clay-btn-mint, .clay-btn-emerald) {
+  --button-wall: #c4d3c9;
+  position: relative;
+  box-shadow: inset 1px 2px 2px #ffffffd9, inset -1px -2px 3px #29453212,
+    0 4px 0 var(--button-wall), 0 7px 5px #25463126, 0 12px 18px -10px #2546314a;
+  transition: transform 160ms var(--ease-control), box-shadow 160ms var(--ease-control), background 160ms ease;
+}
+.public-clay3d .clay-btn-mint {
+  --button-wall: #a7d4bd;
+  background: linear-gradient(150deg, #e2fbee, #c6eed9);
+}
+.public-clay3d .clay-btn-emerald {
+  --button-wall: #075038;
+  background: linear-gradient(155deg, #11976a, #08774f 65%, #096744);
+  box-shadow: inset 1px 2px 3px #b4ffdf52, inset -1px -2px 3px #03452f80,
+    0 4px 0 var(--button-wall), 0 7px 5px #073c2b33, 0 13px 20px -10px #07503866;
+}
+.public-clay3d :is(.clay-btn-white, .clay-btn-mint, .clay-btn-emerald):active {
+  transform: translateY(3px) scale(.985);
+  box-shadow: inset 1px 2px 3px #ffffff40, inset 0 -2px 3px #153e321a,
+    0 1px 0 var(--button-wall), 0 3px 5px #25463126;
+}
+.public-clay3d .clay-icon-sq {
+  background: linear-gradient(145deg, #f9fffc, #d4f2e2);
+  box-shadow: inset 1px 2px 2px #fff, inset -1px -2px 3px #a2cbb94d,
+    0 4px 0 #bad8c8, 0 7px 7px -2px #1f513429;
+}
+.public-clay3d .clay-inner {
+  background: linear-gradient(145deg, #f8fcfa, #edf5f0);
+  box-shadow: inset 1px 2px 3px #fff, inset -1px -2px 4px #244d3520,
+    0 3px 0 #d4e0d8, 0 8px 12px -7px #244d3538;
+}
+.public-clay3d .clay-inner-mint {
+  background: linear-gradient(145deg, #e9fff2, #d1efdf);
+  box-shadow: inset 1px 2px 3px #fff, inset -1px -2px 4px #52886920,
+    0 3px 0 #b5d8c5, 0 8px 12px -7px #244d3538;
+}
+.public-clay3d :is(.clay-pill-mint, .clay-pill-white) {
+  box-shadow: inset 1px 2px 2px #fff, 0 2px 0 #c6dccf, 0 4px 6px -2px #25463126;
+}
+.public-clay3d .clay-input {
+  background: #f7faf8;
+  box-shadow: inset 2px 3px 5px #36513e1c, inset -2px -2px 3px #fff, 0 1px 0 #ffffffed;
+}
+.public-clay3d .clay-input:focus {
+  box-shadow: inset 2px 3px 5px #36513e14, 0 0 0 3px #087a5326;
+}
+
+/* Hero: a single raised base, offset mint photo backplate and forward caption. */
+.public-clay3d .clay-hero-section { overflow: clip; padding-bottom: 28px; }
+.public-clay3d .clay-hero-panel {
+  border-radius: 32px;
+  padding: clamp(24px, 3.2vw, 42px);
+  margin-top: 12px;
+  gap: 32px;
+  background: linear-gradient(140deg, #f5fcf8, #e1f1e7);
+}
+.public-clay3d .clay-hero-copy h1 { font-size: clamp(30px, 3.1vw, 46px); line-height: 1.12; }
+.public-clay3d .clay-hero-copy h1 span { color: #153e32; }
+.public-clay3d .clay-hero-eyebrow {
+  display: inline-flex;
+  margin-bottom: 20px;
+  padding: 7px 13px;
+  border-radius: 12px;
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+.public-clay3d .clay-tilt-stage { perspective: 1100px; min-width: 0; }
+.public-clay3d .clay-tilt-object { transform-style: preserve-3d; }
+.public-clay3d .clay-hero-sculpture {
+  position: relative;
+  padding: 0 12px 22px 0;
+  isolation: isolate;
+}
+.public-clay3d .clay-hero-sculpture::before {
+  content: "";
+  position: absolute;
+  inset: 16px 0 3px 18px;
+  z-index: -1;
+  border-radius: 30px;
+  border: 2px solid #effff5;
+  background: linear-gradient(145deg, #dbf6e6, #b7dec6);
+  box-shadow: inset 2px 3px 3px #ffffffa6, 0 6px 0 #9fbfab,
+    0 13px 14px -7px #214d3552;
+}
+.public-clay3d .clay-hero-frame { padding: 12px; position: relative; }
+.public-clay3d .clay-hero-frame > div:first-child { aspect-ratio: 16 / 10; border-radius: 20px; }
+.public-clay3d .clay-hero-caption {
+  position: relative;
+  width: fit-content;
+  max-width: calc(100% - 20px);
+  min-height: 44px;
+  margin: -8px auto -23px;
+  justify-content: center;
+  border-radius: 18px;
+  padding: 10px 20px;
+  transform: translateZ(18px);
+}
+.public-clay3d .clay-hero-caption > span:last-child { display: none; }
+.public-clay3d .clay-shortcuts {
+  padding: 18px 20px;
+  margin-top: 26px;
+  border-radius: 26px;
+  gap: 20px;
+}
+.public-clay3d .clay-shortcuts .clay-shortcut {
+  min-height: 94px;
+  padding: 10px;
+  gap: 8px;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.public-clay3d .clay-shortcut > div { flex-direction: column; gap: 12px; }
+.public-clay3d .clay-shortcut > svg { display: none; }
+.public-clay3d .clay-shortcut .clay-icon-sq {
+  width: 54px; height: 48px; border-radius: 17px;
+}
+.public-clay3d .clay-shortcut .clay-icon-sq svg { width: 25px; height: 25px; }
+
+/* Stages retain real perspective. Opacity on their ancestors is intentionally
+   not used: that would flatten preserve-3d and wash out the photographs. */
+.public-clay3d .clay-stage-podium {
+  border-radius: 30px;
+  padding-top: 32px;
+  padding-bottom: 30px;
+  background: linear-gradient(145deg, #eafaf1, #cde9d9);
+  border: 1px solid #f5fff9;
+  box-shadow: inset 2px 3px 3px #fff, inset -2px -3px 5px #79a58a26,
+    0 6px 0 #aac6b5, 0 10px 6px #204b3421, 0 23px 30px -20px #204b3452;
+}
+.public-clay3d .clay-coverflow-card { transform-style: preserve-3d; }
+.public-clay3d .clay-coverflow-card[data-active="true"] {
+  box-shadow: inset 2px 3px 3px #fff, inset -2px -3px 5px #26483417,
+    0 6px 0 #bfd0c5, 0 10px 5px #2648342e, 0 26px 30px -16px #26483466;
+}
+.public-clay3d .clay-coverflow-card[data-active="false"] {
+  box-shadow: inset 2px 3px 3px #fff, inset -2px -3px 5px #26483417,
+    0 6px 0 #c2d2c7, 0 15px 21px -9px #2648344d;
+}
+.public-clay3d .clay-member-card { border-radius: 24px; }
+.public-clay3d .clay-member-avatar {
+  box-shadow: inset 1px 2px 5px #3664471a, inset -1px -2px 3px #fff;
+}
+.public-clay3d .clay-member-preview { padding-top: 36px; }
+.public-clay3d .clay-preview-more {
+  display: flex; justify-content: center; margin-top: 24px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .public-clay3d .clay-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: inset 2px 3px 3px #fff, inset -2px -3px 5px #394f4512,
+      0 5px 0 #c8d8ce, 0 11px 7px #1b412e1f, 0 23px 30px -13px #1b412e40;
+  }
+  .public-clay3d :is(.clay-btn-white, .clay-btn-mint, .clay-btn-emerald):hover { transform: translateY(-2px); }
+}
+@media (max-width: 639px) {
+  .public-clay3d { --clay-surface-shadow: inset 1px 2px 3px #fff,
+    inset -1px -2px 4px #39584512, 0 4px 0 var(--clay-wall),
+    0 7px 5px #1b412e1a, 0 14px 20px -12px #1b412e40; }
+  .public-clay3d .clay-hero-panel { padding: 22px 18px 28px; gap: 28px; border-radius: 26px; }
+  .public-clay3d .clay-hero-copy h1 { font-size: clamp(27px, 7.5vw, 36px); }
+  .public-clay3d .clay-hero-eyebrow { margin-bottom: 14px; font-size: 9px; }
+  .public-clay3d .clay-hero-frame { padding: 8px; border-radius: 23px; }
+  .public-clay3d .clay-hero-frame > div:first-child { aspect-ratio: 16 / 10; border-radius: 16px; }
+  .public-clay3d .clay-hero-caption { padding: 8px 12px; min-height: 36px; margin-bottom: -19px; }
+  .public-clay3d .clay-shortcuts { padding: 12px 7px; gap: 4px; margin-top: 20px; }
+  .public-clay3d .clay-shortcuts .clay-shortcut { padding: 4px 0; min-height: 80px; }
+  .public-clay3d .clay-shortcut .clay-icon-sq { width: 42px; height: 42px; border-radius: 14px; }
+  .public-clay3d .clay-shortcut > div { gap: 10px; }
+  .public-clay3d .clay-shortcut span { font-size: 10px; white-space: normal; text-align: center; }
+  .public-clay3d .clay-stage-podium { padding-top: 24px; padding-bottom: 24px; border-radius: 26px; }
+  .public-clay3d .clay-stage-podium > div:first-child { padding-inline: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-clay3d .clay-tilt-object { transform: none !important; }
+  .public-clay3d .clay-hero-caption { transform: none; }
+  .public-clay3d :is(.clay-btn-white, .clay-btn-mint, .clay-btn-emerald, .clay-card-hover):hover { transform: none; }
+}

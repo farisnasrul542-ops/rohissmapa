@@ -11,9 +11,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
+import { parseImageCrop, getImageCropStyle } from "@/lib/imageCropUtils";
+import { formatGoogleDriveUrl, handleGoogleDriveImageError } from "@/lib/driveUtils";
 
 export default function AdminPengumumanPage() {
-  const { announcement, updateAnnouncement, showToast } = useAdmin();
+  const { announcement, updateAnnouncement, showToast, homeCms } = useAdmin();
+  const pembinaList = [homeCms.sambutan.pembina1, homeCms.sambutan.pembina2];
 
   const [title, setTitle] = useState(announcement.title || "Kajian Rutin Jumat");
   const [content, setContent] = useState(
@@ -43,7 +46,7 @@ export default function AdminPengumumanPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+      <div className="admin-page-heading">
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
           Pengumuman &amp; Informasi Pembina
         </h1>
@@ -54,7 +57,7 @@ export default function AdminPengumumanPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* ── LEFT COLUMN: PENGATURAN PENGUMUMAN (MOCKUP 03) ── */}
-        <div className="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-6 admin-surface bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex flex-col justify-between">
           <div>
             <div className="inline-block bg-[#d7f0e3] text-[#006d44] font-semibold text-xs px-3 py-1 rounded-full mb-5">
               Pengaturan Pengumuman
@@ -105,6 +108,7 @@ export default function AdminPengumumanPage() {
                       key={cat}
                       type="button"
                       onClick={() => setCategory(cat)}
+                      aria-pressed={category === cat}
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                         category === cat
                           ? "bg-[#007a4d] text-white shadow-xs"
@@ -179,7 +183,7 @@ export default function AdminPengumumanPage() {
         {/* ── RIGHT COLUMN: PRATINJAU & DEWAN PEMBINA (MOCKUP 03) ── */}
         <div className="lg:col-span-6 space-y-6">
           {/* Card 1: Pratinjau Pengumuman */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm">
+          <div className="admin-surface bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm">
             <div className="inline-block bg-[#d7f0e3] text-[#006d44] font-semibold text-xs px-3 py-1 rounded-full mb-1">
               Pratinjau Pengumuman
             </div>
@@ -213,63 +217,34 @@ export default function AdminPengumumanPage() {
           </div>
 
           {/* Card 2: Dewan Pembina */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm">
+          <div className="admin-surface bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm">
             <div className="inline-block bg-[#d7f0e3] text-[#006d44] font-semibold text-xs px-3 py-1 rounded-full mb-4">
               Dewan Pembina
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Pembina 1 */}
-              <div className="rounded-2xl border border-slate-200 overflow-hidden bg-[#f8faf9]">
-                <div className="relative w-full h-36 bg-slate-200">
-                  <Image
-                    src="/images/pembina-1.png"
-                    alt="Toyyib Yuliadi"
-                    fill
-                    sizes="(max-width: 640px) 100vw, 240px"
-                    className="object-cover"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <span className="text-[10px] font-semibold bg-[#d7f0e3] text-[#006d44] px-2 py-0.5 rounded-full">
-                      Pembina 1
+              {pembinaList.map((pembina, index) => (
+                <div key={index} className="admin-mentor-card rounded-2xl overflow-hidden">
+                  <div className="relative w-full h-44 bg-[#e2f3e9]">
+                    <Image
+                      src={formatGoogleDriveUrl(parseImageCrop(pembina.image).src)}
+                      alt={pembina.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 240px"
+                      className="object-cover"
+                      style={getImageCropStyle(pembina.image)}
+                      onError={handleGoogleDriveImageError}
+                    />
+                    <span className="absolute top-3 left-3 text-[10px] font-semibold bg-[#d7f0e3] text-[#006d44] px-2.5 py-1 rounded-full">
+                      {pembina.role || `Pembina ${index + 1}`}
                     </span>
                   </div>
-                </div>
-                <div className="p-3 text-center">
-                  <h4 className="text-xs font-bold text-slate-900 truncate">
-                    Toyyib Yuliadi, Sh. M.Pd.
-                  </h4>
-                  <p className="text-[10.5px] text-slate-500 mt-0.5 truncate">
-                    Guru Pembina PAI SMA Negeri 4 Purwokerto
-                  </p>
-                </div>
-              </div>
-
-              {/* Pembina 2 */}
-              <div className="rounded-2xl border border-slate-200 overflow-hidden bg-[#f8faf9]">
-                <div className="relative w-full h-36 bg-slate-200">
-                  <Image
-                    src="/images/pembina-2.png"
-                    alt="Saifur Ro'yi"
-                    fill
-                    sizes="(max-width: 640px) 100vw, 240px"
-                    className="object-cover"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <span className="text-[10px] font-semibold bg-[#d7f0e3] text-[#006d44] px-2 py-0.5 rounded-full">
-                      Pembina 2
-                    </span>
+                  <div className="p-4 text-center">
+                    <h4 className="text-xs font-bold text-slate-900 leading-relaxed break-words">{pembina.name}</h4>
+                    <p className="text-[11px] text-slate-500 mt-1">Guru Pembina Rohis SMAPA</p>
                   </div>
                 </div>
-                <div className="p-3 text-center">
-                  <h4 className="text-xs font-bold text-slate-900 truncate">
-                    Saifur Ro&apos;yi, S.Pd.
-                  </h4>
-                  <p className="text-[10.5px] text-slate-500 mt-0.5 truncate">
-                    Guru Pembina PAI SMA Negeri 4 Purwokerto
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
 
             <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
