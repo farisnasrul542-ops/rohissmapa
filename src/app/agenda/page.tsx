@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { getCoverflowState } from "@/lib/coverflow";
 import Footer from "@/components/Footer";
 import EventRegisterModal from "@/components/EventRegisterModal";
 import {
@@ -318,15 +319,15 @@ export default function AgendaPage() {
           aria-label="Showcase Agenda Pilihan"
           className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 w-full mb-10 sm:mb-12"
         >
-          <CinematicReveal direction="up" delay={0.1}>
+          <CinematicReveal direction="up" delay={0.1} className="showcase-panel clay-card">
             <div
-              className={`relative max-w-5xl mx-auto select-none ${
+              className={`showcase-stage showcase-agenda relative mx-auto select-none ${
                 isDragging ? "cursor-grabbing" : "cursor-grab"
               }`}
               style={{
                 perspective: prefersReducedMotion ? "none" : "1200px",
                 perspectiveOrigin: "50% 50%",
-                touchAction: "pan-y",
+                touchAction: "pan-y pinch-zoom",
               }}
               onKeyDown={(e) => {
                 if (e.key === "ArrowLeft") {
@@ -354,7 +355,7 @@ export default function AgendaPage() {
               onTouchCancel={handleDragEnd}
             >
               <div
-                className="relative w-full h-[385px] sm:h-[425px] flex items-center justify-center"
+                className="showcase-deck"
                 style={{
                   transformStyle: prefersReducedMotion ? "flat" : "preserve-3d",
                 }}
@@ -370,9 +371,9 @@ export default function AgendaPage() {
                   style={{
                     transform: prefersReducedMotion
                       ? undefined
-                      : "translateZ(120px)",
+                      : "translateZ(100px)",
                   }}
-                  className="absolute left-0 sm:left-2 lg:left-4 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
+                  className="showcase-arrow showcase-arrow-side hidden sm:flex absolute left-0 sm:left-2 lg:left-4 top-1/2 z-40 w-11 h-11 rounded-full clay-btn-white items-center justify-center text-[#153E32] cursor-pointer"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -388,78 +389,31 @@ export default function AgendaPage() {
                   style={{
                     transform: prefersReducedMotion
                       ? undefined
-                      : "translateZ(120px)",
+                      : "translateZ(100px)",
                   }}
-                  className="absolute right-0 sm:right-2 lg:right-4 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
+                  className="showcase-arrow showcase-arrow-side hidden sm:flex absolute right-0 sm:right-2 lg:right-4 top-1/2 z-40 w-11 h-11 rounded-full clay-btn-white items-center justify-center text-[#153E32] cursor-pointer"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
 
                 {eventList.map((event, idx) => {
-                  let dist =
-                    (idx - safeCoverflowIdx + totalShowcase) % totalShowcase;
-                  if (dist > totalShowcase / 2) dist -= totalShowcase;
-
-                  const isCenter = dist === 0;
-                  const isLeft = dist === -1;
-                  const isRight = dist === 1;
-                  const isVisible = isCenter || isLeft || isRight;
-
-                  const currentDrag = isDragging ? dragOffset : 0;
-                  const dragAngle = prefersReducedMotion
-                    ? 0
-                    : Number(((currentDrag / 300) * 8).toFixed(2));
-
-                  let transform = "";
-                  let zIndex = 1;
-                  let opacity = 0;
-                  let pointerEvents: "auto" | "none" = "none";
-
-                  if (prefersReducedMotion) {
-                    transform = isCenter
-                      ? "translate3d(0, 0, 0) scale(1)"
-                      : isLeft
-                      ? "translate3d(-52%, 0, 0) scale(0.9)"
-                      : isRight
-                      ? "translate3d(52%, 0, 0) scale(0.9)"
-                      : "scale(0.85)";
-                    zIndex = isCenter ? 30 : isVisible ? 15 : 1;
-                    opacity = isCenter ? 1 : isVisible ? 0.55 : 0;
-                    pointerEvents = isVisible ? "auto" : "none";
-                  } else if (isCenter) {
-                    transform = `translate3d(${currentDrag}px, 0, 36px) rotateY(${dragAngle}deg) scale(1)`;
-                    zIndex = 35;
-                    opacity = 1;
-                    pointerEvents = "auto";
-                  } else if (isLeft) {
-                    transform = `translate3d(calc(-56% + ${
-                      currentDrag * 0.55
-                    }px), 6px, -65px) rotateY(${15 + dragAngle}deg) scale(0.89)`;
-                    zIndex = 15;
-                    opacity = 0.78;
-                    pointerEvents = "auto";
-                  } else if (isRight) {
-                    transform = `translate3d(calc(56% + ${
-                      currentDrag * 0.55
-                    }px), 6px, -65px) rotateY(${-15 + dragAngle}deg) scale(0.89)`;
-                    zIndex = 15;
-                    opacity = 0.78;
-                    pointerEvents = "auto";
-                  } else if (dist < -1) {
-                    transform =
-                      "translate3d(-105%, 12px, -160px) rotateY(24deg) scale(0.78)";
-                    zIndex = 1;
-                    opacity = 0;
-                  } else {
-                    transform =
-                      "translate3d(105%, 12px, -160px) rotateY(-24deg) scale(0.78)";
-                    zIndex = 1;
-                    opacity = 0;
-                  }
+                  const { isCenter, isLeft, isRight, isVisible, position, transform } = getCoverflowState(
+                    idx, safeCoverflowIdx, totalShowcase,
+                    isDragging ? dragOffset : 0, Boolean(prefersReducedMotion),
+                  );
+                  const zIndex = isCenter ? 35 : isVisible ? 15 : 1;
+                  const opacity = isVisible ? 1 : 0;
+                  const pointerEvents = isVisible ? "auto" : "none";
 
                   return (
                     <article
                       key={event.id}
+                      data-active={isCenter}
+                      data-position={position}
+                      aria-hidden={!isCenter}
+                      role="group"
+                      aria-roledescription="slide"
+                      aria-label={`${idx + 1} dari ${totalShowcase}: ${event.title}`}
                       onClick={() => {
                         if (hasMovedRef.current) return;
                         if (isLeft) prevSlide();
@@ -480,14 +434,10 @@ export default function AgendaPage() {
                           ? "opacity 100ms ease"
                           : "transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 380ms cubic-bezier(0.22, 1, 0.36, 1)",
                       }}
-                      className={`absolute w-[78vw] min-w-[255px] max-w-[330px] sm:w-[380px] sm:max-w-none lg:w-[430px] clay-card p-3 sm:p-4 flex flex-col justify-between text-left select-none cursor-pointer ${
-                        isCenter
-                          ? "shadow-[0_20px_42px_-12px_rgba(15,62,46,0.18)]"
-                          : "hover:opacity-90"
-                      }`}
+                      className="showcase-card clay-coverflow-card clay-card flex flex-col justify-between text-left select-none cursor-pointer"
                     >
                       <div>
-                        <div className="relative h-[160px] sm:h-[185px] lg:h-[200px] w-full rounded-[16px] overflow-hidden bg-[#E5F2EC] mb-3">
+                        <div className="showcase-photo relative w-full overflow-hidden bg-[#E5F2EC]">
                           <img
                             draggable={false}
                             decoding="async"
@@ -543,7 +493,7 @@ export default function AgendaPage() {
                               if (hasMovedRef.current) return;
                               openEventDetail(event);
                             }}
-                            className="clay-btn-emerald px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                            className="showcase-cta w-full justify-center clay-btn-emerald px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
                           >
                             <span>Lihat rincian</span>
                             <ArrowRight size={14} />
@@ -560,21 +510,22 @@ export default function AgendaPage() {
                 })}
               </div>
 
-              {/* Dots */}
-              <div className="mt-3 flex items-center justify-center gap-2">
-                {eventList.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setCoverflowIndex(i)}
-                    aria-label={`Pilih Agenda ${i + 1}`}
-                    className={`cursor-pointer transition-all duration-200 rounded-full h-2.5 ${
-                      i === safeCoverflowIdx
-                        ? "w-7 bg-[#087A53]"
-                        : "w-2.5 bg-[#C5DDD2] hover:bg-[#8FC2AC]"
-                    }`}
-                  />
-                ))}
+              <div className="showcase-controls flex items-center justify-center">
+                <button type="button" onClick={prevSlide} disabled={totalShowcase <= 1} aria-label="Agenda sebelumnya"
+                  className="showcase-arrow sm:hidden clay-btn-white flex items-center justify-center text-[#153E32]">
+                  <ChevronLeft size={20} />
+                </button>
+                <div className="showcase-pagination">
+                  {eventList.map((_, i) => (
+                    <button key={i} type="button" onClick={() => setCoverflowIndex(i)}
+                      aria-label={`Pilih agenda ${i + 1}`} aria-pressed={i === safeCoverflowIdx}
+                      className="showcase-dot cursor-pointer" />
+                  ))}
+                </div>
+                <button type="button" onClick={nextSlide} disabled={totalShowcase <= 1} aria-label="Agenda berikutnya"
+                  className="showcase-arrow sm:hidden clay-btn-white flex items-center justify-center text-[#153E32]">
+                  <ChevronRight size={20} />
+                </button>
               </div>
             </div>
           </CinematicReveal>

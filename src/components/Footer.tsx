@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SITE } from "@/lib/constants";
-import { MapPin } from "lucide-react";
 
 const FOOTER_LINKS = [
   { href: "/tentang", label: "Profil" },
@@ -15,10 +14,10 @@ export default function Footer() {
     <footer className="w-full pt-8 pb-8 sm:pt-10 sm:pb-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-[1240px] mx-auto">
         <div className="clay-card px-5 py-6 sm:px-8 sm:py-7">
-          {/* Top Row: Brand, Mosque Location, Nav Links, Instagram */}
+          {/* Top Row: Brand, Nav Links, Instagram */}
           <div className="flex flex-col lg:flex-row items-center justify-between gap-5 pb-5 border-b border-[#DCEAE3]">
-            {/* Left: Brand + Location */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-5 text-center sm:text-left">
+            {/* Left: Brand */}
+            <div className="flex items-center text-center sm:text-left">
               <Link
                 href="/"
                 className="flex items-center gap-2.5 group shrink-0"
@@ -41,18 +40,6 @@ export default function Footer() {
                   </span>
                 </div>
               </Link>
-
-              <span
-                className="hidden sm:inline-block w-px h-7 bg-[#D5E6DF]"
-                aria-hidden="true"
-              />
-
-              <div className="inline-flex items-center gap-2 text-xs sm:text-[13px] font-medium text-[#3B5E52]">
-                <span className="w-6 h-6 rounded-full clay-icon-sq flex items-center justify-center shrink-0">
-                  <MapPin size={13} className="text-[#087A53]" />
-                </span>
-                <span>Musholla Al-Ikhlas SMA Negeri 4 Purwokerto</span>
-              </div>
             </div>
 
             {/* Right: Quick Links + Instagram */}

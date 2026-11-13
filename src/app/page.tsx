@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { getCoverflowState } from "@/lib/coverflow";
 import ClayTilt from "@/components/ClayTilt";
 import Footer from "@/components/Footer";
 import EventRegisterModal from "@/components/EventRegisterModal";
@@ -35,7 +36,10 @@ import { pullCloudSync, ensureCleanStorageVersion } from "@/lib/cloudSync";
 import { EventItem } from "@/lib/types";
 import {
   ArrowRight,
+  ArrowUpRight,
+  ArrowLeft,
   Calendar,
+  Clock,
   Camera,
   MapPin,
   BookOpen,
@@ -44,6 +48,7 @@ import {
   ChevronLeft,
   ChevronRight,
   HeartHandshake,
+  Hand,
   Pause,
   Play,
 } from "lucide-react";
@@ -93,7 +98,7 @@ export default function HomePage() {
   const prefersReducedMotion = useReducedMotion();
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [activePembinaIndex, setActivePembinaIndex] = useState(0);
-  const [agendaIndex, setAgendaIndex] = useState(1);
+  const [agendaIndex, setAgendaIndex] = useState(0);
   const [isAgendaPaused, setIsAgendaPaused] = useState(false);
   const [isAgendaHovered, setIsAgendaHovered] = useState(false);
   const [isAgendaFocused, setIsAgendaFocused] = useState(false);
@@ -398,6 +403,8 @@ export default function HomePage() {
     return raw;
   };
 
+  const agendaActiveIndex = getCoverflowState(0, agendaIndex, eventsList.length).active;
+
   const isDefaultHeroTitle =
     !cms.hero?.titleLine1 ||
     (cms.hero.titleLine1 === "ROHIS" && cms.hero.titleLine2 === "PURWOKERTO");
@@ -688,8 +695,8 @@ export default function HomePage() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-                {/* Left: Active Pembina Big Card + Switcher Bar Below (Matches Mockup PC & HP) */}
-                <div className="lg:col-span-5 flex flex-col items-center">
+                {/* Left on Desktop, Bottom on Mobile: Active Pembina Big Card + Switcher Bar Below */}
+                <div className="order-2 lg:order-1 lg:col-span-5 flex flex-col items-center">
                   {/* Big Card with Photo + Overlay Box */}
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -799,8 +806,8 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Right: Active Pembina Greeting Content (Matches Mockup PC & HP) */}
-                <div className="lg:col-span-7">
+                {/* Right on Desktop, Top on Mobile: Active Pembina Greeting Content */}
+                <div className="order-1 lg:order-2 lg:col-span-7">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activePembina.id}
@@ -858,13 +865,22 @@ export default function HomePage() {
                       </div>
 
                       <div className="pt-4 mt-4 border-t border-[#DCEAE3] flex justify-end">
-                        <Link
-                          href="/tentang#pembina"
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setActivePembinaIndex(
+                              (activePembinaIndex + 1) % pembinaList.length
+                            )
+                          }
                           className="text-xs sm:text-sm font-bold text-[#087A53] hover:underline inline-flex items-center gap-1.5 cursor-pointer"
                         >
-                          <span>Lihat Profil & Kepengurusan</span>
+                          <span>
+                            {activePembinaIndex === 0
+                              ? "Lihat Sambutan Pembina 2"
+                              : "Lihat Sambutan Pembina 1"}
+                          </span>
                           <ArrowRight size={14} />
-                        </Link>
+                        </button>
                       </div>
                     </motion.div>
                   </AnimatePresence>
@@ -875,324 +891,360 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── 5. AGENDA & KEGIATAN 3D COVERFLOW (Matches 02_beranda_agenda.png) ── */}
+      {/* ── 5. AGENDA & KEGIATAN 3D COVERFLOW (Matches AGENDA PC & HP Reference) ── */}
       {cms.sections.showAgenda && (
         <section
           id="agenda"
           aria-label="Agenda dan Kegiatan Rohis"
-          className="py-12 sm:py-16 lg:py-20 relative overflow-hidden"
+          className="showcase-section py-10 sm:py-14 relative"
         >
-          <div className="clay-stage-podium max-w-[1176px] mx-4 sm:mx-6 lg:mx-auto px-1 sm:px-6 lg:px-8 relative z-10">
-            <CinematicReveal
-              direction="up"
-              delay={0.06}
-              className="text-center max-w-2xl mx-auto mb-8 sm:mb-10"
-            >
-              <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#153E32] tracking-tight">
-                Agenda & Kegiatan
-              </h2>
-              <p className="text-sm sm:text-base text-[#3B5E52] mt-2 leading-relaxed">
-                {cms.agenda?.lead ||
-                  "Jadwal kajian, latihan kepemimpinan, dan kegiatan sosial terdekat."}
-              </p>
-            </CinematicReveal>
-
-            {/* 3D Coverflow Stage */}
-            <div
-              className={`relative max-w-5xl mx-auto select-none ${
-                isAgendaDragging ? "cursor-grabbing" : "cursor-grab"
-              }`}
-              style={{
-                perspective: prefersReducedMotion ? "none" : "1200px",
-                perspectiveOrigin: "50% 50%",
-                touchAction: "pan-y",
-              }}
-              onMouseEnter={() => setIsAgendaHovered(true)}
-              onMouseLeave={() => {
-                setIsAgendaHovered(false);
-                if (isAgendaDragActiveRef.current) {
-                  handleAgendaDragEnd();
-                }
-              }}
-              onFocusCapture={() => setIsAgendaFocused(true)}
-              onBlurCapture={() => setIsAgendaFocused(false)}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowLeft") {
-                  e.preventDefault();
-                  prevAgenda();
-                } else if (e.key === "ArrowRight") {
-                  e.preventDefault();
-                  nextAgenda();
-                }
-              }}
-              onMouseDown={(e) => {
-                if (e.button !== 0) return;
-                handleAgendaDragStart(e.clientX);
-              }}
-              onMouseMove={(e) => {
-                if (isAgendaDragActiveRef.current) {
-                  handleAgendaDragMove(e.clientX);
-                }
-              }}
-              onMouseUp={handleAgendaDragEnd}
-              onTouchStart={(e) => handleAgendaDragStart(e.touches[0].clientX)}
-              onTouchMove={(e) => handleAgendaDragMove(e.touches[0].clientX)}
-              onTouchEnd={handleAgendaDragEnd}
-              onTouchCancel={handleAgendaDragEnd}
-            >
-              <div
-                className="relative w-full h-[425px] sm:h-[465px] lg:h-[485px] flex items-center justify-center"
-                style={{
-                  transformStyle: prefersReducedMotion ? "flat" : "preserve-3d",
-                }}
+          <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="showcase-panel clay-card rounded-[32px] p-5 sm:p-8 lg:p-10">
+              {/* Header Row (PC: Left aligned + CTA right | HP: Centered) */}
+              <CinematicReveal
+                direction="up"
+                delay={0.06}
+                className="showcase-heading flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8"
               >
-                {/* Left Circular Clay Arrow Button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prevAgenda();
-                  }}
-                  aria-label="Agenda Sebelumnya"
-                  style={{
-                    transform: prefersReducedMotion
-                      ? undefined
-                      : "translateZ(120px)",
-                  }}
-                  className="absolute left-0 sm:left-2 lg:left-4 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-
-                {/* Right Circular Clay Arrow Button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    nextAgenda();
-                  }}
-                  aria-label="Agenda Berikutnya"
-                  style={{
-                    transform: prefersReducedMotion
-                      ? undefined
-                      : "translateZ(120px)",
-                  }}
-                  className="absolute right-0 sm:right-2 lg:right-4 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-
-                {/* Coverflow Cards */}
-                {eventsList.map((event, idx) => {
-                  const total = eventsList.length;
-                  let dist = (idx - agendaIndex + total) % total;
-                  if (dist > total / 2) dist -= total;
-
-                  const isCenter = dist === 0;
-                  const isLeft = dist === -1;
-                  const isRight = dist === 1;
-                  const isVisible = isCenter || isLeft || isRight;
-
-                  const currentDrag = isAgendaDragging ? agendaDragOffset : 0;
-                  const dragAngle = prefersReducedMotion
-                    ? 0
-                    : Number(((currentDrag / 300) * 8).toFixed(2));
-
-                  let transform = "";
-                  let zIndex = 1;
-                  let opacity = 0;
-                  let pointerEvents: "auto" | "none" = "none";
-
-                  if (prefersReducedMotion) {
-                    transform = isCenter
-                      ? "translate3d(0, 0, 0) scale(1)"
-                      : isLeft
-                      ? "translate3d(-52%, 0, 0) scale(0.9)"
-                      : isRight
-                      ? "translate3d(52%, 0, 0) scale(0.9)"
-                      : "scale(0.85)";
-                    zIndex = isCenter ? 30 : isVisible ? 15 : 1;
-                    opacity = isCenter ? 1 : isVisible ? 0.55 : 0;
-                    pointerEvents = isVisible ? "auto" : "none";
-                  } else if (isCenter) {
-                    transform = `translate3d(${currentDrag}px, -4px, 64px) rotateY(${dragAngle}deg) scale(1)`;
-                    zIndex = 35;
-                    opacity = 1;
-                    pointerEvents = "auto";
-                  } else if (isLeft) {
-                    transform = `translate3d(calc(-56% + ${
-                      currentDrag * 0.55
-                    }px), 8px, -90px) rotateY(${23 + dragAngle}deg) scale(0.88)`;
-                    zIndex = 15;
-                    opacity = 0.96;
-                    pointerEvents = "auto";
-                  } else if (isRight) {
-                    transform = `translate3d(calc(56% + ${
-                      currentDrag * 0.55
-                    }px), 8px, -90px) rotateY(${-23 + dragAngle}deg) scale(0.88)`;
-                    zIndex = 15;
-                    opacity = 0.96;
-                    pointerEvents = "auto";
-                  } else if (dist < -1) {
-                    transform =
-                      "translate3d(-105%, 12px, -160px) rotateY(24deg) scale(0.78)";
-                    zIndex = 1;
-                    opacity = 0;
-                  } else {
-                    transform =
-                      "translate3d(105%, 12px, -160px) rotateY(-24deg) scale(0.78)";
-                    zIndex = 1;
-                    opacity = 0;
-                  }
-
-                  return (
-                    <article
-                      key={event.id}
-                      data-active={isCenter}
-                      onClick={() => {
-                        if (agendaHasMovedRef.current) return;
-                        if (isLeft) prevAgenda();
-                        else if (isRight) nextAgenda();
-                        else if (isCenter) {
-                          setSelectedEvent({
-                            ...(event as unknown as EventItem),
-                            category: event.category || event.type || "Kegiatan",
-                          });
-                        }
-                      }}
-                      style={{
-                        transform,
-                        zIndex,
-                        opacity,
-                        pointerEvents,
-                        visibility: isVisible ? "visible" : "hidden",
-                        backfaceVisibility: "hidden",
-                        WebkitBackfaceVisibility: "hidden",
-                        transition: isAgendaDragging
-                          ? "none"
-                          : prefersReducedMotion
-                          ? "opacity 100ms ease"
-                          : "transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 380ms cubic-bezier(0.22, 1, 0.36, 1)",
-                      }}
-                      className={`clay-coverflow-card absolute w-[68vw] min-w-[220px] max-w-[305px] sm:w-[350px] sm:max-w-none lg:w-[400px] clay-card p-3 sm:p-4 flex flex-col justify-between text-left select-none cursor-pointer ${
-                        isCenter
-                          ? "shadow-[0_20px_42px_-12px_rgba(15,62,46,0.18)]"
-                          : "hover:opacity-90"
-                      }`}
-                    >
-                      {/* Top Rounded Photo */}
-                      <div>
-                        <div className="relative h-[165px] sm:h-[195px] lg:h-[210px] w-full rounded-[16px] overflow-hidden bg-[#E5F2EC] mb-3.5">
-                          <img
-                            draggable={false}
-                            decoding="async"
-                            src={parseImageCrop(event.image).src}
-                            alt={event.title}
-                            referrerPolicy="no-referrer"
-                            onError={(e) =>
-                              handleGoogleDriveImageError(e, event.image)
-                            }
-                            style={getImageCropStyle(event.image)}
-                            className="w-full h-full object-cover select-none"
-                          />
-                        </div>
-
-                        <div className="px-1.5">
-                          <h3 className="font-heading text-base sm:text-lg font-extrabold text-[#153E32] mb-2 leading-snug line-clamp-2">
-                            {event.title}
-                          </h3>
-
-                          <div className="space-y-1 text-xs text-[#3B5E52]">
-                            <div className="flex items-center gap-2">
-                              <Calendar
-                                size={13}
-                                className="text-[#087A53] shrink-0"
-                              />
-                              <span className="font-semibold">
-                                {formatEventDate(event.date)}
-                              </span>
-                              {event.time && (
-                                <>
-                                  <span>•</span>
-                                  <span className="truncate">{event.time}</span>
-                                </>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MapPin
-                                size={13}
-                                className="text-[#087A53] shrink-0"
-                              />
-                              <span className="truncate">{event.location}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Bottom CTA Button */}
-                      <div className="px-1.5 pt-3 mt-2 flex items-center justify-between">
-                        {isCenter ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (agendaHasMovedRef.current) return;
-                              setSelectedEvent({
-                                ...(event as unknown as EventItem),
-                                category:
-                                  event.category || event.type || "Kegiatan",
-                              });
-                            }}
-                            className="clay-btn-emerald px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <span>Lihat rincian</span>
-                            <ArrowRight size={14} />
-                          </button>
-                        ) : (
-                          <span className="text-xs font-bold text-[#087A53] inline-flex items-center gap-1">
-                            <span>Pilih agenda</span>
-                            <ArrowRight size={12} />
-                          </span>
-                        )}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-
-              {/* Dots + Pause Control */}
-              <div className="mt-4 flex items-center justify-center gap-3">
-                <div className="flex items-center gap-2">
-                  {eventsList.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setAgendaIndex(i)}
-                      aria-label={`Pilih Agenda ${i + 1}`}
-                      className={`cursor-pointer transition-all duration-200 rounded-full h-2.5 ${
-                        i === agendaIndex
-                          ? "w-7 bg-[#087A53]"
-                          : "w-2.5 bg-[#C5DDD2] hover:bg-[#8FC2AC]"
-                      }`}
-                    />
-                  ))}
+                <div>
+                  <span className="clay-pill-mint px-3.5 py-1 rounded-full text-[10.5px] sm:text-[11px] font-extrabold uppercase tracking-wider text-[#087A53] inline-block mb-2">
+                    {cms.agenda?.tag || "KEGIATAN ROHIS"}
+                  </span>
+                  <h2 className="font-heading text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-[#153E32] tracking-tight">
+                    {cms.agenda?.title || "Agenda & Kegiatan"}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[#4A6B5F] mt-1 leading-relaxed">
+                    {cms.agenda?.lead ||
+                      "Ruang belajar, bertumbuh, dan berbuat baik bersama."}
+                  </p>
                 </div>
 
-                {!prefersReducedMotion && eventsList.length > 1 && (
+                <div className="hidden sm:flex justify-end shrink-0">
+                  <Link
+                    href="/agenda"
+                    className="clay-btn-white px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold text-[#153E32] inline-flex items-center gap-1.5 hover:text-[#087A53]"
+                  >
+                    <span>Semua agenda</span>
+                    <ArrowUpRight size={15} />
+                  </Link>
+                </div>
+              </CinematicReveal>
+
+              {/* 3D Coverflow Stage */}
+              <div
+                className={`showcase-stage showcase-agenda relative mx-auto select-none ${
+                  isAgendaDragging ? "cursor-grabbing" : "cursor-grab"
+                }`}
+                style={{
+                  perspective: prefersReducedMotion ? "none" : "1200px",
+                  perspectiveOrigin: "50% 50%",
+                  touchAction: "pan-y pinch-zoom",
+                }}
+                onMouseEnter={() => setIsAgendaHovered(true)}
+                onMouseLeave={() => {
+                  setIsAgendaHovered(false);
+                  if (isAgendaDragActiveRef.current) {
+                    handleAgendaDragEnd();
+                  }
+                }}
+                onFocusCapture={() => setIsAgendaFocused(true)}
+                onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setIsAgendaFocused(false); }}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowLeft") {
+                    e.preventDefault();
+                    prevAgenda();
+                  } else if (e.key === "ArrowRight") {
+                    e.preventDefault();
+                    nextAgenda();
+                  }
+                }}
+                onMouseDown={(e) => {
+                  if (e.button !== 0) return;
+                  handleAgendaDragStart(e.clientX);
+                }}
+                onMouseMove={(e) => {
+                  if (isAgendaDragActiveRef.current) {
+                    handleAgendaDragMove(e.clientX);
+                  }
+                }}
+                onMouseUp={handleAgendaDragEnd}
+                onTouchStart={(e) => handleAgendaDragStart(e.touches[0].clientX)}
+                onTouchMove={(e) => handleAgendaDragMove(e.touches[0].clientX)}
+                onTouchEnd={handleAgendaDragEnd}
+                onTouchCancel={handleAgendaDragEnd}
+              >
+                <div
+                  className="showcase-deck"
+                  style={{
+                    transformStyle: prefersReducedMotion ? "flat" : "preserve-3d",
+                  }}
+                >
+                  {/* Left Circular Clay Arrow Button (Desktop/Tablet) */}
                   <button
                     type="button"
-                    onClick={() => setIsAgendaPaused((prev) => !prev)}
-                    aria-label={
-                      isAgendaPaused
-                        ? "Putar otomatis agenda"
-                        : "Jeda otomatis agenda"
-                    }
-                    className="clay-pill-white px-2.5 py-1 rounded-full text-[11px] font-semibold text-[#3B5E52] hover:text-[#153E32] inline-flex items-center gap-1 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      prevAgenda();
+                    }}
+                    aria-label="Agenda Sebelumnya"
+                    disabled={eventsList.length <= 1}
+                    style={{
+                      transform: prefersReducedMotion
+                        ? undefined
+                        : "translateZ(100px)",
+                    }}
+                    className="showcase-arrow showcase-arrow-side hidden sm:flex absolute left-0 sm:left-2 lg:left-4 top-1/2 z-40 w-11 h-11 rounded-full clay-btn-white items-center justify-center text-[#153E32] cursor-pointer"
                   >
-                    {isAgendaPaused ? <Play size={11} /> : <Pause size={11} />}
-                    <span>{isAgendaPaused ? "Putar" : "Jeda"}</span>
+                    <ChevronLeft className="w-5 h-5" />
                   </button>
-                )}
+
+                  {/* Right Circular Clay Arrow Button (Desktop/Tablet) */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextAgenda();
+                    }}
+                    aria-label="Agenda Berikutnya"
+                    disabled={eventsList.length <= 1}
+                    style={{
+                      transform: prefersReducedMotion
+                        ? undefined
+                        : "translateY(-50%) translateZ(120px)",
+                    }}
+                    className="showcase-arrow showcase-arrow-side hidden sm:flex absolute right-0 sm:right-2 lg:right-4 top-1/2 z-40 w-11 h-11 rounded-full clay-btn-white items-center justify-center text-[#153E32] cursor-pointer"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+
+                  {/* Coverflow Cards */}
+                  {eventsList.map((event, idx) => {
+                    const { isCenter, isLeft, isRight, isVisible, position, transform } = getCoverflowState(
+                      idx, agendaIndex, eventsList.length,
+                      isAgendaDragging ? agendaDragOffset : 0, Boolean(prefersReducedMotion),
+                    );
+                    const zIndex = isCenter ? 35 : isVisible ? 15 : 1;
+                    const opacity = isVisible ? 1 : 0;
+                    const pointerEvents = isVisible ? "auto" : "none";
+
+                    const eventBadge = event.category || event.type || "Kegiatan";
+
+                    return (
+                      <article
+                        key={event.id}
+                        data-active={isCenter}
+                        data-position={position}
+                        role="group"
+                        aria-roledescription="slide"
+                        aria-label={`${idx + 1} dari ${eventsList.length}: ${event.title}`}
+                        aria-hidden={!isCenter}
+                        onClick={() => {
+                          if (agendaHasMovedRef.current) return;
+                          if (isLeft) prevAgenda();
+                          else if (isRight) nextAgenda();
+                          else if (isCenter) {
+                            setSelectedEvent({
+                              ...(event as unknown as EventItem),
+                              category: eventBadge,
+                            });
+                          }
+                        }}
+                        style={{
+                          transform,
+                          zIndex,
+                          opacity,
+                          pointerEvents,
+                          visibility: isVisible ? "visible" : "hidden",
+                          backfaceVisibility: "hidden",
+                          WebkitBackfaceVisibility: "hidden",
+                          transition: isAgendaDragging
+                            ? "none"
+                            : prefersReducedMotion
+                            ? "opacity 100ms ease"
+                            : "transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 380ms cubic-bezier(0.22, 1, 0.36, 1)",
+                        }}
+                        className="showcase-card clay-coverflow-card clay-card flex flex-col justify-between text-left select-none cursor-pointer"
+                      >
+                        {/* Top Rounded Photo */}
+                        <div>
+                          <div className="showcase-photo relative w-full overflow-hidden bg-[#E5F2EC]">
+                            <img
+                              draggable={false}
+                              decoding="async"
+                              src={parseImageCrop(event.image).src}
+                              alt={event.title}
+                              referrerPolicy="no-referrer"
+                              onError={(e) =>
+                                handleGoogleDriveImageError(e, event.image)
+                              }
+                              style={getImageCropStyle(event.image)}
+                              className="w-full h-full object-cover select-none"
+                            />
+                          </div>
+
+                          <div className="px-1">
+                            <span className="clay-pill-mint px-2.5 py-0.5 rounded-full text-[11px] font-bold text-[#087A53] inline-block mb-1.5">
+                              {eventBadge}
+                            </span>
+
+                            <h3 className="font-heading text-base sm:text-xl font-extrabold text-[#153E32] mb-2 leading-snug line-clamp-2">
+                              {event.title}
+                            </h3>
+
+                            {isCenter ? (
+                              <div className="showcase-meta flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-1.5 gap-x-2.5 text-[11.5px] sm:text-xs text-[#3B5E52]">
+                                <span className="inline-flex items-center gap-1.5 font-medium">
+                                  <Calendar
+                                    size={13}
+                                    className="text-[#087A53] shrink-0"
+                                  />
+                                  <span>{formatEventDate(event.date)}</span>
+                                </span>
+                                {event.time && (
+                                  <>
+                                    <span className="hidden sm:inline text-[#A7C4B7]">|</span>
+                                    <span className="inline-flex items-center gap-1.5 font-medium">
+                                      <Clock
+                                        size={13}
+                                        className="text-[#087A53] shrink-0"
+                                      />
+                                      <span className="truncate">{event.time}</span>
+                                    </span>
+                                  </>
+                                )}
+                                <span className="hidden sm:inline text-[#A7C4B7]">|</span>
+                                <span className="inline-flex items-center gap-1.5 font-medium min-w-0">
+                                  <MapPin
+                                    size={13}
+                                    className="text-[#087A53] shrink-0"
+                                  />
+                                  <span className="truncate">{event.location}</span>
+                                </span>
+                              </div>
+                            ) : (
+                              <p className="mt-2 text-xs font-medium text-[#587467]">{formatEventDate(event.date)}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Bottom Full-Width Emerald CTA Button */}
+                        {isCenter && (
+                          <div className="px-1 pt-3 mt-1">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (agendaHasMovedRef.current) return;
+                                setSelectedEvent({
+                                  ...(event as unknown as EventItem),
+                                  category: eventBadge,
+                                });
+                              }}
+                              className="showcase-cta w-full clay-btn-emerald py-2.5 rounded-full text-xs sm:text-[13px] font-bold text-white inline-flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                              <span>Lihat rincian</span>
+                              <ArrowUpRight size={14} />
+                            </button>
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop Controls: Dots + Pause Button (Matches AGENDA PC Reference) */}
+                <div className="showcase-controls mt-4 hidden sm:flex items-center justify-center gap-3">
+                  <div className="showcase-pagination flex items-center gap-2">
+                    {eventsList.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setAgendaIndex(i)}
+                        aria-label={`Pilih Agenda ${i + 1}`}
+                        aria-pressed={i === agendaActiveIndex}
+                        className="showcase-dot cursor-pointer"
+                      />
+                    ))}
+                  </div>
+
+                  {!prefersReducedMotion && eventsList.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setIsAgendaPaused((prev) => !prev)}
+                      aria-label={
+                        isAgendaPaused
+                          ? "Putar otomatis agenda"
+                          : "Jeda otomatis agenda"
+                      }
+                      aria-pressed={isAgendaPaused}
+                      className="showcase-pause clay-btn-white px-3 py-1 rounded-full text-[11.5px] font-bold text-[#153E32] inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      {isAgendaPaused ? <Play size={11} /> : <Pause size={11} />}
+                      <span>{isAgendaPaused ? "Putar" : "Jeda"}</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Mobile Controls: Swipe Hint + < dots > (Matches AGENDA HP Reference) */}
+                <div className="mt-3 sm:hidden flex flex-col items-center gap-3">
+                  <div className="flex flex-col items-center gap-1 text-[#4A6B5F]">
+                    <div className="inline-flex items-center gap-1.5 text-[#3B5E52]">
+                      <ArrowLeft size={13} />
+                      <Hand size={15} className="text-[#153E32]" />
+                      <ArrowRight size={13} />
+                    </div>
+                    <span className="text-[11px] font-medium">
+                      Geser untuk melihat agenda lainnya
+                    </span>
+                  </div>
+
+                  <div className="showcase-controls flex items-center justify-center gap-4">
+                    <button
+                      type="button"
+                      onClick={prevAgenda}
+                      aria-label="Agenda Sebelumnya"
+                      disabled={eventsList.length <= 1}
+                      className="showcase-arrow w-9 h-9 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    <div className="showcase-pagination flex items-center gap-2">
+                      {eventsList.map((_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setAgendaIndex(i)}
+                          aria-label={`Pilih Agenda ${i + 1}`}
+                          aria-pressed={i === agendaActiveIndex}
+                          className="showcase-dot cursor-pointer"
+                        />
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={nextAgenda}
+                      aria-label="Agenda Berikutnya"
+                      disabled={eventsList.length <= 1}
+                      className="showcase-arrow w-9 h-9 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {!prefersReducedMotion && eventsList.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setIsAgendaPaused((value) => !value)}
+                      aria-label={isAgendaPaused ? "Putar otomatis agenda" : "Jeda otomatis agenda"}
+                      aria-pressed={isAgendaPaused}
+                      className="showcase-pause clay-btn-white inline-flex items-center gap-2 text-xs font-semibold text-[#153E32]"
+                    >
+                      {isAgendaPaused ? <Play size={13} /> : <Pause size={13} />}
+                      {isAgendaPaused ? "Putar" : "Jeda"}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1212,17 +1264,26 @@ export default function HomePage() {
               }
               return GALLERY_DATA;
             })()}
-            tag={cms.gallery?.tag || "Dokumentasi Kegiatan"}
-            title="Galeri Syiar & Ukhuwah"
-            lead="Dokumentasi kegiatan dan kebersamaan keluarga besar Rohis SMAPA."
+            tag={cms.gallery?.tag || "DOKUMENTASI ROHIS"}
+            title={cms.gallery?.title || "Galeri Syiar & Ukhuwah"}
+            lead={
+              cms.gallery?.lead ||
+              "Cerita kegiatan dan kebersamaan keluarga Rohis SMAPA."
+            }
           />
         </CinematicReveal>
       )}
 
       {/* ── 7. JELAJAHI ROHIS & DIREKTORI (Matches 02_beranda_agenda.png) ── */}
-      <CinematicReveal direction="up" delay={0.08}>
-        <Directory3DShowcase />
-      </CinematicReveal>
+      {cms.sections.showDirectory !== false && (
+        <CinematicReveal direction="up" delay={0.08}>
+          <Directory3DShowcase
+            title={cms.directory?.title}
+            lead={cms.directory?.lead}
+            items={cms.directory?.items}
+          />
+        </CinematicReveal>
+      )}
 
       {/* Event Detail Clay Modal */}
       <EventRegisterModal

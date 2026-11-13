@@ -43,7 +43,6 @@
 
 .public-clay3d :is(.clay-btn-white, .clay-btn-mint, .clay-btn-emerald) {
   --button-wall: #c4d3c9;
-  position: relative;
   box-shadow: inset 1px 2px 2px #ffffffd9, inset -1px -2px 3px #29453212,
     0 4px 0 var(--button-wall), 0 7px 5px #25463126, 0 12px 18px -10px #2546314a;
   transition: transform 160ms var(--ease-control), box-shadow 160ms var(--ease-control), background 160ms ease;
@@ -192,6 +191,126 @@
   display: flex; justify-content: center; margin-top: 24px;
 }
 
+/* Agenda and gallery: broad photographic cards on a sculpted, compact base. */
+.public-clay3d .showcase-section {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+.public-clay3d .showcase-panel {
+  padding: clamp(20px, 3.4vw, 40px);
+  border-radius: 32px;
+  background: linear-gradient(140deg, #fcfffd, #eff8f2);
+  box-shadow: inset 2px 3px 3px #fff, inset -2px -3px 5px #42634e0d,
+    0 6px 0 #bed5c7, 0 10px 6px #204b3420, 0 24px 34px -23px #204b3459;
+}
+.public-clay3d .showcase-heading { text-align: left; gap: 20px; margin-bottom: 12px; }
+.public-clay3d .showcase-heading h2 { font-size: clamp(25px, 3vw, 38px); line-height: 1.2; text-wrap: balance; }
+.public-clay3d .showcase-heading p { max-width: 580px; font-size: 14px; line-height: 1.65; margin-top: 10px; }
+.public-clay3d .showcase-heading a { min-height: 44px; border-radius: 15px; padding-inline: 18px; }
+.public-clay3d .showcase-stage {
+  --showcase-card-width: 480px;
+  --showcase-offset: 68%;
+  position: relative;
+  max-width: 1100px;
+  margin-inline: auto;
+  /* Clip only at the section edge. A perspective card paints beyond its layout
+     box, including its lower rim and shadow. The inner stage must stay open. */
+  overflow: visible;
+  padding: 4px 0 20px;
+  touch-action: pan-y pinch-zoom;
+}
+.public-clay3d .showcase-gallery { --showcase-card-width: 540px; --showcase-offset: 64%; }
+.public-clay3d .showcase-deck {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: 32px 0 46px;
+}
+.public-clay3d .showcase-card {
+  position: relative;
+  grid-area: 1 / 1;
+  width: var(--showcase-card-width);
+  min-width: 0;
+  max-width: calc(100% - 24px);
+  height: auto;
+  max-height: none;
+  padding: 14px;
+  border-radius: 28px;
+  border: 1px solid #fff;
+  background: linear-gradient(145deg, #fff, #f8fcf9 74%, #edf5f0);
+  transform-style: preserve-3d;
+}
+.public-clay3d .showcase-card[data-active="true"] {
+  box-shadow: inset 2px 3px 3px #fff, inset -2px -3px 5px #26483412,
+    0 7px 0 #bfd2c5, 0 11px 6px #26483429, 0 24px 28px -17px #26483473;
+}
+.public-clay3d .showcase-card[data-active="false"] {
+  box-shadow: inset 2px 3px 3px #fff, inset -2px -3px 5px #26483412,
+    0 6px 0 #c0d4c7, 0 14px 20px -10px #26483452;
+}
+.public-clay3d .showcase-photo {
+  height: auto;
+  aspect-ratio: 16 / 10;
+  border: 1px solid #dbe9e0;
+  border-radius: 19px;
+  margin-bottom: 16px;
+  box-shadow: inset 1px 2px 4px #2b4d351a, 0 1px 0 #fff;
+}
+.public-clay3d .showcase-gallery .showcase-photo { aspect-ratio: 3 / 2; }
+.public-clay3d .showcase-card h3 { font-size: 19px; line-height: 1.4; overflow-wrap: anywhere; }
+.public-clay3d .showcase-agenda .showcase-card[data-active="true"] h3 { min-height: 2.8em; }
+.public-clay3d .showcase-card[data-active="true"] h3 { display: block; -webkit-line-clamp: unset; overflow: visible; }
+.public-clay3d .showcase-title-row { align-items: flex-start; flex-wrap: wrap; }
+.public-clay3d .showcase-title-row h3 { flex: 1 1 240px; }
+.public-clay3d .showcase-title-row > span { max-width: 100%; white-space: normal; }
+.public-clay3d .showcase-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; font-size: 12px; line-height: 1.5; }
+.public-clay3d .showcase-meta > span.hidden { display: none; }
+.public-clay3d .showcase-meta > span:last-child { grid-column: 1 / -1; }
+.public-clay3d .showcase-meta svg { width: 15px; height: 15px; }
+.public-clay3d .showcase-meta .truncate { white-space: normal; overflow: visible; }
+.public-clay3d .showcase-cta { border-radius: 14px; min-height: 44px; font-size: 13px; margin-bottom: 3px; }
+.public-clay3d .showcase-caption { text-align: left; line-height: 1.6; }
+.public-clay3d .showcase-arrow { width: 44px; height: 44px; border-radius: 15px; flex-shrink: 0; }
+.public-clay3d .showcase-arrow:disabled { opacity: .4; cursor: default; }
+.public-clay3d .showcase-arrow-side { top: 48%; translate: 0 -50%; }
+.public-clay3d .showcase-controls { margin-top: 4px; padding: 4px 8px; gap: 12px; }
+.public-clay3d .showcase-pagination { display: flex; align-items: center; gap: 0; max-width: 220px; overflow-x: auto; scrollbar-width: none; }
+.public-clay3d .showcase-dot { display: grid; place-items: center; width: 28px; height: 44px; flex-shrink: 0; border-radius: 10px; background: transparent; }
+.public-clay3d .showcase-dot::after { content: ""; width: 8px; height: 8px; border-radius: 8px; background: #bad6c8; transition: width 180ms ease, background 180ms ease; }
+.public-clay3d .showcase-dot[aria-pressed="true"] { width: 36px; }
+.public-clay3d .showcase-dot[aria-pressed="true"]::after { width: 22px; background: #087a53; }
+.public-clay3d .showcase-pause { min-height: 40px; border-radius: 13px; padding-inline: 13px; }
+.public-clay3d .showcase-filters { padding: 7px; gap: 5px; border-radius: 20px; background: #dff3e8; box-shadow: inset 2px 3px 5px #3e77531a, inset -2px -2px 3px #fff, 0 2px 0 #fff; }
+.public-clay3d .showcase-filters button { min-height: 40px; border-radius: 14px; padding-inline: 18px; }
+.public-clay3d .showcase-stage :is(button, a):focus-visible,
+.public-clay3d .showcase-filters button:focus-visible { outline: 2px solid #087a53; outline-offset: 4px; }
+@media (min-width: 640px) and (max-width: 1023px) {
+  .public-clay3d .showcase-stage { --showcase-card-width: 360px; --showcase-offset: 61%; }
+  .public-clay3d .showcase-gallery { --showcase-card-width: 400px; }
+}
+@media (max-width: 639px) {
+  .public-clay3d .showcase-panel { padding: 22px 16px 20px; border-radius: 25px; }
+  .public-clay3d .showcase-heading { margin-bottom: 4px; }
+  .public-clay3d .showcase-heading p { font-size: 13px; }
+  .public-clay3d .showcase-heading > div:last-child { justify-content: flex-start; }
+  .public-clay3d .showcase-stage { --showcase-card-width: min(400px, calc(100% - 24px)); --showcase-offset: 65%; margin-inline: 0; }
+  .public-clay3d .showcase-deck { padding-top: 24px; padding-bottom: 42px; }
+  .public-clay3d .showcase-card { padding: 10px; border-radius: 23px; }
+  .public-clay3d .showcase-photo { border-radius: 15px; margin-bottom: 13px; }
+  .public-clay3d .showcase-agenda .showcase-photo { aspect-ratio: 16 / 9; }
+  .public-clay3d .showcase-card h3 { font-size: 16px; }
+  .public-clay3d .showcase-title-row h3 { flex-basis: 170px; }
+  .public-clay3d .showcase-meta { grid-template-columns: 1fr; gap: 6px; }
+  .public-clay3d .showcase-meta > span:last-child { grid-column: auto; }
+  .public-clay3d .showcase-pagination { max-width: 156px; }
+  .public-clay3d .showcase-filters { width: 100%; justify-content: flex-start; border-radius: 17px; }
+  .public-clay3d .showcase-filters button { padding-inline: 13px; font-size: 12px; }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .public-clay3d .clay-card-hover:hover {
     transform: translateY(-4px);
@@ -219,6 +338,7 @@
   .public-clay3d .clay-stage-podium > div:first-child { padding-inline: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .public-clay3d .showcase-dot::after { transition: none; }
   .public-clay3d .clay-tilt-object { transform: none !important; }
   .public-clay3d .clay-hero-caption { transform: none; }
   .public-clay3d :is(.clay-btn-white, .clay-btn-mint, .clay-btn-emerald, .clay-card-hover):hover { transform: none; }

@@ -25,6 +25,7 @@ import {
   Building,
   MapPin,
   HelpCircle,
+  Layers,
 } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 import { HomeCmsData, DEFAULT_HOME_CMS, normalizeHomeCms } from "@/lib/homeCmsData";
@@ -40,6 +41,7 @@ type SubnavTab =
   | "agenda"
   | "gallery"
   | "closing"
+  | "directory"
   | "sections";
 
 export default function HomeCmsEditorPage() {
@@ -205,6 +207,7 @@ export default function HomeCmsEditorPage() {
     { id: "agenda", label: "Agenda", icon: Calendar },
     { id: "gallery", label: "Galeri", icon: ImageIcon },
     { id: "closing", label: "Ajakan Bergabung", icon: Send },
+    { id: "directory", label: "Direktori Layanan", icon: Layers },
     { id: "sections", label: "Konfigurasi Seksi", icon: Sliders },
   ];
 
@@ -214,6 +217,7 @@ export default function HomeCmsEditorPage() {
   const about = draft?.about || DEFAULT_HOME_CMS.about;
   const sambutan = draft?.sambutan || DEFAULT_HOME_CMS.sambutan;
   const closing = draft?.closing || DEFAULT_HOME_CMS.closing;
+  const directory = draft?.directory || DEFAULT_HOME_CMS.directory!;
   const stats = draft?.stats || DEFAULT_HOME_CMS.stats;
   const sections = draft?.sections || DEFAULT_HOME_CMS.sections;
 
@@ -1710,6 +1714,176 @@ export default function HomeCmsEditorPage() {
         </div>
       )}
 
+      {/* ── 8. DIREKTORI LAYANAN & INFORMASI ── */}
+      {activeTab === "directory" && (
+        <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
+                DIREKTORI LAYANAN
+              </span>
+              <h2 className="text-lg font-black text-emerald-950 mt-1">
+                Direktori Layanan &amp; Informasi (Slider 3D)
+              </h2>
+              <p className="text-xs text-gray-500">
+                Kelola judul, deskripsi, dan kartu direktori yang tampil di bagian bawah beranda publik.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label className="font-bold text-gray-700 block mb-1.5">
+                Judul Seksi Direktori
+              </label>
+              <input
+                type="text"
+                value={directory.title}
+                onChange={(e) => {
+                  setDraft((prev) => ({
+                    ...prev,
+                    directory: {
+                      ...(prev.directory || DEFAULT_HOME_CMS.directory!),
+                      title: e.target.value,
+                    },
+                  }));
+                  setHasChanges(true);
+                }}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-emerald-600 focus:bg-white outline-none font-bold text-gray-900"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-gray-700 block mb-1.5">
+                Sub-judul / Keterangan
+              </label>
+              <input
+                type="text"
+                value={directory.lead}
+                onChange={(e) => {
+                  setDraft((prev) => ({
+                    ...prev,
+                    directory: {
+                      ...(prev.directory || DEFAULT_HOME_CMS.directory!),
+                      lead: e.target.value,
+                    },
+                  }));
+                  setHasChanges(true);
+                }}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-emerald-600 focus:bg-white outline-none text-gray-800"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-emerald-900">
+              Daftar Kartu Direktori ({directory.items.length} Kartu)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              {directory.items.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                      Kartu #{idx + 1}
+                    </span>
+                    <input
+                      type="text"
+                      value={item.tag}
+                      onChange={(e) => {
+                        const updated = [...directory.items];
+                        updated[idx] = { ...item, tag: e.target.value };
+                        setDraft((prev) => ({
+                          ...prev,
+                          directory: {
+                            ...(prev.directory || DEFAULT_HOME_CMS.directory!),
+                            items: updated,
+                          },
+                        }));
+                        setHasChanges(true);
+                      }}
+                      placeholder="TAG KATEGORI"
+                      className="px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-[10px] font-bold uppercase text-emerald-800 outline-none focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-gray-700 block mb-1">
+                      Judul Kartu
+                    </label>
+                    <input
+                      type="text"
+                      value={item.title}
+                      onChange={(e) => {
+                        const updated = [...directory.items];
+                        updated[idx] = { ...item, title: e.target.value };
+                        setDraft((prev) => ({
+                          ...prev,
+                          directory: {
+                            ...(prev.directory || DEFAULT_HOME_CMS.directory!),
+                            items: updated,
+                          },
+                        }));
+                        setHasChanges(true);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 focus:border-emerald-600 outline-none font-bold text-gray-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-gray-700 block mb-1">
+                      Deskripsi Singkat
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={item.description}
+                      onChange={(e) => {
+                        const updated = [...directory.items];
+                        updated[idx] = { ...item, description: e.target.value };
+                        setDraft((prev) => ({
+                          ...prev,
+                          directory: {
+                            ...(prev.directory || DEFAULT_HOME_CMS.directory!),
+                            items: updated,
+                          },
+                        }));
+                        setHasChanges(true);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 focus:border-emerald-600 outline-none text-gray-700 resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-gray-700 block mb-1">
+                      Link Tujuan
+                    </label>
+                    <input
+                      type="text"
+                      value={item.link}
+                      onChange={(e) => {
+                        const updated = [...directory.items];
+                        updated[idx] = { ...item, link: e.target.value };
+                        setDraft((prev) => ({
+                          ...prev,
+                          directory: {
+                            ...(prev.directory || DEFAULT_HOME_CMS.directory!),
+                            items: updated,
+                          },
+                        }));
+                        setHasChanges(true);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 focus:border-emerald-600 outline-none font-mono text-[11px] text-emerald-700"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── 8. KONFIGURASI SEKSI (VISIBILITAS) ── */}
       {activeTab === "sections" && (
         <div className="admin-surface bg-white rounded-3xl p-6 sm:p-8 border border-emerald-950/10 shadow-sm space-y-6 animate-in fade-in duration-150">
@@ -1763,6 +1937,11 @@ export default function HomeCmsEditorPage() {
                 key: "showClosing" as const,
                 label: "7. Closing Banner & Ajakan Daftar",
                 desc: "Ajakan bergabung calon anggota baru dan link ke formulir pendaftaran.",
+              },
+              {
+                key: "showDirectory" as const,
+                label: "8. Direktori Layanan & Informasi",
+                desc: "Slider 3D direktori halaman informasi Rohis SMAPA.",
               },
             ].map((sec) => (
               <div

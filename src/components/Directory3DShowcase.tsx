@@ -9,11 +9,18 @@ import {
   Layers,
   Calendar,
   Camera,
-  Building,
   ArrowRight,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
+const ICON_MAP: Record<string, React.ElementType> = {
+  BookOpen,
+  Users,
+  Layers,
+  Calendar,
+  Camera,
+};
 
 export interface DirectoryItem {
   id: string;
@@ -23,6 +30,22 @@ export interface DirectoryItem {
   shortSubtitle: string;
   description: string;
   link: string;
+}
+
+export interface DirectoryCmsItem {
+  id: string;
+  tag: string;
+  iconName: string;
+  title: string;
+  shortSubtitle: string;
+  description: string;
+  link: string;
+}
+
+interface Directory3DShowcaseProps {
+  title?: string;
+  lead?: string;
+  items?: DirectoryCmsItem[];
 }
 
 const QUICK_EXPLORE_CARDS = [
@@ -97,22 +120,16 @@ const DIRECTORY_ITEMS: DirectoryItem[] = [
     title: "Galeri Syiar & Ukhuwah",
     shortSubtitle: "Dokumentasi kegiatan resmi",
     description:
-      "Arsip dokumentasi visual potret kebersamaan ibadah di Musholla Al-Ikhlas, bakti sosial, dan momen ukhuwah pelajar.",
+      "Arsip dokumentasi visual potret kebersamaan ibadah, bakti sosial, dan momen ukhuwah pelajar SMA Negeri 4 Purwokerto.",
     link: "/galeri",
-  },
-  {
-    id: "musholla",
-    tag: "PUSAT KEGIATAN",
-    icon: Building,
-    title: "Musholla Al-Ikhlas SMAPA",
-    shortSubtitle: "Pusat syiar & pembinaan",
-    description:
-      "Pusat kegiatan ibadah harian, kajian rutin, tahsin Al-Qur'an, dan sekretariat Rohis SMA Negeri 4 Purwokerto.",
-    link: "/tentang#tentang-kami",
   },
 ];
 
-export default function Directory3DShowcase() {
+export default function Directory3DShowcase({
+  title = "Direktori Layanan & Informasi",
+  lead = "Geser atau pilih kartu untuk membuka halaman informasi Rohis SMAPA.",
+  items,
+}: Directory3DShowcaseProps) {
   const prefersReducedMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(2);
   const [isPaused, setIsPaused] = useState(false);
@@ -125,7 +142,22 @@ export default function Directory3DShowcase() {
   const isDragActiveRef = useRef(false);
   const hasMovedRef = useRef(false);
 
-  const total = DIRECTORY_ITEMS.length;
+  const resolvedItems: DirectoryItem[] =
+    items && items.length > 0
+      ? items
+          .filter((item) => item.id !== "musholla")
+          .map((item) => ({
+            id: item.id,
+            tag: item.tag,
+            icon: ICON_MAP[item.iconName] || BookOpen,
+            title: item.title,
+            shortSubtitle: item.shortSubtitle,
+            description: item.description,
+            link: item.link,
+          }))
+      : DIRECTORY_ITEMS;
+
+  const total = resolvedItems.length;
 
   const nextItem = useCallback(() => {
     setActiveIndex((prev) => (prev + 1) % total);
@@ -246,10 +278,10 @@ export default function Directory3DShowcase() {
         {/* 2. 3D Coverflow Directory Showcase */}
         <div className="text-center max-w-xl mx-auto mb-6">
           <h3 className="font-heading text-lg sm:text-xl font-extrabold text-[#153E32]">
-            Direktori Layanan & Informasi
+            {title}
           </h3>
           <p className="text-xs sm:text-sm text-[#4A6B5F] mt-1">
-            Geser atau pilih kartu untuk membuka halaman informasi Rohis SMAPA.
+            {lead}
           </p>
         </div>
 
@@ -301,7 +333,9 @@ export default function Directory3DShowcase() {
             }}
             aria-label="Direktori Sebelumnya"
             style={{
-              transform: prefersReducedMotion ? undefined : "translateZ(120px)",
+              transform: prefersReducedMotion
+                ? undefined
+                : "translateY(-50%) translateZ(120px)",
             }}
             className="absolute left-0 sm:left-2 lg:left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
           >
@@ -317,14 +351,16 @@ export default function Directory3DShowcase() {
             }}
             aria-label="Direktori Berikutnya"
             style={{
-              transform: prefersReducedMotion ? undefined : "translateZ(120px)",
+              transform: prefersReducedMotion
+                ? undefined
+                : "translateY(-50%) translateZ(120px)",
             }}
             className="absolute right-0 sm:right-2 lg:right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-full clay-btn-white flex items-center justify-center text-[#153E32] cursor-pointer"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          {DIRECTORY_ITEMS.map((item, idx) => {
+          {resolvedItems.map((item, idx) => {
             let dist = (idx - activeIndex + total) % total;
             if (dist > total / 2) dist -= total;
 
@@ -456,7 +492,7 @@ export default function Directory3DShowcase() {
 
         {/* Dots */}
         <div className="mt-4 flex items-center justify-center gap-2">
-          {DIRECTORY_ITEMS.map((_, idx) => (
+          {resolvedItems.map((_, idx) => (
             <button
               key={idx}
               type="button"

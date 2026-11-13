@@ -9,11 +9,11 @@ const AUTH_SESSION_KEY = "rohis_admin_auth_session_v1";
 const CUSTOM_PASSWORD_HASH_KEY = "rohis_admin_custom_pw_hash_v2";
 const CUSTOM_USERNAME_KEY = "rohis_admin_custom_username_v1";
 
-export const DEFAULT_ADMIN_USERNAME = "admin";
+export const DEFAULT_ADMIN_USERNAME = "rohissmapa";
 const PASSWORD_SALT = "rohis-smapa-2026-salt!";
 // SHA-256(rohis-smapa-2026-salt!:<default_password>) — tidak ada password plaintext di bundle client
-const DEFAULT_PASSWORD_HASH = "2842b6ff26e3d19fcbef2b59479cc0c704dda730f6b51236d8d2fc0423967db1";
-const VALID_FALLBACK_USERNAMES = ["admin", "rohis", "bph", "admin@sman4purwokerto.sch.id"];
+const DEFAULT_PASSWORD_HASH = "6e907e6659dc98beaaa95595eaf36107529f8107fa2d34de7b1b8936c22cac4a";
+const VALID_FALLBACK_USERNAMES = ["rohissmapa"];
 
 function isLocalhostEnv(): boolean {
   if (typeof window === "undefined") return false;

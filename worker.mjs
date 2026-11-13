@@ -20,8 +20,8 @@ const ALLOWED_ORIGINS = new Set([
 
 const REQUIRED_SCHEMA_VERSION = 3;
 const PASSWORD_SALT = "rohis-smapa-2026-salt!";
-const DEFAULT_PASSWORD_HASH = "2842b6ff26e3d19fcbef2b59479cc0c704dda730f6b51236d8d2fc0423967db1";
-const DEFAULT_VALID_USERNAMES = ["admin", "rohis", "bph", "admin@sman4purwokerto.sch.id"];
+const DEFAULT_PASSWORD_HASH = "6e907e6659dc98beaaa95595eaf36107529f8107fa2d34de7b1b8936c22cac4a";
+const DEFAULT_VALID_USERNAMES = ["rohissmapa"];
 const DEFAULT_HMAC_KEY = "rohis-smapa-edge-hmac-secret-2026-v3-locked#9f8a7c2e";
 const SESSION_COOKIE_NAME = "rohis_admin_session";
 

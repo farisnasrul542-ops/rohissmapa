@@ -100,6 +100,19 @@ export interface HomeCmsData {
     btnSecondaryText: string;
     btnSecondaryLink: string;
   };
+  directory?: {
+    title: string;
+    lead: string;
+    items: Array<{
+      id: string;
+      tag: string;
+      iconName: string;
+      title: string;
+      shortSubtitle: string;
+      description: string;
+      link: string;
+    }>;
+  };
   sections: {
     showHero: boolean;
     showStats: boolean;
@@ -108,6 +121,7 @@ export interface HomeCmsData {
     showAgenda: boolean;
     showGallery: boolean;
     showClosing: boolean;
+    showDirectory?: boolean;
   };
 }
 
@@ -204,15 +218,15 @@ export const DEFAULT_HOME_CMS: HomeCmsData = {
     },
   },
   agenda: {
-    tag: "AGENDA KEGIATAN",
-    title: "Agenda & Kajian Rohis SMAPA",
-    lead: "Informasi jadwal kegiatan, pembinaan syiar, dan kajian dakwah pelajar di lingkungan SMA Negeri 4 Purwokerto.",
-    hintText: "Klik kartu samping atau gunakan tombol panah untuk agenda lain ›",
+    tag: "KEGIATAN ROHIS",
+    title: "Agenda & Kegiatan",
+    lead: "Ruang belajar, bertumbuh, dan berbuat baik bersama.",
+    hintText: "Geser untuk melihat agenda lainnya",
   },
   gallery: {
-    tag: "Dokumentasi Kegiatan",
-    title: "Galeri Syiar & Ukhuwah SMAPA",
-    lead: "Potret nyata aktivitas pembiasaan ibadah di Musholla Al-Ikhlas, kajian keputrian, dan kegiatan kepemimpinan SMA Negeri 4 Purwokerto.",
+    tag: "DOKUMENTASI ROHIS",
+    title: "Galeri Syiar & Ukhuwah",
+    lead: "Cerita kegiatan dan kebersamaan keluarga Rohis SMAPA.",
     items: [
       {
         id: "GAL-001",
@@ -249,6 +263,62 @@ export const DEFAULT_HOME_CMS: HomeCmsData = {
     btnPrimaryLink: "/agenda",
     btnSecondaryText: "Tentang Kami",
     btnSecondaryLink: "/tentang",
+  },
+  directory: {
+    title: "Direktori Layanan & Informasi",
+    lead: "Geser atau pilih kartu untuk membuka halaman informasi Rohis SMAPA.",
+    items: [
+      {
+        id: "profil",
+        tag: "PROFIL & VISI",
+        iconName: "BookOpen",
+        title: "Profil & Sejarah Rohis",
+        shortSubtitle: "Visi, misi & filosofi",
+        description:
+          "Mengenal visi, misi, rekam jejak perjalanan, dan pembiasaan nilai-nilai Islam rahmatan lil 'alamin di SMA Negeri 4 Purwokerto.",
+        link: "/tentang",
+      },
+      {
+        id: "kepengurusan",
+        tag: "STRUKTUR ORGANISASI",
+        iconName: "Users",
+        title: "Dewan Pembina & Pengurus",
+        shortSubtitle: "2 pembina & 44 pengurus",
+        description:
+          "Susunan dewan pembina guru PAI serta 44 pengurus harian (BPH) dan divisi masa bakti 2026/2027.",
+        link: "/tentang#kepengurusan",
+      },
+      {
+        id: "divisi",
+        tag: "DIVISI & PROKER",
+        iconName: "Layers",
+        title: "6 Divisi & Program Kerja",
+        shortSubtitle: "BPH, Pendidikan, Kaderisasi, Humas, Perpusmed, Sarpras",
+        description:
+          "Eksplorasi program kerja unggulan divisi BPH, Pendidikan, Kaderisasi, Humas, Perpusmed, dan Sarpras Rohis SMAPA.",
+        link: "/program",
+      },
+      {
+        id: "agenda",
+        tag: "JADWAL & KEGIATAN",
+        iconName: "Calendar",
+        title: "Agenda & Kegiatan",
+        shortSubtitle: "Kajian & LDKR SMAPA",
+        description:
+          "Jadwal kajian akbar, latihan dasar kepemimpinan (LDKR), keputrian Jumat, dan musyawarah kerja kader.",
+        link: "/agenda",
+      },
+      {
+        id: "galeri",
+        tag: "DOKUMENTASI VISUAL",
+        iconName: "Camera",
+        title: "Galeri Syiar & Ukhuwah",
+        shortSubtitle: "Dokumentasi kegiatan resmi",
+        description:
+          "Arsip dokumentasi visual potret kebersamaan ibadah, bakti sosial, dan momen ukhuwah pelajar SMA Negeri 4 Purwokerto.",
+        link: "/galeri",
+      },
+    ],
   },
   sections: {
     showHero: true,
@@ -452,6 +522,14 @@ export function normalizeHomeCms(raw: any): HomeCmsData {
         raw.closing?.btnSecondaryLink ||
         DEFAULT_HOME_CMS.closing.btnSecondaryLink,
     },
+    directory: {
+      title: raw.directory?.title || DEFAULT_HOME_CMS.directory!.title,
+      lead: raw.directory?.lead || DEFAULT_HOME_CMS.directory!.lead,
+      items:
+        Array.isArray(raw.directory?.items) && raw.directory.items.length > 0
+          ? raw.directory.items.filter((item: any) => item?.id !== "musholla")
+          : DEFAULT_HOME_CMS.directory!.items,
+    },
     sections: {
       showHero: raw.sections?.showHero !== false,
       showStats: false,
@@ -460,6 +538,7 @@ export function normalizeHomeCms(raw: any): HomeCmsData {
       showAgenda: raw.sections?.showAgenda !== false,
       showGallery: raw.sections?.showGallery !== false,
       showClosing: raw.sections?.showClosing !== false,
+      showDirectory: raw.sections?.showDirectory !== false,
     },
   };
 }
