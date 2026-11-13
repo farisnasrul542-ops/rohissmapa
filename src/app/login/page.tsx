@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { usePublicSiteUrl } from "@/hooks/usePublicSiteUrl";
 import {
-  verifyAdminPassword,
-  loginAdminSession,
+  loginWithServerAuth,
+  verifySessionWithServer,
   isAdminAuthenticated,
 } from "@/lib/adminAuth";
 
@@ -22,33 +22,32 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.location.hostname.toLowerCase().includes("rohis-sman4pwt.web.id")
-    ) {
-      window.location.replace("https://rohis-sman4pwt.web.id/");
-      return;
+    if (typeof window !== "undefined") {
+      const host = window.location.hostname.toLowerCase();
+      if (host.includes("rohis-sman4pwt.web.id") || host.includes("rohis-banyumas.web.id")) {
+        window.location.replace(window.location.origin + "/");
+        return;
+      }
     }
     if (isAdminAuthenticated()) {
-      router.replace("/admin");
+      verifySessionWithServer().then((valid) => {
+        if (valid) router.replace("/admin");
+      });
     }
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsLoading(true);
 
-    setTimeout(() => {
-      const valid = verifyAdminPassword(password, username);
-      if (valid) {
-        loginAdminSession(rememberMe);
-        router.push("/admin");
-      } else {
-        setErrorMsg("Username atau Password yang Anda masukkan salah!");
-        setIsLoading(false);
-      }
-    }, 250);
+    const res = await loginWithServerAuth(username, password, rememberMe);
+    if (res.ok) {
+      router.push("/admin");
+    } else {
+      setErrorMsg(res.error || "Username atau Password yang Anda masukkan salah!");
+      setIsLoading(false);
+    }
   };
 
   return (

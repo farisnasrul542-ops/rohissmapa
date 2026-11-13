@@ -4,6 +4,8 @@
  * dengan Website Umum Publik (https://rohis-sman4pwt.web.id/) secara permanen dan real-time.
  */
 
+import { getAdminSessionToken } from "./adminAuth";
+
 export const PUBLIC_SITE_URL = "https://rohis-sman4pwt.web.id/";
 export const ADMIN_PORTAL_URL = "https://rohissmapa.farisnasrul542.workers.dev/";
 export const ROHIS_SCHEMA_VERSION = 3;
@@ -87,11 +89,17 @@ export async function pushCloudSync(partial: CloudSyncPayload): Promise<void> {
   };
 
   const body = JSON.stringify(payloadWithTime);
+  const token = getAdminSessionToken();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
 
   const workerRequests = SYNC_ENDPOINTS.map((endpoint) =>
     fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
+      credentials: "include",
       body,
     }).catch(() => null)
   );

@@ -19,11 +19,11 @@ import { useAdminOverlay } from "@/hooks/useAdminOverlay";
 import { usePublicSiteUrl } from "@/hooks/usePublicSiteUrl";
 import {
   isAdminAuthenticated,
-  verifyAdminPassword,
-  loginAdminSession,
+  loginWithServerAuth,
+  verifySessionWithServer,
+  changeAdminCredentialsWithServer,
   getStoredAdminUsername,
-  getStoredAdminPassword,
-  updateAdminCredentials,
+  logoutAdmin,
 } from "@/lib/adminAuth";
 
 export default function AdminLayout({
@@ -59,19 +59,22 @@ export default function AdminLayout({
   } | null>(null);
 
   useEffect(() => {
-    // Jika dibuka dari domain publik (rohis-sman4pwt.web.id), alihkan ke beranda publik
-    if (
-      typeof window !== "undefined" &&
-      window.location.hostname.toLowerCase().includes("rohis-sman4pwt.web.id")
-    ) {
-      window.location.replace("https://rohis-sman4pwt.web.id/");
-      return;
+    // Jika dibuka dari domain publik (rohis-sman4pwt.web.id / rohis-banyumas.web.id), alihkan ke beranda publik
+    if (typeof window !== "undefined") {
+      const host = window.location.hostname.toLowerCase();
+      if (host.includes("rohis-sman4pwt.web.id") || host.includes("rohis-banyumas.web.id")) {
+        window.location.replace(window.location.origin + "/");
+        return;
+      }
     }
 
     queueMicrotask(() => {
       setMounted(true);
       setAuthenticated(isAdminAuthenticated());
       setAccUsername(getStoredAdminUsername());
+      verifySessionWithServer().then((valid) => {
+        setAuthenticated(valid);
+      });
     });
 
     const syncAuth = () => {
@@ -86,22 +89,44 @@ export default function AdminLayout({
     };
   }, []);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  // Auto-logout jika tidak ada aktivitas selama 30 menit
+  useEffect(() => {
+    if (!authenticated || typeof window === "undefined") return;
+    let timer: ReturnType<typeof setTimeout>;
+    const IDLE_LIMIT_MS = 30 * 60 * 1000;
+
+    const resetIdleTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        logoutAdmin();
+        setAuthenticated(false);
+        setErrorMsg("Sesi admin dikunci otomatis karena tidak ada aktivitas selama 30 menit.");
+      }, IDLE_LIMIT_MS);
+    };
+
+    const events = ["mousedown", "keydown", "touchstart", "scroll"];
+    events.forEach((ev) => window.addEventListener(ev, resetIdleTimer, { passive: true }));
+    resetIdleTimer();
+
+    return () => {
+      clearTimeout(timer);
+      events.forEach((ev) => window.removeEventListener(ev, resetIdleTimer));
+    };
+  }, [authenticated]);
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsVerifying(true);
 
-    setTimeout(() => {
-      const isValid = verifyAdminPassword(password, username);
-      if (isValid) {
-        loginAdminSession(rememberMe);
-        setAuthenticated(true);
-        setPassword("");
-      } else {
-        setErrorMsg("Username atau Password yang Anda masukkan salah!");
-      }
-      setIsVerifying(false);
-    }, 250);
+    const res = await loginWithServerAuth(username, password, rememberMe);
+    if (res.ok) {
+      setAuthenticated(true);
+      setPassword("");
+    } else {
+      setErrorMsg(res.error || "Username atau Password yang Anda masukkan salah!");
+    }
+    setIsVerifying(false);
   };
 
   const openAccountModal = () => {
@@ -114,18 +139,8 @@ export default function AdminLayout({
     setAccountModalOpen(true);
   };
 
-  const handleSaveAccount = (e: React.FormEvent) => {
+  const handleSaveAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    const actualCurrent = getStoredAdminPassword();
-
-    if (currentPw !== actualCurrent) {
-      setAccFeedback({
-        type: "error",
-        text: "Password saat ini salah!",
-      });
-      return;
-    }
-
     if (newPw.trim().length > 0 && newPw.trim().length < 4) {
       setAccFeedback({
         type: "error",
@@ -134,17 +149,26 @@ export default function AdminLayout({
       return;
     }
 
-    const finalPw = newPw.trim() ? newPw.trim() : actualCurrent;
-    const finalUser = accUsername.trim() || "admin";
+    const res = await changeAdminCredentialsWithServer(
+      currentPw,
+      newPw.trim(),
+      accUsername.trim() || "admin"
+    );
 
-    updateAdminCredentials(finalPw, finalUser);
-    setAccFeedback({
-      type: "success",
-      text: "Pengaturan akun berhasil disimpan!",
-    });
-    setTimeout(() => {
-      setAccountModalOpen(false);
-    }, 900);
+    if (res.ok) {
+      setAccFeedback({
+        type: "success",
+        text: "Pengaturan akun berhasil disimpan & disinkronkan!",
+      });
+      setTimeout(() => {
+        setAccountModalOpen(false);
+      }, 900);
+    } else {
+      setAccFeedback({
+        type: "error",
+        text: res.error || "Password saat ini salah!",
+      });
+    }
   };
 
   if (!mounted) {

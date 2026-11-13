@@ -4,6 +4,8 @@
  * sehingga otomatis terkunci ke sistem web dan bisa dilihat di semua perangkat (HP & PC).
  */
 
+import { getAdminSessionToken } from "./adminAuth";
+
 export function dataUrlToBlob(dataUrl: string): Blob {
   const arr = dataUrl.split(",");
   const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
@@ -34,10 +36,17 @@ export async function uploadImageToWebSystem(
     "https://rohis-sman4pwt.web.id/api/upload-image",
   ];
 
+  const token = getAdminSessionToken();
+  const authHeaders: Record<string, string> = token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
+
   for (const ep of endpoints) {
     try {
       const res = await fetch(ep, {
         method: "POST",
+        headers: authHeaders,
+        credentials: "include",
         body: formData,
       });
       if (res.ok) {
